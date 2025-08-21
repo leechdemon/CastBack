@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 if(!function_exists('Test')) { // PHP script to dump variable into JavaScript console on front-end.
 	function Test($output, $with_script_tags = false) {
@@ -33,3 +33,19 @@ function castback_admin_edit_listing( $wp_admin_bar ) {
 			$wp_admin_bar->add_node( $args );
 		}
 } add_action( 'admin_bar_menu', 'castback_admin_edit_listing', 90 );
+
+function castback_admin_edit_order( $wp_admin_bar ) {
+		if( $_GET['order_id'] ) {
+			$url = get_site_URL() . '/wp-admin/admin.php?page=wc-orders&action=edit&id='.$_GET['order_id'].'&action=edit';
+			$args = array(
+					'id'    => 'edit-order', // Unique ID for your link
+					'title' => 'Edit Order', // Text displayed in the admin bar
+					'href'  => $url,
+					'meta'  => array(
+							'class' => 'my-custom-link-class', // Optional: Add a custom CSS class
+							'title' => 'Links directly to "Edit Order" in Admin', // Optional: Add a tooltip
+					),
+			);
+			$wp_admin_bar->add_node( $args );
+		}
+} add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );

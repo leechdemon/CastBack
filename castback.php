@@ -3,7 +3,7 @@
 Plugin Name: CastBack
 Description: A Wordpress plugin to manage Listings, Offers, and other CastBack tools. Creates Shortcodes for use with Elementor.
 Author: Leechdemon
-Version: 0.1
+Version: 0.2
 */
 
 require_once plugin_dir_path(__FILE__) . 'tools.php';
@@ -11,6 +11,7 @@ require_once plugin_dir_path(__FILE__) . 'tools.php';
 require_once plugin_dir_path(__FILE__) . 'includes/queries.php';
 require_once plugin_dir_path(__FILE__) . 'includes/shortcodes.php';
 require_once plugin_dir_path(__FILE__) . 'includes/listings.php';
+require_once plugin_dir_path(__FILE__) . 'includes/offers.php';
 
 // global $cc_db_version, $cc_workshop_db_version, $cc_waitlist_db_version;
 // $cc_db_version = '1.2.9';

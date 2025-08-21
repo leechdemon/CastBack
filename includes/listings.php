@@ -1,44 +1,78 @@
 <?php
 
-function acf_pre_save_post($post_id) {
-	// Front-end works 100%
-	// Back-end does nothing
+
+function CastBack_add_new_listing($atts, $content = null) {
+	extract(shortcode_atts(array( 'name' => null, 'class' => null ), $atts));
 	
-	// if( ! is_admin() ) {
-		if ( empty($_POST['acf']) ) { return; }
-
-		/* If we have POST data, set the variable. If not, set the variable from existing ACF. */
-		$MSRP = $_POST['acf']['field_68964cb9355ee'];
-		$ListingPrice = $_POST['acf']['field_68964c94355ed'];
-
-		/* Handle Variables*/
-		if( $MSRP ) { $MSRP = number_format( $MSRP, 2 ); }
-		if( $ListingPrice ) { $ListingPrice = number_format( $ListingPrice, 2 ); }
-		// if( $MSRP < $ListingPrice ) { $MSRP = $ListingPrice; }
-
-		/* Set Fields from variables */
-		update_post_meta( $post_id, '_regular_price', $ListingPrice );
-		// update_post_meta( $post_id, '_sale_price', $ListingPrice );
-		
-		/* Resync ACF from variables */ 
-		$_POST['acf']['field_68964cb9355ee'] = $MSRP;
-		$_POST['acf']['field_68964c94355ed'] = $ListingPrice;
-		
-
-
-		/* Set Category from Listing Type */
-		if ( !empty( $_POST['acf']['field_68644913a0ab7'] ) ) {
-			$term = get_term_by( 'slug', $_POST['acf']['field_68644913a0ab7'], 'product_cat' );
-			wp_set_post_terms( $post_id, $term->term_id, 'product_cat', false );
-		}
-		
-		/* Image Handling */
-		set_post_thumbnail( $post_id, get_field( 'images', $post_id )[0]['image']['id'] );
-		
-		
-		return $post_id;
-	// }
-} add_action('acf/pre_save_post', 'acf_pre_save_post', 10 );
+	ob_start();
+	acf_form_head();
+	acf_form(array(
+		// 'form_attributes'   => array(
+			// 'method'	=>	'post',
+			// 'class'		=>	'acf-form',
+			// 'class'		=>	'',
+		// ),
+		'post_id'   => 'new_post',
+		'new_post'  => array(
+				'post_title'   => 'New Listing',
+				'post_type'   => 'product',
+				'post_status' => 'publish',
+			// 'post_parent' => $parentID,
+			// 'page_template' => 'custom-comic.php',
+		),
+		// 'field_groups' => array('group_687295e704ff8',),
+		'uploader'		=> 'basic',
+		'submit_value' => 'Create New Listing',
+		'return'	=> get_site_url().'/selling/edit?listing_id=%post_id%',
+	));
+	
+	return ob_get_clean();
+} add_shortcode('CastBack_add_new_listing', 'CastBack_add_new_listing');
+function Castback_edit_listing_url($atts, $content = null) {
+	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null ), $atts));
+	return '<a class="button" href="'.get_site_url().'/selling/edit?listing_id='.$listing_id.'">Edit Listing</a>';
+} add_shortcode('Castback_edit_listing_url', 'Castback_edit_listing_url');
+function Castback_edit_listing($atts, $content = null) {
+	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null ), $atts));
+	
+	ob_start(); 
+	
+	// echo '<strong>'. get_the_terms( $listing_id, 'product_cat' ) .'</strong><br>';
+	// echo get_the_terms( $listing_id, 'product_cat' )[0]->name;
+	
+	if( get_current_user_id() == get_post_field( 'post_author', $listing_id ) ) {
+		acf_form_head();
+		acf_form(array(
+			// 'form_attributes'   => array(
+				// 'method'	=>	'post',
+				// 'class'		=>	'acf-form',
+				// 'class'		=>	'',
+			// ),
+			'post_title'   => true,
+			'post_id'   => $listing_id,
+			// 'new_post'  => array(
+				// 'post_title'   => 'Test '.$comicNumber,
+				// 'post_type'   => 'product',
+			'post_status' => 'publish',
+			// 'product_cat' => $_POST['acf']['field_68644913a0ab7'],
+			// 'post_parent' => $parentID,
+				// 'page_template' => 'custom-comic.php',
+			// ),
+			// 'field_groups' => array('group_687295e704ff8',),
+			// 'field_groups' => array(503,),
+			'uploader'		=> 'basic',
+			'submit_value' => 'Save Listing',
+			// 'return'	=> get_site_url() .'/selling/edit?listing=%post_id%',
+		));
+	} else {
+		echo 'This is not your Listing. Please check your URL, or log out/in and try again.';
+	}
+	
+	// $term = get_term_by( 'name', $_POST['acf']['field_68644913a0ab7'], 'product_cat' );
+	// echo $term->term_id;
+	
+	return ob_get_clean();
+} add_shortcode('Castback_edit_listing', 'Castback_edit_listing');
 
 
 	// extract(shortcode_atts(array( 'listing_id' => null, 'class' => null ), $atts));
