@@ -1,6 +1,7 @@
 <?php
 
 function CastBack_make_offer($atts, $content = null) {
+	$customer_id = get_current_user_id();
 	$listing_id = $_GET['listing_id'];
 	$args = array(
 			'status'        => 'wc-checkout-draft', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
@@ -12,7 +13,6 @@ function CastBack_make_offer($atts, $content = null) {
 	$order_id = $order->get_id();
 	
 	/* Set ACF fields */
-	$customer_id = get_current_user_id();
 	update_field( 'customer_id', $customer_id, $order_id );
 
 	$seller_id = get_the_author_ID();
@@ -28,19 +28,19 @@ function CastBack_make_offer($atts, $content = null) {
 	update_field( 'waiting_on', $customer_id, $order_id );
 
 	/* Set Order Details */
-	$quantity = 1;
-	$args = array(
+// $quantity = 1;
+// $args = array(
 		// 'name'         => $product->get_name(),
 		// 'tax_class'    => $product->get_tax_class(),
 		// 'product_id'   => $product->is_type( ProductType::VARIATION ) ? $product->get_parent_id() : $product->get_id(),
 		// 'variation_id' => $product->is_type( ProductType::VARIATION ) ? $product->get_id() : 0,
 		// 'variation'    => $product->is_type( ProductType::VARIATION ) ? $product->get_attributes() : array(),
-		'subtotal'     		=> $listing_price,
-		'total'						=> $listing_price,
+	// 'subtotal'     		=> $listing_price,
+	// 'total'						=> $listing_price,
 		// 'total'       	 => $total,
 		// 'quantity'     => $qty,
-	);
-	$order->add_product( wc_get_product( $listing_id ), $quantity, $args );
+// );
+// $order->add_product( wc_get_product( $listing_id ), $quantity, $args );
 
 	// Example: Setting billing and shipping addresses
 	// $billing_address = array(
@@ -114,23 +114,68 @@ function CastBack_offers($atts, $content = null) {
 			WaitingOnToggle();
 		}
 		if( $_GET['action'] == 'accept_offer' ) {
+			$order_amount = number_format( get_field( 'order_amount', $order_id ), 2 );
 			update_field( 'accepted_date', date('F j, Y g:i a'), $order_id );
 
 			// WaitingOnToggle();
 			/* force WaitingOn to buyer */
 			update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
 			
+			
+			
 			$order->update_status('wc-payment');
+			
+			$offers = get_field( 'offers', $_GET['order_id'] );
+			$order_amount = $offers[0]['offer_amount'];
+
+			$listing_id = get_field( 'listing_id', $order_id );
+
+			/* Set Order Details */
+			$quantity = 1;
+			$args = array(
+				'name'       		  => get_the_title( $listing_id ),
+				// 'tax_class'    => $product->get_tax_class(),
+				'product_id'   		=> $listing_id,
+				// 'variation_id' => $product->is_type( ProductType::VARIATION ) ? $product->get_id() : 0,
+				'variation'    		=> $listing_id,
+				'subtotal'     		=> $order_amount,
+				'total'						=> $order_amount,
+				'price'						=> $order_amount,
+			);
+			$order->add_product( wc_get_product( $listing_id ), $quantity, $args );
+
+			// Example: Setting billing and shipping addresses
+			// $billing_address = array(
+					// 'first_name' => 'John',
+					// 'last_name'  => 'Doe',
+					// 'address_1'  => '123 Main St',
+					// 'city'       => 'Anytown',
+					// 'state'      => 'CA',
+					// 'postcode'   => '12345',
+					// 'country'    => 'US',
+					// 'email'      => 'john.doe@example.com',
+					// 'phone'      => '555-123-4567',
+			// );
+			// $order->set_address( $billing_address, 'billing' );
+			// $order->set_address( $billing_address, 'shipping' ); // Can be different if needed
+
+			// Calculate totals after adding items and setting addresses
+			$order->calculate_totals();
+
+			// Save the order to the database
+			$order->save();
+			
+			/* "Waiting On" is toggled via "woocommerce_payment_complete" */
 		}
 		if( $_GET['action'] == 'submit_payment' ) {
-			$order_id = $_GET['order_id'];
-			update_field( 'payment_date', date('F j, Y g:i a'), $order_id );
+			// $order_id = $_GET['order_id'];
+			// update_field( 'payment_date', date('F j, Y g:i a'), $order_id );
 
 			// WaitingOnToggle();
 			/* force WaitingOn to seller */
-			update_field( 'waiting_on', get_field( 'seller_id', $order_id ), $order_id );
+			// update_field( 'waiting_on', get_field( 'seller_id', $order_id ), $order_id );
 			
-			$order->update_status('wc-processing');
+			// $order->update_status('wc-processing');
 		}
 		if( $_GET['action'] == 'ship_order' ) {
 			$order_id = $_GET['order_id'];
@@ -169,150 +214,162 @@ function CastBack_offers($atts, $content = null) {
 		$waitingOn = get_field( 'waiting_on', $order_id );
 		$name = get_userdata( $waitingOn );
 		$order = wc_get_order( $order_id );
-		$orderStatus = $order->get_status();
+		if( $order ) {
+			$orderStatus = $order->get_status();
 		
-		$orderStatusCosmetic = $orderStatus;
-		switch( $orderStatus ) {
-			case 'checkout-draft':
-				$orderStatusCosmetic = 'Draft';
-				break;
-			case 'pending':
-				$orderStatusCosmetic = 'Pending Payment';
-				break;
-			case 'processing':
-				if( get_field( 'shipped_date', $order_id ) ) {  
-					$orderStatusCosmetic = 'Processing (Shipped)';
-				}
-				else {
-					$orderStatusCosmetic = 'Processing (Awaiting Shipment)';
-				}
-				break;
-			case 'completed':
-				$orderStatusCosmetic = 'Complete';
-				break;
-		}
-		echo '<h5 style="margin-left: 1rem;">Order Status: '.$orderStatusCosmetic.'</h5>';
-		if( $name ) { echo '<h5 style="margin-left: 1rem;">Waiting On: '.$name->first_name .' '.$name->last_name.'</h5>'; }
-		echo '<br>';
+			$orderStatusCosmetic = $orderStatus;
+			switch( $orderStatus ) {
+				case 'checkout-draft':
+					$orderStatusCosmetic = 'Draft';
+					break;
+				case 'pending':
+					$orderStatusCosmetic = 'Pending Payment';
+					break;
+				case 'processing':
+					if( get_field( 'shipped_date', $order_id ) ) {  
+						$orderStatusCosmetic = 'Processing (Shipped)';
+					}
+					else {
+						$orderStatusCosmetic = 'Processing (Awaiting Shipment)';
+					}
+					break;
+				case 'completed':
+					$orderStatusCosmetic = 'Complete';
+					break;
+			}
+			echo '<h5 style="margin-left: 1rem;">Order Status: '.$orderStatusCosmetic.'</h5>';
+			if( $name ) { echo '<h5 style="margin-left: 1rem;">Waiting On: '.$name->first_name .' '.$name->last_name.'</h5>'; }
+			echo '<br>';
 
-		/* Display the Listing */
-		$listing_id = get_field( 'listing_id', $order_id );
-		$args = array(
-				'p'							 =>	$listing_id,
-				'post_type'      => 'product', // or 'page', 'custom_post_type'
-				'posts_per_page' => 1,
-		);
-		$custom_query = new WP_Query( $args );
-		if ( $custom_query->have_posts() ) {
-			while ( $custom_query->have_posts() ) {
-				$custom_query->the_post();
-				echo '<div style="max-width: 288px; float: right; display: block;">';
-				echo do_shortcode('[elementor-template id="822"]');
+			/* Display the Listing */
+			$listing_id = get_field( 'listing_id', $order_id );
+			$args = array(
+					'p'							 =>	$listing_id,
+					'post_type'      => 'product', // or 'page', 'custom_post_type'
+					'posts_per_page' => 1,
+			);
+			$custom_query = new WP_Query( $args );
+			if ( $custom_query->have_posts() ) {
+				while ( $custom_query->have_posts() ) {
+					$custom_query->the_post();
+					echo '<div style="max-width: 288px; float: right; display: block;">';
+					echo do_shortcode('[elementor-template id="822"]');
+					echo '</div>';
+				}
+			} else {
+				// No posts found
+				echo '<p>No posts found matching your criteria.</p>';
+			}
+			wp_reset_postdata();
+
+			/* Display Offer History */
+			$offers = get_field( 'offers', $_GET['order_id'] );
+			if( $offers ) {
+				echo '<style>#offer_history { display: table; width: auto; border: solid 1px black; }</style>';
+				echo '<style>.offer_history_item:nth-child(odd) { background-color: #d4efef; }</style>';
+				echo '<style>.offer_history_item:nth-child(even) { background-color: #aad3d3; }</style>';
+				echo '<style>.offer_history_item  { width: 100%; float: left; }</style>';
+				echo '<style>.offer_history_subitem  { float: left; text-align: right; padding: 0.5rem; }</style>';
+
+				echo '<div id="offer_history">';
+				foreach( $offers as $offer ) {
+					echo '<div class="offer_history_item">';
+						echo '<div class="offer_history_subitem" style="width: 35%;">'. $offer['offer_date'] . '</div>';
+						echo '<div class="offer_history_subitem" style="width: 15%;">$'. $offer['offer_amount'] . '</div>';
+						$name = get_userdata( $offer['offer_user_id'] );
+						echo '<div class="offer_history_subitem" style="width: auto;">'. $name->first_name .' '.$name->last_name . '</div>';
+						// echo '<div style="width: 30%; float: left;">'. $name. '</div>';
+					echo '</div>'; // end order history item
+				}
+				echo '</div>'; // end order history
+			}
+			
+			/* Display Buttons / ACF Form */
+			acf_form_head();
+			/* Accept / Submit Offer */
+			if( get_current_user_id() == $waitingOn && !get_field( 'accepted_date', $order_id ) ) {
+				echo '<div style="width: 50%; float: left;">';
+
+				/* Submit Offer */
+				acf_form(array(
+					'post_id'   => $_GET['order_id'],
+					'field_groups' => array('group_689a2f343751f',),
+					'uploader'		=> 'basic',
+					'submit_value' => 'Submit Offer',
+					// 'form' => false,
+					'return' => '?order_id='.$_GET['order_id'].'&action=submit_offer'
+				));
+				
+				/* Accept Offer */
+				if( $offers ) {
+					acf_form(array(
+						'post_id'   => $_GET['order_id'],
+						// 'status'    => 'wc-pending', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
+						// 'field_groups' => array('group_689a2f343751f',),
+						'uploader'		=> 'basic',
+						'submit_value' => 'Accept Offer',
+						// 'form' => false,
+						'return' => '?order_id='.$_GET['order_id'].'&action=accept_offer'
+					));
+				}
+		
+				echo '</div>';
+			}		
+			/* Submit Payment */
+			if( get_current_user_id() == $waitingOn && get_field( 'accepted_date', $order_id ) && !get_field( 'payment_date', $order_id ) ) {
+				echo '<div style="width: 50%; float: left;">';
+
+				// acf_form(array(
+					// 'post_id'   => $_GET['order_id'],
+					// 'status'    => 'wc-processing', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
+					// 'field_groups' => array('group_689a2f343751f',),
+					// 'uploader'		=> 'basic',
+					// 'submit_value' => 'Submit Payment (Test Status)',
+					// 'form' => false,
+					// 'return' => '?order_id='.$_GET['order_id'].'&action=submit_payment'
+				// ));
+				
+				$payment_url = $order->get_checkout_payment_url();
+				echo '<a class="button" href="'.$payment_url.'">Pay Order</a>';
+				
+				
+		
+				echo '</div>';
+			}
+			/* Ship Order */
+			if( get_current_user_id() == $waitingOn && get_field( 'payment_date', $order_id ) && !get_field( 'shipped_date', $order_id ) ) {
+				echo '<div style="width: 50%; float: left;">';
+
+				acf_form(array(
+					'post_id'   => $_GET['order_id'],
+					// 'status'    => 'wc-processing', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
+					// 'field_groups' => array('group_689a2f343751f',),
+					'uploader'		=> 'basic',
+					'submit_value' => 'Ship Order',
+					// 'form' => false,
+					'return' => '?order_id='.$_GET['order_id'].'&action=ship_order'
+				));
+		
+				echo '</div>';
+			}
+			/* Complete Order */
+			if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) && !get_field( 'completed_date', $order_id ) ) {
+				echo '<div style="width: 50%; float: left;">';
+
+				acf_form(array(
+					'post_id'   => $_GET['order_id'],
+					// 'status'    => 'wc-processing', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
+					// 'field_groups' => array('group_689a2f343751f',),
+					'uploader'		=> 'basic',
+					'submit_value' => 'Complete Order',
+					// 'form' => false,
+					'return' => '?order_id='.$_GET['order_id'].'&action=complete_order'
+				));
+		
 				echo '</div>';
 			}
 		} else {
-			// No posts found
-			echo '<p>No posts found matching your criteria.</p>';
-		}
-		wp_reset_postdata();
-
-		/* Display Offer History */
-		$offers = get_field( 'offers', $_GET['order_id'] );
-		if( $offers ) {
-			echo '<style>#offer_history { display: table; width: auto; border: solid 1px black; }</style>';
-			echo '<style>.offer_history_item:nth-child(odd) { background-color: #d4efef; }</style>';
-			echo '<style>.offer_history_item:nth-child(even) { background-color: #aad3d3; }</style>';
-			echo '<style>.offer_history_item  { width: 100%; float: left; }</style>';
-			echo '<style>.offer_history_subitem  { float: left; text-align: right; padding: 0.5rem; }</style>';
-
-			echo '<div id="offer_history">';
-			foreach( $offers as $offer ) {
-				echo '<div class="offer_history_item">';
-					echo '<div class="offer_history_subitem" style="width: 35%;">'. $offer['offer_date'] . '</div>';
-					echo '<div class="offer_history_subitem" style="width: 15%;">$'. $offer['offer_amount'] . '</div>';
-					$name = get_userdata( $offer['offer_user_id'] );
-					echo '<div class="offer_history_subitem" style="width: auto;">'. $name->first_name .' '.$name->last_name . '</div>';
-					// echo '<div style="width: 30%; float: left;">'. $name. '</div>';
-				echo '</div>'; // end order history item
-			}
-			echo '</div>'; // end order history
-		}
-		
-		/* Display Buttons / ACF Form */
-		acf_form_head();
-		if( get_current_user_id() == $waitingOn && !get_field( 'accepted_date', $order_id ) ) {
-			echo '<div style="width: 50%; float: left;">';
-
-			/* Submit Offer */
-			acf_form(array(
-				'post_id'   => $_GET['order_id'],
-				'field_groups' => array('group_689a2f343751f',),
-				'uploader'		=> 'basic',
-				'submit_value' => 'Submit Offer',
-				// 'form' => false,
-				'return' => '?order_id='.$_GET['order_id'].'&action=submit_offer'
-			));
-			
-			/* Accept Offer */
-			acf_form(array(
-				'post_id'   => $_GET['order_id'],
-				// 'status'    => 'wc-pending', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
-				// 'field_groups' => array('group_689a2f343751f',),
-				'uploader'		=> 'basic',
-				'submit_value' => 'Accept Offer',
-				// 'form' => false,
-				'return' => '?order_id='.$_GET['order_id'].'&action=accept_offer'
-			));
-	
-			echo '</div>';
-		}		
-		if( get_current_user_id() == $waitingOn && get_field( 'accepted_date', $order_id ) && !get_field( 'payment_date', $order_id ) ) {
-			echo '<div style="width: 50%; float: left;">';
-
-			/* Accept Offer */
-			acf_form(array(
-				'post_id'   => $_GET['order_id'],
-				// 'status'    => 'wc-processing', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
-				// 'field_groups' => array('group_689a2f343751f',),
-				'uploader'		=> 'basic',
-				'submit_value' => 'Submit Payment',
-				// 'form' => false,
-				'return' => '?order_id='.$_GET['order_id'].'&action=submit_payment'
-			));
-	
-			echo '</div>';
-		}
-		if( get_current_user_id() == $waitingOn && get_field( 'payment_date', $order_id ) && !get_field( 'shipped_date', $order_id ) ) {
-			echo '<div style="width: 50%; float: left;">';
-
-			/* Accept Offer */
-			acf_form(array(
-				'post_id'   => $_GET['order_id'],
-				// 'status'    => 'wc-processing', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
-				// 'field_groups' => array('group_689a2f343751f',),
-				'uploader'		=> 'basic',
-				'submit_value' => 'Ship Order',
-				// 'form' => false,
-				'return' => '?order_id='.$_GET['order_id'].'&action=ship_order'
-			));
-	
-			echo '</div>';
-		}
-		if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) && !get_field( 'completed_date', $order_id ) ) {
-			echo '<div style="width: 50%; float: left;">';
-
-			/* Accept Offer */
-			acf_form(array(
-				'post_id'   => $_GET['order_id'],
-				// 'status'    => 'wc-processing', // Set initial status, e.g., 'wc-pending', 'wc-processing', 'wc-completed'
-				// 'field_groups' => array('group_689a2f343751f',),
-				'uploader'		=> 'basic',
-				'submit_value' => 'Complete Order',
-				// 'form' => false,
-				'return' => '?order_id='.$_GET['order_id'].'&action=complete_order'
-			));
-	
-			echo '</div>';
+			echo  "order not found.";
 		}
 		
 	} else {
@@ -339,3 +396,12 @@ function CastBack_offers($atts, $content = null) {
 	}
 	return ob_get_clean();
 } add_shortcode('CastBack_offers', 'CastBack_offers');
+
+function so_payment_complete( $order_id ){
+    // $order = wc_get_order( $order_id );
+		update_field( 'waiting_on', get_field( 'seller_id', $order_id ), $order_id );
+		update_field( 'payment_date', date('F j, Y g:i a'), $order_id );
+
+		
+		
+} add_action( 'woocommerce_payment_complete', 'so_payment_complete' );
