@@ -8,16 +8,6 @@ if(!function_exists('Test')) { // PHP script to dump variable into JavaScript co
 	 }
 }
 
-//if(!function_exists('OutputTemplateSlug')) {
-//	function OutputTemplateSlug() {	
-//		$Display = false;	
-//		if($Display) {
-//			global $template;
-//			echo '<script>console.log("Template: ' .basename($template).'");</script>';
-//		}
-//	} add_action( 'wp_head', 'OutputTemplateSlug' );
-//}
-
 function castback_admin_edit_listing( $wp_admin_bar ) {
 		if( $_GET['listing_id'] ) {
 			$url = get_site_URL() . '/wp-admin/post.php?post='.$_GET['listing_id'].'&action=edit';
@@ -49,3 +39,142 @@ function castback_admin_edit_order( $wp_admin_bar ) {
 			$wp_admin_bar->add_node( $args );
 		}
 } add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
+
+function castback_login_redirect( $redirect_to, $requested_redirect_to, $user ) {
+		if ( is_a( $user, 'WP_User' ) && $user->has_cap( 'administrator' ) ) {
+				return admin_url(); // Redirect to the admin dashboard
+		} else {
+				$url = get_site_URL() . '/my-account';
+				return $url; // Redirect to the homepage for other users
+		}
+} add_filter( 'login_redirect', 'castback_login_redirect', 10, 3 );
+
+
+function castback_cron_noExpiredDate() {
+	$args = array(
+		'status' => 'wc-checkout-draft', // Get completed orders
+		// 'limit'  => 10,           // Retrieve up to 10 orders
+		'orderby' => 'date',      // Order by date
+		'order'  => 'DESC',  
+		// 'customer_id'  => get_current_user_id(),  
+		// 'meta_query' => array(
+			// array(
+					// 'key'     => 'offers_0_offer_amount',
+					// 'value'   => 'example_value',
+					// 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
+			// ),
+		// ),
+	);
+
+	$orders = wc_get_orders( $args );
+	foreach( $orders as $order ) {
+		$order_id = $order->get_id();				
+		$offers = get_field( 'offers', $order_id );
+    	foreach( $offers as $key => $offer ) {
+    		// $cron_no_offer_expired_date_days = get_field( 'cron_no_offer_expired_date_days', 'option' );
+    		// $offer_expired_date = date('F j, Y g:i a', strtotime( '+'.$cron_no_offer_expired_date_days.' days', strtotime( $offer['offer_date'] ) ) );
+    		$cron_no_offer_expired_date_days = 5;
+    		$offer_expired_date = date('F j, Y g:i a', strtotime( '+'.$cron_no_offer_expired_date_days.' minutes', strtotime( $offer['offer_date'] ) ) );
+    		
+    		
+    		$offer_expired = strtotime( '+5 minutes', strtotime( $offer['offer_date'] ) );
+    		$currentTime = strtotime( date('F j, Y g:i a') );
+    		
+    		if( $currentTime > $offer_expired ) {
+    		    castback_offer_expiration( $order_id, $key );
+    		}
+    	}
+	}
+} add_action( 'castback_cron', 'castback_cron_noExpiredDate' );
+function castback_cron_noShippedDate() {
+	
+	$args = array(
+		'status' => 'processing', // Get completed orders
+		// 'limit'  => 10,           // Retrieve up to 10 orders
+		'orderby' => 'date',      // Order by date
+		'order'  => 'DESC',  
+		// 'customer_id'  => get_current_user_id(),  
+		// 'meta_query' => array(
+			// array(
+					// 'key'     => 'offers_0_offer_amount',
+					// 'value'   => 'example_value',
+					// 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
+			// ),
+		// ),
+	);
+
+	$orders = wc_get_orders( $args );
+	foreach( $orders as $order ) {
+		$order_id = $order->get_id();				
+		if( get_field( 'shipped_date', $order_id ) == '' ) {
+			
+    		// $cron_no_offer_expired_date_days = get_field( 'cron_no_offer_expired_date_days', 'option' );
+	    	// $offer_expired_date = date('F j, Y g:i a', strtotime( '+'.$cron_no_offer_expired_date_days.' days', strtotime( $offer['offer_date'] ) ) );
+
+				$cron_no_shipping_refund_date_days = 5;
+    		$offer_expired_date = date('F j, Y g:i a',
+    		    strtotime( '+'.$cron_no_shipping_refund_date_days.' minutes',
+        		    strtotime( get_field( 'payment_date', $order_id ) )
+    		    )
+    		);
+    		
+    		$offer_expired = strtotime( '+5 minutes', strtotime( get_field( 'payment_date', $order_id ) ) );
+    		$currentTime = strtotime( date('F j, Y g:i a') );
+    		
+    		if( $currentTime > $offer_expired ) {
+    		    update_field( 'disputed_date', $currentTime, $order_id );
+    		}
+		}
+	}
+} add_action( 'castback_cron', 'castback_cron_noShippedDate' );
+
+function Castback_tools_complete_order( $order_id ) {
+	update_field( 'completed_date', date('F j, Y g:i a'), $order_id );
+
+	// WaitingOnToggle();
+	/* force WaitingOn to seller */
+	update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
+	
+	$order->update_status('wc-completed');
+}
+function castback_cron_noCompletedDate() {
+	
+	$args = array(
+		'status' => 'processing', // Get completed orders
+		// 'limit'  => 10,           // Retrieve up to 10 orders
+		'orderby' => 'date',      // Order by date
+		'order'  => 'DESC',  
+		// 'customer_id'  => get_current_user_id(),  
+		// 'meta_query' => array(
+			// array(
+					// 'key'     => 'offers_0_offer_amount',
+					// 'value'   => 'example_value',
+					// 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
+			// ),
+		// ),
+	);
+
+	$orders = wc_get_orders( $args );
+	foreach( $orders as $order ) {
+		$order_id = $order->get_id();				
+		if( get_field( 'completed_date', $order_id ) == '' && get_field( 'disputed_date', $order_id ) == '' ) {
+			
+    		// $cron_no_offer_expired_date_days = get_field( 'cron_no_offer_expired_date_days', 'option' );
+	    	// $offer_expired_date = date('F j, Y g:i a', strtotime( '+'.$cron_no_offer_expired_date_days.' days', strtotime( $offer['offer_date'] ) ) );
+
+				$cron_no_dispute_completed_date_days = 5;
+    		$offer_expired_date = date('F j, Y g:i a',
+    		    strtotime( '+'.$cron_no_dispute_completed_date_days.' minutes',
+        		    strtotime( get_field( 'shipped_date', $order_id ) )
+    		    )
+    		);
+    		
+    		$offer_expired = strtotime( '+5 minutes', strtotime( get_field( 'shipped_date', $order_id ) ) );
+    		$currentTime = strtotime( date('F j, Y g:i a') );
+    		
+    		if( $currentTime > $offer_expired ) {
+    		    Castback_tools_complete_order( $order_id );
+    		}
+		}
+	}
+} add_action( 'castback_cron', 'castback_cron_noCompletedDate' );
