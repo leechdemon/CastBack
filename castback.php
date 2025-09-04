@@ -14,8 +14,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/listings.php';
 require_once plugin_dir_path(__FILE__) . 'includes/offers.php';
 
 function CastBack_enqueue_scripts() {
-	$randVersion = rand(0,9999999999);
-	wp_enqueue_script( 'castback_ajax', plugins_url() . '/castback-plugin/includes/castback_ajax.js', array(), $randVersion, true );
+	// $version = rand(0,9999999999);
+	$version = "0001";
+	wp_enqueue_script( 'castback_ajax', plugins_url() . '/castback-plugin/includes/castback_ajax.js', array(), $version, true );
 
 	$data_to_pass = array(
 			'url' => admin_url( 'admin-ajax.php' ),

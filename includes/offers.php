@@ -15,109 +15,17 @@ function CastBack_make_offer_URL($atts, $content = null) {
 } add_shortcode('CastBack_make_offer_URL', 'CastBack_make_offer_URL');
 
 function CastBack_offers($atts, $content = null) {
-
 	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null, 'view' => null ), $atts));
+	if ( !$order_id ) { $order_id = $_GET['order_id']; }
 
 	ob_start();
 
-	if( $order_id || $_GET['order_id'] ) { /* Display the Order */
-		if ( !$order_id ) { $order_id = $_GET['order_id']; }
+	if( $order_id ) {
 		$customer_id = get_field( 'customer_id', $order_id );
-		$seller_id = get_field( 'seller_id', $order_id );
 		
-		echo '<style>
-		#castback-order { display: inline-block; width: fit-content; float: left; margin-bottom: 1rem; }
-		#castback-sidebar { width: 35%; display: inline-block; float: right; margin-bottom: 1rem; }
-		#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; }
-		
-		.castback-order-listing { max-width: 575px; float: left; padding: 1rem; padding: 1rem; }
-		.castback-order-details { width: fit-content; }
-		
-		.castback-order-listing .listing { background-color: #DDDDDD;  }
-		.castback-order-listing .listing-pricebox { flex-direction: row !important; padding: 0; }
-		.castback-order-listing .listing-tags { flex-direction: row !important; padding: 0; }
-		.castback-order-listing .listing-info { display: block; }
-		.castback-order-listing .listing-buttons { display: none; }
-		.castback-order-listing .listing-details { background-color: white; }
-		.e-con-full .e-flex:has(> .listing-details) { flex-direction: row; }
-		.castback-order-listing .listing-details .e-con-inner { display: block; }
-		
-		.order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
-		.order_history_item  { width: 100%; background-color: #dddddd; float: left; padding: 0.5rem; }
-		.order_history_item.customer { background-color: #d4efef; }
-		.order_history_item.seller { background-color: #aad3d3; }
-		.order_history_subitem { width: 100%; float: left; }
-		.order_history_subitem.date { font-size: small; }
-		// .order_history_subitem.offer_expired { text-decoration: line-through; }
-		.order_history_subitem.offer_expired:after { content: " (expired)"; color: red; font-size: smaller; }
-		.customer .order_history_subitem { text-align: left; }
-		.seller .order_history_subitem { text-align: right; }
-		
-
-		.acf_offers, .acf_messages, .acf_shipping, .acf_dispute { width: fit-content; clear: both; float: left; margin: 1rem 0; }
-		.acf-field-68a0f1c63178a, .acf-field-68af2cd79c27b, .acf-field-68b1c614b344d { display: none; }
-		
-		.acf_offers .acf-field-68a0f1c63178a { display: block; width: 100% !important; }
-		.acf_messages .acf-field-68af2cd79c27b { display: block; width: 100% !important; }
-		.acf_shipping .acf-field-68b1c614b344d { display: block; width: 100% !important; }
-
-		
-		
-		</style>';
-		
-		echo '<span id="castback_order_id" style="display: none !important;">'.$order_id.'</span>';
-		echo '<h3>Order #'.$order_id.'</h3>';
-		echo '<div id="castback-order">'; /* Open Order Block */
-			echo '<div class="castback-order-details">';
-				
-				$waitingOn = get_field( 'waiting_on', $order_id );
-				$name = get_userdata( $waitingOn );
-				
-				$order = wc_get_order( $order_id );
-				if( $order ) { /* If null, don't display it... */
-					$orderStatus = $order->get_status();
-					echo '<h5 style="margin-left: 1rem;">Order Status: '.CastBack_orderStatusCosmetic( $orderStatus ).'</h5>';
-					
-					
-					// $order_date = $order->get_date_created()->format('F j, Y g:i a');
-					// echo '<h5 style="margin-left: 1rem;">Order Date: '. $order_date .'</h5>';
-					if( $name && $orderStatus != 'completed' ) { echo '<h5 style="margin-left: 1rem;">Waiting On: '.$name->first_name .' '.$name->last_name.'</h5>'; }
-
-					/* Display the Listing */
-					$listing_id = get_field( 'listing_id', $order_id );
-					$args = array(
-							'p'							 =>	$listing_id,
-							'post_type'      => 'product', // or 'page', 'custom_post_type'
-							'posts_per_page' => 1,
-					);
-					$custom_query = new WP_Query( $args );
-					if ( $custom_query->have_posts() ) {
-						while ( $custom_query->have_posts() ) {
-							$custom_query->the_post();
-							echo '<div class="castback-order-listing">';
-							echo do_shortcode('[elementor-template id="822"]');
-							echo '</div>';
-						}
-					} else {
-						// No posts found
-						echo '<p>No posts found matching your criteria.</p>';
-					}
-					wp_reset_postdata();
-		
-					/* Display Buttons / ACF Form */
-					CastBack_offers_acf_buttons( $order_id, $orderStatus );
+		echo '<div id="castback-order-page">'.CastBack_offers_draw_order_page( $order_id, false ).'</div>';
 	
-				echo '</div>';
-				echo '</div>';/* close castback-order */
-				
-			} else {
-				echo  "</div>";
-				echo  "order not found.";
-			}
-
-		CastBack_offers_sidebar( $order_id );
-	}
-	else { /* Display list of Offers for buyer/seller */
+	} else { /* Display list of Offers for buyer/seller */
 		$args = array(
 			// 'status' => 'wc-processing', // Get completed orders
 			'limit'  => -1,           // Retrieve up to 10 orders
@@ -177,125 +85,63 @@ function CastBack_orderStatusCosmetic( $orderStatus ) {
 	
 	return $orderStatusCosmetic;
 }
-function CastBack_offers_sidebar( $order_id ) {
-	$order = wc_get_order( $order_id );
-	echo '<div id=castback-sidebar>';
+function CastBack_offers_draw_order_page( $order_id = '', $AJAX = true ) {
+	if( !$order_id ) { $order_id = $_POST['order_id']; }
 	
-	/* Display History */
-	echo '<h5 style="">Order History</h5>';
-	echo '<div class="order_history">';
-
-	/* Display Offers */
-	$offers = get_field( 'offers', $order_id  );
-	if( $offers ) {
-		foreach( $offers as $offer ) {
-			if( $offer['offer_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
-			else { $customerOrSeller = ' seller'; }
-			
-			echo '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $offer['offer_date'] ).';">';
-				echo '<div class="order_history_subitem date">'. $offer['offer_date'] . '</div>';
-
-				$name = get_userdata( $offer['offer_user_id'] );
-				if( $offer['offer_expired_date'] ) { $offerExpired = ' offer_expired'; } else { $offerExpired = ''; }
-				echo '<div class="order_history_subitem'.$offerExpired.'">'. $name->first_name .' '.$name->last_name . ' made an Offer of $'. $offer['offer_amount'].'</div>';
-			echo '</div>'; // end order history item
-		}
-	}
-			
-	/* Display Message History */
-	$messages = get_field( 'messages', $order_id  );
-	if( $messages ) {
-		foreach( $messages as $message ) {
-			if( $message['message_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
-			else { $customerOrSeller = ' seller'; }
-			
-			echo '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $message['message_date'] ).';">';
-				echo '<div class="order_history_subitem date">'. $message['message_date'] . '</div>';
-
-				$name = get_userdata( $message['message_user_id'] );
-				echo '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ': "'.$message['message_text'].'"</div>';
-			echo '</div>'; // end order history item
-		}
-	}
-
-	/* Display Tracking History */
-	$trackingLabels = get_field( 'tracking', $order_id  );
-	if( $trackingLabels ) {
-		foreach( $trackingLabels as $tracking ) {
-			if( $tracking['tracking_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
-			else { $customerOrSeller = ' seller'; }
-			
-			echo '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $tracking['tracking_date'] ).';">';
-				echo '<div class="order_history_subitem date">'. $tracking['tracking_date'] . '</div>';
-
-				$name = get_userdata( $tracking['tracking_user_id'] );
-				echo '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ' added Tracking #<a href="'.get_site_url().'/?tracking='.$tracking['tracking_number'].'">'.$tracking['tracking_number'].'</a></div>';
-			echo '</div>'; // end order history item
-		}
-	}
-
-	/* Display Status Changes */
-	$dateCreated = $order->get_date_created();
-	echo '<div class="order_history_item customer" style="order: '.strtotime( $dateCreated ).';">';
-		echo '<div class="order_history_subitem date">'. $dateCreated->format('F j, Y g:i a') . '</div>';
-		echo '<div class="order_history_subitem">Order Created</div>';
-	echo '</div>';
-	$acceptedDate = get_field( 'accepted_date', $order_id );
-	if( $acceptedDate ) {
-		echo '<div class="order_history_item seller" style="order: '.strtotime( $acceptedDate ).';">';
-			echo '<div class="order_history_subitem date">'. $acceptedDate . '</div>';
-			echo '<div class="order_history_subitem">Offer Accepted</div>';
-		echo '</div>';
-	}
-	$paymentDate = get_field( 'payment_date', $order_id );
-	if( $paymentDate ) {
-		echo '<div class="order_history_item customer" style="order: '.strtotime( $paymentDate ).';">';
-			echo '<div class="order_history_subitem date">'. $paymentDate . '</div>';
-			echo '<div class="order_history_subitem">Order Paid</div>';
-		echo '</div>';
-	}
-	$shippedDate = get_field( 'shipped_date', $order_id );
-	if( $shippedDate ) {
-		echo '<div class="order_history_item seller" style="order: '.strtotime( $shippedDate ).';">';
-			echo '<div class="order_history_subitem date">'. $shippedDate . '</div>';
-			echo '<div class="order_history_subitem">Order Shipped</div>';
-		echo '</div>';
-	}
-	$completedDate = get_field( 'completed_date', $order_id );
-	if( $completedDate ) {
-		echo '<div class="order_history_item customer" style="order: '.strtotime( $completedDate ).';">';
-			echo '<div class="order_history_subitem date">'. $completedDate . '</div>';
-			echo '<div class="order_history_subitem">Order Completed</div>';
-		echo '</div>';
-	}
-	$disputedDate = get_field( 'disputed_date', $order_id );
-	if( $disputedDate ) {
-		echo '<div class="order_history_item customer" style="order: '.strtotime( $disputedDate ).';">';
-			echo '<div class="order_history_subitem date">'. $disputedDate . '</div>';
-			echo '<div class="order_history_subitem">Order was Disputed. CastBack support will be in touch soon...</div>';
-		echo '</div>';
-	}
-	echo '</div>'; // end order history					
-
-	/* Display Messaging Window */
-	/* (Only with existing offers) */
-	acf_form_head();
-	echo '<div class="acf_messages">';
-
-	/* Send Message */
-	acf_form(array(
-		'post_id'   => $order_id,
-		'field_groups' => array('group_689a2f343751f',),
-		'uploader'		=> 'basic',
-		'submit_value' => 'Send Message',
-		// 'form' => false,
-		'return' => '?order_id='.$order_id.'&action=send_message'
-	));
+	/* Display Order */
+	$output = '';
+	$output .= '<div id="castback-order">';
+		$output .= CastBack_offers_draw_order( $order_id, false );
+	$output .= '</div>';
 	
-	echo '</div>';
-	echo '</div>'; // end Sidebar
-}
-function CastBack_offers_acf_buttons( $order_id, $orderStatus ) {
+	/* Display Sidebar */
+	$output .= '<div id="castback-sidebar">';
+		$output .= CastBack_offers_draw_sidebar( $order_id, false );
+	$output .= '</div>';
+	
+	if($AJAX) { echo $output; wp_die(); } else { return $output; }
+} add_action( 'wp_ajax_CastBack_offers_draw_order_page', 'CastBack_offers_draw_order_page' );
+function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
+	if( !$order_id ) { $order_id = $_POST['order_id']; }
+
+	$order = wc_get_order( $order_id );	
+	if( $order ) {
+		/* Display Order Details */
+		$output .= '';
+		$output .= '<h3>Order #<span id="castback_order_id" style="">'.$order_id.'</span></h3>';
+		$output .= '<div class="castback-order-details">';
+			$orderStatus = $order->get_status();
+			$waitingOn = get_field( 'waiting_on', $order_id );
+			$name = get_userdata( $waitingOn );
+			$output .= '<h5 style="margin-left: 1rem;">Order Status: '.CastBack_orderStatusCosmetic( $orderStatus ).'</h5>';
+			if( $name && $orderStatus != 'completed' ) { $output .= '<h5 style="margin-left: 1rem;">Waiting On: '.$name->first_name .' '.$name->last_name.'</h5>'; }
+		$output .= '</div>';
+
+		/* Display the Listing */
+		$listing_id = get_field( 'listing_id', $order_id );
+		$args = array(
+				'p'							 =>	$listing_id,
+				'post_type'      => 'product',
+				'posts_per_page' => 1,
+		);
+		$custom_query = new WP_Query( $args );
+		if ( $custom_query->have_posts() ) {
+			while ( $custom_query->have_posts() ) {
+				$custom_query->the_post();
+				$output .= '<div class="castback-order-listing">'. do_shortcode('[elementor-template id="822"]') .'</div>';
+				wp_reset_postdata();
+			}
+		}
+
+		/* Display Buttons */
+		$output .= CastBack_offers_draw_buttons( $order_id, $orderStatus );	
+	} else {
+		$output .=  "order not found.";
+	}
+
+	if($AJAX) { echo $output; wp_die(); } else { return $output; }
+} add_action( 'wp_ajax_CastBack_offers_draw_order', 'CastBack_offers_draw_order' );
+function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
     $disputedDate = get_field( 'disputed_date', $order_id );
     $waitingOn = get_field( 'waiting_on', $order_id );
     $order = wc_get_order( $order_id );
@@ -304,17 +150,18 @@ function CastBack_offers_acf_buttons( $order_id, $orderStatus ) {
         
 			/* Accept / Submit Offer */
     	if( $orderStatus == 'checkout-draft' && get_current_user_id() == $waitingOn ) {
-				echo '<div class="acf_offers">';
-					echo '<input id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
-					echo '<a class="button" href="javascript:CastBack_action_submit_offer_button()">Submit Offer</a>';
-					if( get_field( 'offers', $order_id ) ) { echo '<a class="button" href="javascript:CastBack_action_accept_offer_button()">Accept Offer</a>'; }
-				echo '</div>';
+				$output = '';
+				$output .= '<div class="acf_offers">';
+					$output .= '<input id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
+					$output .= '<a class="button" href="javascript:CastBack_action_submit_offer_button()">Submit Offer</a>';
+					if( get_field( 'offers', $order_id ) ) { $output .= '<a class="button" href="javascript:CastBack_action_accept_offer_button()">Accept Offer</a>'; }
+				$output .= '</div>';
 			}		
 			/* Submit Payment */
 			if( $orderStatus == 'pending' && get_current_user_id() == $waitingOn ) {
-				echo '<div class="acf_offers">';
-					echo '<a class="button" href="'. $order->get_checkout_payment_url() .'">Pay Order</a>';
-				echo '</div>';
+				$output .= '<div class="acf_offers">';
+					$output .= '<a class="button" href="'. $order->get_checkout_payment_url() .'" target="_blank">Pay Order</a>';
+				$output .= '</div>';
 			}
 			
     	/* Shipping */
@@ -324,34 +171,141 @@ function CastBack_offers_acf_buttons( $order_id, $orderStatus ) {
 				else if( get_field( 'shipped_date', $order_id ) ) { $displayShipping = true; }
 				
 				if( $displayShipping ) {
-					echo '<div class="acf_offers">';
-						echo '<input id="castback_new_tracking_number" type="text">';
-							echo '<a class="button" href="javascript:CastBack_action_add_tracking_button()">Add Tracking Order</a>';
-					echo '</div>';
+					$output .= '<div class="acf_offers">';
+						$output .= '<input id="castback_new_tracking_number" type="text">';
+						$output .= '<a class="button" href="javascript:CastBack_action_add_tracking_button()">Add Tracking Order</a>';
+					$output .= '</div>';
 				}
 				
 				/* Complete Order */
 				if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) ) {
-					echo '<div class="acf_offers">';
-						echo '<a class="button" href="javascript:CastBack_action_complete_order_button()">Complete Order</a>';
-					echo '</div>';
-			}
+					$output .= '<div class="acf_offers">';
+						$output .= '<a class="button" href="javascript:CastBack_action_complete_order_button()">Complete Order</a>';
+					$output .= '</div>';
+				}
 		//	if( get_current_user_id() == get_field( 'customer_id', $order_id ) ) {
-				echo '<div class="acf_dispute">';
-					// acf_form_head();
-	
-				acf_form(array(
-					'post_id'   => $_GET['order_id'],
-									'uploader'		=> 'basic',
-					'submit_value' => 'Dispute Order',
-									'return' => '?order_id='.$order_id.'&action=dispute_order'
-				));
-					
-				echo '</div>';
+				$output .= '<div class="acf_dispute"><a class="button" href="javascript:CastBack_action_dispute_order_button()">Dispute Order</a></div>';
 			//	}
 			}
     }
+		
+		return $output;
 }
+function CastBack_offers_draw_sidebar( $order_id, $AJAX = true ) {
+	if( !$order_id ) { $order_id = $_POST['order_id']; }
+	$order = wc_get_order( $order_id );
+	
+	/* Display History */
+	$output = '';
+	$output .= '<h5 style="">Order History';	
+		$output .= '<a class="castback-order-refresh" href="javascript:CastBack_offers_draw_order_page_button('.$order_id.');">(Refresh)</a>';
+	$output .= '</h5>';
+	$output .= '<div class="order_history">';
+
+		/* Display Offers */
+		$offers = get_field( 'offers', $order_id  );
+		if( $offers ) {
+			foreach( $offers as $offer ) {
+				if( $offer['offer_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
+				else { $customerOrSeller = ' seller'; }
+				
+				$output .= '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $offer['offer_date'] ).';">';
+					$output .= '<div class="order_history_subitem date">'. $offer['offer_date'] . '</div>';
+
+					$name = get_userdata( $offer['offer_user_id'] );
+					if( $offer['offer_expired_date'] ) { $offerExpired = ' offer_expired'; } else { $offerExpired = ''; }
+					$output .= '<div class="order_history_subitem'.$offerExpired.'">'. $name->first_name .' '.$name->last_name . ' made an Offer of $'. $offer['offer_amount'].'</div>';
+				$output .= '</div>'; // end order history item
+			}
+		}
+				
+		/* Display Message History */
+		$messages = get_field( 'messages', $order_id  );
+		if( $messages ) {
+			foreach( $messages as $message ) {
+				if( $message['message_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
+				else { $customerOrSeller = ' seller'; }
+				
+				$output .= '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $message['message_date'] ).';">';
+					$output .= '<div class="order_history_subitem date">'. $message['message_date'] . '</div>';
+
+					$name = get_userdata( $message['message_user_id'] );
+					$output .= '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ': "'.$message['message_text'].'"</div>';
+				$output .= '</div>'; // end order history item
+			}
+		}
+
+		/* Display Tracking History */
+		$trackingLabels = get_field( 'tracking', $order_id  );
+		if( $trackingLabels ) {
+			foreach( $trackingLabels as $tracking ) {
+				if( $tracking['tracking_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
+				else { $customerOrSeller = ' seller'; }
+				
+				$output .= '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $tracking['tracking_date'] ).';">';
+					$output .= '<div class="order_history_subitem date">'. $tracking['tracking_date'] . '</div>';
+
+					$name = get_userdata( $tracking['tracking_user_id'] );
+					$output .= '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ' added Tracking #<a href="'.get_site_url().'/?tracking='.$tracking['tracking_number'].'">'.$tracking['tracking_number'].'</a></div>';
+				$output .= '</div>'; // end order history item
+			}
+		}
+
+		/* Display Status Changes */
+		$dateCreated = $order->get_date_created();
+		$output .= '<div class="order_history_item customer" style="order: '.strtotime( $dateCreated ).';">';
+			$output .= '<div class="order_history_subitem date">'. $dateCreated->format('F j, Y g:i a') . '</div>';
+			$output .= '<div class="order_history_subitem">Order Created</div>';
+		$output .= '</div>';
+		$acceptedDate = get_field( 'accepted_date', $order_id );
+		if( $acceptedDate ) {
+			$output .= '<div class="order_history_item seller" style="order: '.strtotime( $acceptedDate ).';">';
+				$output .= '<div class="order_history_subitem date">'. $acceptedDate . '</div>';
+				$output .= '<div class="order_history_subitem">Offer Accepted</div>';
+			$output .= '</div>';
+		}
+		$paymentDate = get_field( 'payment_date', $order_id );
+		if( $paymentDate ) {
+			$output .= '<div class="order_history_item customer" style="order: '.strtotime( $paymentDate ).';">';
+				$output .= '<div class="order_history_subitem date">'. $paymentDate . '</div>';
+				$output .= '<div class="order_history_subitem">Order Paid</div>';
+			$output .= '</div>';
+		}
+		$shippedDate = get_field( 'shipped_date', $order_id );
+		if( $shippedDate ) {
+			$output .= '<div class="order_history_item seller" style="order: '.strtotime( $shippedDate ).';">';
+				$output .= '<div class="order_history_subitem date">'. $shippedDate . '</div>';
+				$output .= '<div class="order_history_subitem">Order Shipped</div>';
+			$output .= '</div>';
+		}
+		$completedDate = get_field( 'completed_date', $order_id );
+		if( $completedDate ) {
+			$output .= '<div class="order_history_item customer" style="order: '.strtotime( $completedDate ).';">';
+				$output .= '<div class="order_history_subitem date">'. $completedDate . '</div>';
+				$output .= '<div class="order_history_subitem">Order Completed</div>';
+			$output .= '</div>';
+		}
+		$disputedDate = get_field( 'disputed_date', $order_id );
+		if( $disputedDate ) {
+			$output .= '<div class="order_history_item customer" style="order: '.strtotime( $disputedDate ).';">';
+				$output .= '<div class="order_history_subitem date">'. $disputedDate . '</div>';
+				$output .= '<div class="order_history_subitem">Order was Disputed. CastBack support will be in touch soon...</div>';
+			$output .= '</div>';
+	}
+	$output .= '</div>'; // end order history					
+
+	/* Display Messaging Window */
+	$output .= '<div class="acf_messages">';
+
+		/* Send Message */
+		$output .= '<input id="castback_new_message" type="text-area">';
+		$output .= '<a class="button" href="javascript:CastBack_action_send_message_button()">Send Message</a>';
+	
+	$output .= '</div>';
+
+	if($AJAX) { echo $output; wp_die(); } else { return $output; }
+} add_action( 'wp_ajax_CastBack_offers_draw_sidebar', 'CastBack_offers_draw_sidebar' );
+
 
 function castback_offer_expiration( $order_id ) {
 	$offers = get_field( 'offers', $order_id );
@@ -399,13 +353,13 @@ function CastBack_action_make_offer( $listing_id = '', $AJAX = true ) {
 	// ob_start();
 
 	// if ( $order ) {
-			// echo '<script>window.location.href = "'.get_site_url().'/buying/offers/?order_id='.$order_id.'";</script>';
+			// $output .= '<script>window.location.href = "'.get_site_url().'/buying/offers/?order_id='.$order_id.'";</script>';
 	// } else {
-			// echo "Failed to create new order.";
+			// $output .= "Failed to create new order.";
 	// }
 	
-	echo $order_id;
-	if($AJAX) { wp_die(); }
+	$output .= $order_id;
+	if($AJAX) { echo $output; wp_die(); } else { return $output; }
 } add_action( 'wp_ajax_CastBack_action_make_offer', 'CastBack_action_make_offer' );
 function CastBack_action_submit_offer( $order_id = '', $order_amount = '', $AJAX = true ) {
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
@@ -430,7 +384,6 @@ function CastBack_action_submit_offer( $order_id = '', $order_amount = '', $AJAX
 	
 	update_field( 'waiting_on', $waitingOn, $order_id );
 	
-	// echo '';
 	if($AJAX) { wp_die(); }
 } add_action( 'wp_ajax_CastBack_action_submit_offer', 'CastBack_action_submit_offer' );
 function CastBack_action_accept_offer( $order_id = '', $AJAX = true ) {
@@ -493,9 +446,10 @@ function CastBack_action_accept_offer( $order_id = '', $AJAX = true ) {
 	// echo '';
 	if($AJAX) { wp_die(); }
 } add_action( 'wp_ajax_CastBack_action_accept_offer', 'CastBack_action_accept_offer' );
-function CastBack_action_send_message( $order_id = '', $AJAX = true ) {
+function CastBack_action_send_message( $order_id = '', $new_message = '', $AJAX = true ) {
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
-	$new_message = get_field( 'new_message', $order_id );
+	if( !$new_message ) { $new_message = $_POST['new_message']; }
+	// $new_message = get_field( 'new_message', $order_id );
 	
 	if( $new_message ) {
 		$row = array(
@@ -504,7 +458,7 @@ function CastBack_action_send_message( $order_id = '', $AJAX = true ) {
 			'message_user_id' => get_current_user_id(),
 		);
 		add_row( 'messages', $row, $order_id );
-		update_field( 'new_message', '', $order_id );
+		// update_field( 'new_message', '', $order_id );
 	}
 	
 	// echo '';
