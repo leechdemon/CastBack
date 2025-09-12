@@ -61,39 +61,33 @@ function custom_query_offers( $query ) {
 // function custom_query_new( $query ) {
 	
 // }
-function custom_query_drafts( $query ) {
-	$query->set( 'posts_per_page', -1 );
-	$query->set( 'post_type', 'product' );
-	$userid = wp_get_current_user();
-	$query->set( 'author', $userid->ID );
-	
-	$query->set( 'meta_key', 'post_status' );
-	$query->set( 'meta_value', 'draft' );
-} add_action( 'elementor/query/drafts' , 'custom_query_drafts'  ); 
 function custom_query_mylistings( $query ) {
 	$query->set( 'posts_per_page', -1 );
 	$query->set( 'post_type', 'product' );
-	$userid = wp_get_current_user();
-	$query->set( 'author', $userid->ID );
 	
-	$query->set( 'meta_key', 'post_status' );
-	$query->set( 'meta_value', 'publish' );
 
 	$userid = wp_get_current_user();
 	$query->set( 'author', $userid->ID );
-	// $query->set( 'posts_per_page', 2 );
-} add_action( 'elementor/query/mylistings' , 'custom_query_mylistings'  ); 
-// function custom_query_payments( $query ) {
-	// $query->set( 'post_type', 'product' );
-	// $query->set( 'posts_per_page', '1' );
-// }
-// function custom_query_shipping( $query ) {
-	// $query->set( 'post_type', 'product' );
-	// $query->set( 'posts_per_page', '1' );
-// }
-// Assign the Subpage
-// if( isset($_GET['subpage']) ) {
+	// Add your meta query conditions
+	// if ( ! $query->get( 'meta_query' ) ) { $query->set( 'meta_query', array() ); }
+	// $meta_query = $query->get( 'meta_query' );
+	// $meta_query[] = [
+			// 'key'     => 'seller_id', // Replace with your ACF field's name
+			// 'key'     => 'field_68c043d8de002', // Replace with your ACF field's name
+			// 'value'   => wp_get_current_user(),   // Replace with the value to filter by
+			// 'compare' => '=',                    // Comparison operator (e.g., '=', 'LIKE', 'EXISTS')
+	// ];
+	// $query->set( 'meta_query', $meta_query );
+	// $query->set( 'meta_key', 'seller_id' );
+	// $query->set( 'meta_value', wp_get_current_user() );
 	
-	// add_action( 'elementor/query/' .$_GET['subpage'] , 'custom_query_' .$_GET['subpage']  ); 
-// }
-/* end Buying/Selling Subpages */
+	// $user_id = wp_get_current_user();
+	// if( $user_id == 0 ) { $user_id = 'anonymous'; }
+	// $query->set( 'meta_key', 'seller_id' );
+	// $query->set( 'meta_value', $user_id );
+	
+	// $query->set( 'meta_key', 'post_status' );
+	// $query->set( 'meta_value', array('draft', 'publish') );
+}
+
+if( !$_GET['listing_id'] ) { add_action( 'elementor/query/mylistings' , 'custom_query_mylistings'  ); }

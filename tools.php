@@ -7,48 +7,12 @@ if(!function_exists('Test')) { // PHP script to dump variable into JavaScript co
 		else { echo "<pre>" .var_dump($js_code). "</pre>"; }
 	 }
 }
-function CastBack_CSS() {
-	echo '<style>
-	#castback-order { display: inline-block; width: fit-content; float: left; margin-bottom: 1rem; }
-	#castback-sidebar { width: 35%; display: inline-block; float: right; margin-bottom: 1rem; }
-	#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; }
-	
-	.castback-order-listing { max-width: 575px; float: left; padding: 1rem; padding: 1rem; }
-	.castback-order-details { width: fit-content; }
-	a.castback-order-refresh { display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small; }
-
-	
-	.castback-order-listing .listing { background-color: #DDDDDD;  }
-	.castback-order-listing .listing-pricebox { flex-direction: row !important; padding: 0; }
-	.castback-order-listing .listing-tags { flex-direction: row !important; padding: 0; }
-	.castback-order-listing .listing-info { display: block; }
-	.castback-order-listing .listing-buttons { display: none; }
-	.castback-order-listing .listing-details { background-color: white; }
-	.e-con-full .e-flex:has(> .listing-details) { flex-direction: row; }
-	.castback-order-listing .listing-details .e-con-inner { display: block; }
-	
-	.order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
-	.order_history_item  { width: 100%; background-color: #dddddd; float: left; padding: 0.5rem; }
-	.order_history_item.customer { background-color: #d4efef; }
-	.order_history_item.seller { background-color: #aad3d3; }
-	.order_history_subitem { width: 100%; float: left; }
-	.order_history_subitem.date { font-size: small; }
-	// .order_history_subitem.offer_expired { text-decoration: line-through; }
-	.order_history_subitem.offer_expired:after { content: " (expired)"; color: red; font-size: smaller; }
-	.customer .order_history_subitem { text-align: left; }
-	.seller .order_history_subitem { text-align: right; }
-	
-	.acf_offers, .acf_messages, .acf_shipping, .acf_dispute { width: fit-content; clear: both; float: left; margin: 1rem 0; }
-	.acf-field-68a0f1c63178a, .acf-field-68af2cd79c27b, .acf-field-68b1c614b344d { display: none; }
-	
-	.acf_offers .acf-field-68a0f1c63178a { display: block; width: 100% !important; }
-	.acf_messages .acf-field-68af2cd79c27b { display: block; width: 100% !important; }
-	.acf_shipping .acf-field-68b1c614b344d { display: block; width: 100% !important; }	
-</style>';
-} add_action( 'wp_head', 'CastBack_CSS', 90 );
 function castback_admin_edit_listing( $wp_admin_bar ) {
-		if( $_GET['listing_id'] ) {
-			$url = get_site_URL() . '/wp-admin/post.php?post='.$_GET['listing_id'].'&action=edit';
+	if( !$listing_id ) { $listing_id = $_GET['listing_id']; }
+	if( !$listing_id ) { $listing_id = $_POST['listing_id']; }
+			
+		if( $listing_id ) {
+			$url = get_site_URL() . '/wp-admin/post.php?post='.$listing_id.'&action=edit';
 			$args = array(
 					'id'    => 'edit-listing', // Unique ID for your link
 					'title' => 'Edit Listing', // Text displayed in the admin bar

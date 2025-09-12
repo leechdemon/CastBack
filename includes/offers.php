@@ -14,50 +14,87 @@ function CastBack_make_offer_URL($atts, $content = null) {
 	return ob_get_clean();
 } add_shortcode('CastBack_make_offer_URL', 'CastBack_make_offer_URL');
 
-function CastBack_offers($atts, $content = null) {
-	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null, 'view' => null ), $atts));
-	if ( !$order_id ) { $order_id = $_GET['order_id']; }
 
-	ob_start();
 
-	if( $order_id ) {
-		$customer_id = get_field( 'customer_id', $order_id );
-		
-		echo '<div id="castback-order-page">'.CastBack_offers_draw_order_page( $order_id, false ).'</div>';
+function CastBack_Offers( $method, $page = false, $AJAX = false ) {
+	if( $method == 'MyOffers' ) {
+		$title = 'My Offers';
+		$title_url = '/buying/offers';
+		$orderLimit = -1;
+		$buyerOrSeller = 'customer_id';
+		$orderStatus = array( 'checkout-draft', 'pending', 'processing', 'completed' );
+		$offersOrders = 'offers';
+	}
+	if( $method == 'MyOrders' ) {
+		$title = 'My Orders';
+		$title_url = '/selling/my-orders';
+		$orderLimit = -1;
+		$buyerOrSeller = 'seller_id';
+		$orderStatus = array( 'checkout-draft', 'pending', 'processing', 'completed' );
+		$offersOrders = 'orders';
+	}
+	if( $page ) {
+		$orderLimit = 4;
+		// $buyerOrSeller = 'seller_id';
+		// $orderStatus = array( 'checkout-draft', 'pending', 'processing', 'completed' );
+		// $offersOrders = 'orders';
+	} else { $page = $method; }
 	
-	} else { /* Display list of Offers for buyer/seller */
-		$args = array(
-			// 'status' => 'wc-processing', // Get completed orders
-			'limit'  => -1,           // Retrieve up to 10 orders
-			'orderby' => 'date',      // Order by date
-			'order'  => 'DESC',  
-			// 'customer_id'  => get_current_user_id(),  
-			// 'meta_query' => array(
-				// array(
-						// 'key'     => 'offers_0_offer_amount',
-						// 'value'   => 'example_value',
-						// 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
-				// ),
-			// ),
-		);
-
-		$orders = wc_get_orders( $args );
-		foreach( $orders as $order ) {
-			$order_id = $order->get_id();
+	$args = array(
+		'status' => $orderStatus, // Get completed orders
+		'limit'  => $orderLimit,           // Retrieve up to 10 orders
+		'orderby' => 'date',      // Order by date
+		'order'  => 'DESC',  
+		'meta_query' => array(
+			array(
+				'key'     => $buyerOrSeller,
+				'value'   => get_current_user_id(),
+				'compare' => 'IN', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
+			),
+		),
+	);
+	$orders = wc_get_orders( $args );
+	
+	/* Draw Results */	
+	if( $title_url ) { echo '<h3><a href="'.$title_url.'">'.$title.'</a></h3>'; }
+	else { echo '<h3>'.$title.'</h3>'; }
+	
+	foreach( $orders as $key => $order ) {
+		if( $key+1 == $orderLimit ) {
+			echo '<span><a style="font-size: smaller;" href="'.$title_url.'">View More...</a></span>';
+		}
+		else {
+			if($order) {
+				$order_id = $order->get_id();
 			
-			$offers = get_field( 'offers', $order_id );
-			if( $offers[0]['offer_amount'] || get_field( 'customer_id', $order_id ) == get_current_user_id() ) {
-				$orderCount++;
-				echo '<div class=""><a href="?order_id='.$order_id.'">Order #' .$order_id .'</a> - '.CastBack_orderStatusCosmetic( $order->get_status() ).'</div>';
+				$offers = get_field( 'offers', $order_id );
+				// if( $offers[0]['offer_amount'] || get_field( 'customer_id', $order_id ) == get_current_user_id() ) {
+				// if( $offers[0]['offer_amount'] ) {
+					$orderCount++;
+					echo '<a style="display: flex;" href="'.get_site_url().$title_url.'/?order_id='.$order_id.'">Order #' .$order_id .' - '.CastBack_orderStatusCosmetic( $order->get_status() ).'</a>';
+					// AJAX "View" URL removed for v0.5 Release
+					// echo '<a class="button" href="javascript:CastBack_edit_listing_button(\''.$listing_id.'\', \''.$user_id.'\', \'CastBack-MyListings\');">Edit Listing</a>';
+
+					
+					
+					// echo '<div class=""><a href="javascript:CastBack_offers_draw_order_page_button('.$order_id.', \'CastBack-'.$page.'\');">.'</div>';
+					// echo '<div class=""><a href="javascript:CastBack_offers_draw_order_page_button('.$order_id.', \'CastBack-'.$page.'\');">Order #' .$order_id .'</a> - '.CastBack_orderStatusCosmetic( $order->get_status() ).'</div>';
+				// }
 			}
 		}
-		if( $orderCount < 1 ) {
-			echo '<div>You have no orders.</div>';
-		}
+	}
+	if( $orderCount < 1 ) {
+		echo 'You have no '.$offersOrders.'.';
 	}
 	
-	return ob_get_clean();
-} add_shortcode('CastBack_offers', 'CastBack_offers');
+	if($AJAX) { echo ob_get_clean(); wp_die(); }
+	else {
+		ob_start();
+		echo $output;
+		return ob_get_clean();
+	}
+}
+
 function CastBack_orderStatusCosmetic( $orderStatus ) {
 	$orderStatusCosmetic = $orderStatus;
 	switch( $orderStatus ) {
@@ -86,28 +123,40 @@ function CastBack_orderStatusCosmetic( $orderStatus ) {
 	return $orderStatusCosmetic;
 }
 function CastBack_offers_draw_order_page( $order_id = '', $AJAX = true ) {
-	if( !$order_id ) { $order_id = $_POST['order_id']; }
-	
-	/* Display Order */
-	$output = '';
-	$output .= '<div id="castback-order">';
-		$output .= CastBack_offers_draw_order( $order_id, false );
-	$output .= '</div>';
-	
-	/* Display Sidebar */
-	$output .= '<div id="castback-sidebar">';
-		$output .= CastBack_offers_draw_sidebar( $order_id, false );
-	$output .= '</div>';
-	
-	if($AJAX) { echo $output; wp_die(); } else { return $output; }
-} add_action( 'wp_ajax_CastBack_offers_draw_order_page', 'CastBack_offers_draw_order_page' );
-function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
+	if( !$order_id ) { $order_id = $_GET['order_id']; }
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
 
+	ob_start();
+	
+	$order = wc_get_order( $order_id );	
+	if( $order ) {
+		/* Display Order */
+		// $output = '';
+		
+		echo '<div id="castback-display-order" style="display: inline-block; width: 65%;">';
+			echo CastBack_offers_draw_order( $order_id, false );
+		echo '</div>';
+		
+		/* Display Sidebar */
+		echo '<div id="castback-sidebar" style="width: 35%; display: inline-block; float: right; margin-bottom: 1rem;">';
+			echo CastBack_offers_draw_sidebar( $order_id, false );
+		echo '</div>';
+		
+		if($AJAX) { echo $output; wp_die(); } else { return $output; }
+	} else {
+		echo '<div>Order #'.$order_id.' does not exist.</div>';
+	}
+} add_action( 'wp_ajax_CastBack_offers_draw_order_page', 'CastBack_offers_draw_order_page' );
+function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
+	
+	if( !$order_id ) { $order_id = $_POST['order_id']; }
+
+	// ob_start();
+	$output = '';
+	
 	$order = wc_get_order( $order_id );	
 	if( $order ) {
 		/* Display Order Details */
-		$output .= '';
 		$output .= '<h3>Order #<span id="castback_order_id" style="">'.$order_id.'</span></h3>';
 		$output .= '<div class="castback-order-details">';
 			$orderStatus = $order->get_status();
@@ -119,26 +168,15 @@ function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
 
 		/* Display the Listing */
 		$listing_id = get_field( 'listing_id', $order_id );
-		$args = array(
-				'p'							 =>	$listing_id,
-				'post_type'      => 'product',
-				'posts_per_page' => 1,
-		);
-		$custom_query = new WP_Query( $args );
-		if ( $custom_query->have_posts() ) {
-			while ( $custom_query->have_posts() ) {
-				$custom_query->the_post();
-				$output .= '<div class="castback-order-listing">'. do_shortcode('[elementor-template id="822"]') .'</div>';
-				wp_reset_postdata();
-			}
-		}
+		$output .= CastBack_listings_draw_listing( $listing_id, '949', $AJAX );
 
 		/* Display Buttons */
-		$output .= CastBack_offers_draw_buttons( $order_id, $orderStatus );	
+		$output .= CastBack_offers_draw_buttons( $order_id, $orderStatus );
 	} else {
 		$output .=  "order not found.";
 	}
-
+	
+	// if($order_id) { echo $output; }
 	if($AJAX) { echo $output; wp_die(); } else { return $output; }
 } add_action( 'wp_ajax_CastBack_offers_draw_order', 'CastBack_offers_draw_order' );
 function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
@@ -151,15 +189,15 @@ function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
 			/* Accept / Submit Offer */
     	if( $orderStatus == 'checkout-draft' && get_current_user_id() == $waitingOn ) {
 				$output = '';
-				$output .= '<div class="acf_offers">';
-					$output .= '<input id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
+				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
+					$output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
 					$output .= '<a class="button" href="javascript:CastBack_action_submit_offer_button()">Submit Offer</a>';
 					if( get_field( 'offers', $order_id ) ) { $output .= '<a class="button" href="javascript:CastBack_action_accept_offer_button()">Accept Offer</a>'; }
 				$output .= '</div>';
 			}		
 			/* Submit Payment */
 			if( $orderStatus == 'pending' && get_current_user_id() == $waitingOn ) {
-				$output .= '<div class="acf_offers">';
+				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
 					$output .= '<a class="button" href="'. $order->get_checkout_payment_url() .'" target="_blank">Pay Order</a>';
 				$output .= '</div>';
 			}
@@ -171,34 +209,34 @@ function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
 				else if( get_field( 'shipped_date', $order_id ) ) { $displayShipping = true; }
 				
 				if( $displayShipping ) {
-					$output .= '<div class="acf_offers">';
-						$output .= '<input id="castback_new_tracking_number" type="text">';
+					$output .= '<div class="acf_offers" style="float: left; clear: both;">';
+						$output .= '<input style="width: 100px;"id="castback_new_tracking_number" type="text">';
 						$output .= '<a class="button" href="javascript:CastBack_action_add_tracking_button()">Add Tracking Order</a>';
 					$output .= '</div>';
 				}
 				
 				/* Complete Order */
 				if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) ) {
-					$output .= '<div class="acf_offers">';
+					$output .= '<div class="acf_offers" style="float: left; clear: both;">';
 						$output .= '<a class="button" href="javascript:CastBack_action_complete_order_button()">Complete Order</a>';
 					$output .= '</div>';
 				}
 		//	if( get_current_user_id() == get_field( 'customer_id', $order_id ) ) {
-				$output .= '<div class="acf_dispute"><a class="button" href="javascript:CastBack_action_dispute_order_button()">Dispute Order</a></div>';
+				$output .= '<div class="acf_dispute" style="float: left; clear: both;"><a class="button" href="javascript:CastBack_action_dispute_order_button()">Dispute Order</a></div>';
 			//	}
 			}
     }
 		
 		return $output;
 }
-function CastBack_offers_draw_sidebar( $order_id, $AJAX = true ) {
+function CastBack_offers_draw_sidebar( $order_id, $AJAX = true ) {	
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
 	$order = wc_get_order( $order_id );
 	
 	/* Display History */
 	$output = '';
 	$output .= '<h5 style="">Order History';	
-		$output .= '<a class="castback-order-refresh" href="javascript:CastBack_offers_draw_order_page_button('.$order_id.');">(Refresh)</a>';
+		$output .= '<a class="castback-order-refresh" href="javascript:CastBack_offers_draw_order_page_button('.$order_id.', \'CastBack-'.$page.'\');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
 	$output .= '</h5>';
 	$output .= '<div class="order_history">';
 
@@ -298,7 +336,7 @@ function CastBack_offers_draw_sidebar( $order_id, $AJAX = true ) {
 	$output .= '<div class="acf_messages">';
 
 		/* Send Message */
-		$output .= '<input id="castback_new_message" type="text-area">';
+		$output .= '<input style="width: 100px;"id="castback_new_message" type="text-area">';
 		$output .= '<a class="button" href="javascript:CastBack_action_send_message_button()">Send Message</a>';
 	
 	$output .= '</div>';
@@ -326,6 +364,36 @@ function so_payment_complete( $order_id ){
 		
 		
 } add_action( 'woocommerce_payment_complete', 'so_payment_complete' );
+function castback_order_disputed_columns($columns) {
+	$columns["disputed"] = "Disputed";
+	return $columns;
+} add_filter('manage_woocommerce_page_wc-orders_columns', 'castback_order_disputed_columns');
+add_filter('manage_woocommerce_page_wc-orders_columns_sortable', 'castback_order_disputed_columns');
+
+/* WP Admin - Order Tables */
+function castback_order_columns_sort_disputed($vars) {
+	if(array_key_exists('orderby', $vars)) {
+		if('Disputed' == $vars['orderby']) {
+			$vars['orderby'] = 'meta_value';
+			$vars['meta_key'] = 'disputed_date';
+		}
+	}
+	return $vars;
+} add_filter('request', 'castback_order_columns_sort_disputed');
+function castback_order_view_disputed( $views ) {
+	$view = "<a href=\"http://example.com/wp-admin/edit-comments.php?comment_status=watch\">Disputed</a>";
+	$views['disputed'] = $view;
+	return $views;
+} add_filter('views_wc-orders', 'castback_order_view_disputed');
+function castback_order_disputed_column($colname, $order) {
+	if ($colname == 'disputed') {
+	    $disputedDate = get_field( 'disputed_date' , $order->get_id() );
+	    if( $disputedDate ) { echo $disputedDate; }
+	    else { echo '--'; }
+	}
+		
+} add_action('manage_woocommerce_page_wc-orders_custom_column', 'castback_order_disputed_column', 10, 2);
+
 
 /* AJAX Actions */
 function CastBack_action_make_offer( $listing_id = '', $AJAX = true ) {
