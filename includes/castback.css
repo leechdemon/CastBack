@@ -1,3 +1,5 @@
+.yith-wcwl-add-to-wishlist-button { padding: 0.5rem 1rem !important; margin-bottom: 0.5rem; }
+
 .listing-status-Published { display: none; }
  #CastBack-MyListings .listing-status-Published { display: flex; }
 .listing-status-Draft { background-color: #ff0000; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; }
@@ -9,7 +11,7 @@
 .listing-tag-category a:hover { color: #ffffff88 !important; 
 .listing-tag-msrp { text-decoration: line-through; }
 
-.acf-hide { display: none; }
+.acf-hidden, .acf-castback-hidden { display: none; }
 
 #CastBack-Logout { float: right; width: 10%; }
 #CastBack-MyAccount { float: left; }

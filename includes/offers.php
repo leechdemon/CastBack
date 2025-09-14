@@ -1,22 +1,5 @@
 <?php
-
-function CastBack_make_offer_URL($atts, $content = null) {
-	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null ), $atts));
-	ob_start();
-	
-	if( get_current_user_id() ) {
-		$url = get_site_url().'/buying/offers/';
-		echo '<a class="button" href="javascript:CastBack_action_make_offer_button('.$listing_id.');">Make Offer</a>';
-	} else {
-		echo '<a class="button" href="'. get_site_url().'/wp-login.php">Make Offer</a>';
-	}
-
-	return ob_get_clean();
-} add_shortcode('CastBack_make_offer_URL', 'CastBack_make_offer_URL');
-
-
-
-function CastBack_Offers( $method, $page = false, $AJAX = false ) {
+function CastBack_Offers( $method, $page = null, $AJAX = false ) {
 	if( $method == 'MyOffers' ) {
 		$title = 'My Offers';
 		$title_url = '/buying/offers';
@@ -34,11 +17,14 @@ function CastBack_Offers( $method, $page = false, $AJAX = false ) {
 		$offersOrders = 'orders';
 	}
 	if( $page ) {
-		$orderLimit = 4;
-		// $buyerOrSeller = 'seller_id';
-		// $orderStatus = array( 'checkout-draft', 'pending', 'processing', 'completed' );
-		// $offersOrders = 'orders';
-	} else { $page = $method; }
+		if( $page == 'MyAccount' ) {
+			$orderLimit = 4;
+			// $buyerOrSeller = 'seller_id';
+			// $orderStatus = array( 'checkout-draft', 'pending', 'processing', 'completed' );
+			// $offersOrders = 'orders';
+		}
+	} 
+	// else { $page = 'CastBack-'.$method; }
 	
 	$args = array(
 		'status' => $orderStatus, // Get completed orders
@@ -122,9 +108,10 @@ function CastBack_orderStatusCosmetic( $orderStatus ) {
 	
 	return $orderStatusCosmetic;
 }
-function CastBack_offers_draw_order_page( $order_id = '', $AJAX = true ) {
+function CastBack_offers_draw_order_page( $order_id = '', $page = null, $AJAX = true ) {
 	if( !$order_id ) { $order_id = $_GET['order_id']; }
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
+	if( !$page ) { $page = $_POST['targetDiv']; }
 
 	ob_start();
 	
@@ -134,12 +121,12 @@ function CastBack_offers_draw_order_page( $order_id = '', $AJAX = true ) {
 		// $output = '';
 		
 		echo '<div id="castback-display-order" style="display: inline-block; width: 65%;">';
-			echo CastBack_offers_draw_order( $order_id, false );
+			echo CastBack_offers_draw_order( $order_id, $page, false );
 		echo '</div>';
 		
 		/* Display Sidebar */
 		echo '<div id="castback-sidebar" style="width: 35%; display: inline-block; float: right; margin-bottom: 1rem;">';
-			echo CastBack_offers_draw_sidebar( $order_id, false );
+			echo CastBack_offers_draw_sidebar( $order_id, $page, false );
 		echo '</div>';
 		
 		if($AJAX) { echo $output; wp_die(); } else { return $output; }
@@ -147,7 +134,7 @@ function CastBack_offers_draw_order_page( $order_id = '', $AJAX = true ) {
 		echo '<div>Order #'.$order_id.' does not exist.</div>';
 	}
 } add_action( 'wp_ajax_CastBack_offers_draw_order_page', 'CastBack_offers_draw_order_page' );
-function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
+function CastBack_offers_draw_order( $order_id, $page = null, $AJAX = true ) {
 	
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
 
@@ -171,7 +158,7 @@ function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
 		$output .= CastBack_listings_draw_listing( $listing_id, '949', $AJAX );
 
 		/* Display Buttons */
-		$output .= CastBack_offers_draw_buttons( $order_id, $orderStatus );
+		$output .= CastBack_offers_draw_buttons( $order_id, $page, $orderStatus );
 	} else {
 		$output .=  "order not found.";
 	}
@@ -179,11 +166,12 @@ function CastBack_offers_draw_order( $order_id, $AJAX = true ) {
 	// if($order_id) { echo $output; }
 	if($AJAX) { echo $output; wp_die(); } else { return $output; }
 } add_action( 'wp_ajax_CastBack_offers_draw_order', 'CastBack_offers_draw_order' );
-function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
+function CastBack_offers_draw_buttons( $order_id, $page = null, $orderStatus ) {
     $disputedDate = get_field( 'disputed_date', $order_id );
     $waitingOn = get_field( 'waiting_on', $order_id );
     $order = wc_get_order( $order_id );
-    
+    // if( !$page ) { $page = $_POST['targetDiv']; }
+		
     if( $disputedDate == '' ) {
         
 			/* Accept / Submit Offer */
@@ -191,8 +179,8 @@ function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
 				$output = '';
 				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
 					$output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
-					$output .= '<a class="button" href="javascript:CastBack_action_submit_offer_button()">Submit Offer</a>';
-					if( get_field( 'offers', $order_id ) ) { $output .= '<a class="button" href="javascript:CastBack_action_accept_offer_button()">Accept Offer</a>'; }
+					$output .= '<a class="button" href="javascript:CastBack_action_submit_offer_button(\''.$page.'\')">Submit Offer</a>';
+					if( get_field( 'offers', $order_id ) ) { $output .= '<a class="button" href="javascript:CastBack_action_accept_offer_button(\''.$page.'\')">Accept Offer</a>'; }
 				$output .= '</div>';
 			}		
 			/* Submit Payment */
@@ -211,32 +199,33 @@ function CastBack_offers_draw_buttons( $order_id, $orderStatus ) {
 				if( $displayShipping ) {
 					$output .= '<div class="acf_offers" style="float: left; clear: both;">';
 						$output .= '<input style="width: 100px;"id="castback_new_tracking_number" type="text">';
-						$output .= '<a class="button" href="javascript:CastBack_action_add_tracking_button()">Add Tracking Order</a>';
+						$output .= '<a class="button" href="javascript:CastBack_action_add_tracking_button(\''.$page.'\')">Add Tracking Order</a>';
 					$output .= '</div>';
 				}
 				
 				/* Complete Order */
 				if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) ) {
 					$output .= '<div class="acf_offers" style="float: left; clear: both;">';
-						$output .= '<a class="button" href="javascript:CastBack_action_complete_order_button()">Complete Order</a>';
+						$output .= '<a class="button" href="javascript:CastBack_action_complete_order_button(\''.$page.'\')">Complete Order</a>';
 					$output .= '</div>';
 				}
 		//	if( get_current_user_id() == get_field( 'customer_id', $order_id ) ) {
-				$output .= '<div class="acf_dispute" style="float: left; clear: both;"><a class="button" href="javascript:CastBack_action_dispute_order_button()">Dispute Order</a></div>';
+				$output .= '<div class="acf_dispute" style="float: left; clear: both;"><a class="button" href="javascript:CastBack_action_dispute_order_button(\''.$page.'\')">Dispute Order</a></div>';
 			//	}
 			}
     }
 		
 		return $output;
 }
-function CastBack_offers_draw_sidebar( $order_id, $AJAX = true ) {	
+function CastBack_offers_draw_sidebar( $order_id, $page = null, $AJAX = true ) {	
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
 	$order = wc_get_order( $order_id );
+
 	
 	/* Display History */
 	$output = '';
 	$output .= '<h5 style="">Order History';	
-		$output .= '<a class="castback-order-refresh" href="javascript:CastBack_offers_draw_order_page_button('.$order_id.', \'CastBack-'.$page.'\');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
+		$output .= '<a class="castback-order-refresh" href="javascript:CastBack_offers_draw_order_page_button('.$order_id.', \''.$page.'\');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
 	$output .= '</h5>';
 	$output .= '<div class="order_history">';
 
@@ -337,7 +326,7 @@ function CastBack_offers_draw_sidebar( $order_id, $AJAX = true ) {
 
 		/* Send Message */
 		$output .= '<input style="width: 100px;"id="castback_new_message" type="text-area">';
-		$output .= '<a class="button" href="javascript:CastBack_action_send_message_button()">Send Message</a>';
+		$output .= '<a class="button" href="javascript:CastBack_action_send_message_button(\''.$page.'\')">Send Message</a>';
 	
 	$output .= '</div>';
 
