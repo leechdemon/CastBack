@@ -45,8 +45,11 @@ function CastBack_MyOffers( $atts, $content = null ) {
 
 	ob_start();
 
+	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+	if( !$order_id && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
+	
 	echo '<div id="CastBack-MyOffers">';
-		if( $_GET['order_id'] ) { echo CastBack_offers_draw_order_page( $_GET[ 'order_id' ], 'CastBack-'.$page, false ); }
+		if( $order_id ) { echo CastBack_offers_draw_order_page( $order_id, 'CastBack-'.$page, false ); }
 		else { echo CastBack_Offers( 'MyOffers', $page ); }
 	echo '</div>';
 	
@@ -61,8 +64,11 @@ function CastBack_MyOrders( $atts, $content = null ) {
 	
 	ob_start();
 
+	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+	if( !$order_id && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
+	
 	echo '<div id="CastBack-MyOrders">';
-		if( $_GET['order_id'] ) { echo CastBack_offers_draw_order_page( $_GET[ 'order_id' ], 'CastBack-'.$page, false ); }
+		if( $order_id ) { echo CastBack_offers_draw_order_page( $order_id, 'CastBack-'.$page, false ); }
 		else { echo CastBack_Offers( 'MyOrders', $page ); }
 	echo '</div>';
 	

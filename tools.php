@@ -8,26 +8,35 @@ if(!function_exists('Test')) { // PHP script to dump variable into JavaScript co
 	 }
 }
 function castback_admin_edit_listing( $wp_admin_bar ) {
-	if( !$listing_id ) { $listing_id = $_GET['listing_id']; }
-	if( !$listing_id ) { $listing_id = $_POST['listing_id']; }
-			
+	if( !is_admin() ) {
+		$listing_id = '';
+		if( isset($_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
+		if( !$listing_id && isset($_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; }
+				
 		if( $listing_id ) {
-			$url = get_site_URL() . '/wp-admin/post.php?post='.$listing_id.'&action=edit';
-			$args = array(
-					'id'    => 'edit-listing', // Unique ID for your link
-					'title' => 'Edit Listing', // Text displayed in the admin bar
-					'href'  => $url,
-					'meta'  => array(
-							'class' => 'my-custom-link-class', // Optional: Add a custom CSS class
-							'title' => 'Links directly to "Edit Product" in Admin', // Optional: Add a tooltip
-					),
-			);
-			$wp_admin_bar->add_node( $args );
-		}
-} add_action( 'admin_bar_menu', 'castback_admin_edit_listing', 90 );
+				$url = get_site_URL() . '/wp-admin/post.php?post='.$listing_id.'&action=edit';
+				$args = array(
+						'id'    => 'edit-listing', // Unique ID for your link
+						'title' => 'Edit Listing', // Text displayed in the admin bar
+						'href'  => $url,
+						'meta'  => array(
+								'class' => 'my-custom-link-class', // Optional: Add a custom CSS class
+								'title' => 'Links directly to "Edit Product" in Admin', // Optional: Add a tooltip
+						),
+				);
+				$wp_admin_bar->add_node( $args );
+			}
+	}
+}
+add_action( 'admin_bar_menu', 'castback_admin_edit_listing', 90 );
 function castback_admin_edit_order( $wp_admin_bar ) {
-		if( $_GET['order_id'] ) {
-			$url = get_site_URL() . '/wp-admin/admin.php?page=wc-orders&action=edit&id='.$_GET['order_id'].'&action=edit';
+	if( !is_admin() ) {
+		$order_id = '';
+		if( isset($_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( !$order_id && isset($_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
+		
+		if( $order_id ) {
+			$url = get_site_URL() . '/wp-admin/admin.php?page=wc-orders&action=edit&id='.$order_id.'&action=edit';
 			$args = array(
 					'id'    => 'edit-order', // Unique ID for your link
 					'title' => 'Edit Order', // Text displayed in the admin bar
@@ -39,7 +48,9 @@ function castback_admin_edit_order( $wp_admin_bar ) {
 			);
 			$wp_admin_bar->add_node( $args );
 		}
-} add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
+	}
+} 
+add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
 
 function castback_login_redirect( $redirect, $user ) {
   // Get the first of all the roles assigned to the user
@@ -108,7 +119,8 @@ function castback_cron_noOffers( $AJAX = true ) {
 		
 		// if($AJAX) { wp_die(); }
 	}
-} add_action( 'castback_cron', 'castback_cron_noOffers' );
+}
+// add_action( 'castback_cron', 'castback_cron_noOffers' );
 function castback_cron_noExpiredDate( $AJAX = false ) {
 	if( get_field( 'run_automations', 'option' ) ) { 
 		$args = array(
@@ -147,7 +159,8 @@ function castback_cron_noExpiredDate( $AJAX = false ) {
 		
 		// if($AJAX) { wp_die(); }
 	}
-} add_action( 'castback_cron', 'castback_cron_noExpiredDate' );
+}
+// add_action( 'castback_cron', 'castback_cron_noExpiredDate' );
 function castback_cron_noShippedDate( $AJAX = false ) {
 	if( get_field( 'run_automations', 'option' ) ) { 
 		$args = array(
@@ -192,7 +205,8 @@ function castback_cron_noShippedDate( $AJAX = false ) {
 		
 		// if($AJAX) { wp_die(); }
 	}
-} add_action( 'castback_cron', 'castback_cron_noShippedDate' );
+}
+// add_action( 'castback_cron', 'castback_cron_noShippedDate' );
 function castback_cron_noCompletedDate( $AJAX = false ) {
 	if( get_field( 'run_automations', 'option' ) ) { 
 		$args = array(
@@ -236,4 +250,5 @@ function castback_cron_noCompletedDate( $AJAX = false ) {
 		
 		// if($AJAX) { wp_die(); }
 	}
-} add_action( 'castback_cron', 'castback_cron_noCompletedDate' );
+}
+// add_action( 'castback_cron', 'castback_cron_noCompletedDate' );

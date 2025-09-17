@@ -1,18 +1,3 @@
-// function CastBack_action_make_offer_button( listing_id ) {
-	// jQuery.ajax({
-		// type: "POST",
-		// url: castback_object.url,
-		// data: {
-			// "action": "CastBack_action_make_offer",
-			// "listing_id": listing_id, 
-		// },
-		// success: function (data) {
-			// console.log( data );
-			// window.location.href = "/buying/offers/?order_id=" + data;
-		// }
-	// });
-// }
-
 /* Listings */
 function CastBack_action_add_listing_button() {
 	jQuery.ajax({

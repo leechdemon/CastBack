@@ -89,5 +89,5 @@ function custom_query_mylistings( $query ) {
 	// $query->set( 'meta_key', 'post_status' );
 	// $query->set( 'meta_value', array('draft', 'publish') );
 }
-
-if( !$_GET['listing_id'] ) { add_action( 'elementor/query/mylistings' , 'custom_query_mylistings'  ); }
+//This is breaking stuff. Deleted 9/16/25 for Stripe API Testing
+// if( !$_GET['listing_id'] ) { add_action( 'elementor/query/mylistings' , 'custom_query_mylistings'  ); }

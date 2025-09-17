@@ -1,5 +1,6 @@
 <?php
 function CastBack_Offers( $method, $page = null, $AJAX = false ) {
+	$output = '';
 	if( $method == 'MyOffers' ) {
 		$title = 'My Offers';
 		$title_url = '/buying/offers';
@@ -42,12 +43,12 @@ function CastBack_Offers( $method, $page = null, $AJAX = false ) {
 	$orders = wc_get_orders( $args );
 	
 	/* Draw Results */	
-	if( $title_url ) { echo '<h3><a href="'.$title_url.'">'.$title.'</a></h3>'; }
-	else { echo '<h3>'.$title.'</h3>'; }
+	if( $title_url ) { $output .= '<h3><a href="'.$title_url.'">'.$title.'</a></h3>'; }
+	else { $output .= '<h3>'.$title.'</h3>'; }
 	
 	foreach( $orders as $key => $order ) {
 		if( $key+1 == $orderLimit ) {
-			echo '<span><a style="font-size: smaller;" href="'.$title_url.'">View More...</a></span>';
+			$output .= '<span><a style="font-size: smaller;" href="'.$title_url.'">View More...</a></span>';
 		}
 		else {
 			if($order) {
@@ -57,7 +58,7 @@ function CastBack_Offers( $method, $page = null, $AJAX = false ) {
 				// if( $offers[0]['offer_amount'] || get_field( 'customer_id', $order_id ) == get_current_user_id() ) {
 				// if( $offers[0]['offer_amount'] ) {
 					$orderCount++;
-					echo '<a style="display: flex;" href="'.get_site_url().$title_url.'/?order_id='.$order_id.'">Order #' .$order_id .' - '.CastBack_orderStatusCosmetic( $order->get_status() ).'</a>';
+					$output .= '<a style="display: flex;" href="'.get_site_url().$title_url.'/?order_id='.$order_id.'">Order #' .$order_id .' - '.CastBack_orderStatusCosmetic( $order->get_status() ).'</a>';
 					// AJAX "View" URL removed for v0.5 Release
 					// echo '<a class="button" href="javascript:CastBack_edit_listing_button(\''.$listing_id.'\', \''.$user_id.'\', \'CastBack-MyListings\');">Edit Listing</a>';
 
@@ -70,7 +71,7 @@ function CastBack_Offers( $method, $page = null, $AJAX = false ) {
 		}
 	}
 	if( $orderCount < 1 ) {
-		echo 'You have no '.$offersOrders.'.';
+		$output .= 'You have no '.$offersOrders.'.';
 	}
 	
 	if($AJAX) { echo ob_get_clean(); wp_die(); }
@@ -158,7 +159,7 @@ function CastBack_offers_draw_order( $order_id, $page = null, $AJAX = true ) {
 		$output .= CastBack_listings_draw_listing( $listing_id, '949', $AJAX );
 
 		/* Display Buttons */
-		$output .= CastBack_offers_draw_buttons( $order_id, $page, $orderStatus );
+		$output .= CastBack_offers_draw_buttons( $order_id, $orderStatus, $page );
 	} else {
 		$output .=  "order not found.";
 	}
@@ -166,7 +167,7 @@ function CastBack_offers_draw_order( $order_id, $page = null, $AJAX = true ) {
 	// if($order_id) { echo $output; }
 	if($AJAX) { echo $output; wp_die(); } else { return $output; }
 } add_action( 'wp_ajax_CastBack_offers_draw_order', 'CastBack_offers_draw_order' );
-function CastBack_offers_draw_buttons( $order_id, $page = null, $orderStatus ) {
+function CastBack_offers_draw_buttons( $order_id, $orderStatus, $page = null  ) {
     $disputedDate = get_field( 'disputed_date', $order_id );
     $waitingOn = get_field( 'waiting_on', $order_id );
     $order = wc_get_order( $order_id );
