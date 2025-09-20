@@ -130,6 +130,22 @@ function CastBack_action_dispute_order_button( targetDiv ) {
 		}
 	});
 }
+function CastBack_action_remove_dispute_button( targetDiv ) {
+	document.getElementById( targetDiv ).style.opacity = "0.5";
+	var order_id = document.getElementById("castback_order_id").innerHTML;
+	
+	jQuery.ajax({
+		type: "POST",
+		url: castback_object.url,
+		data: {
+			"action": "CastBack_action_remove_dispute",
+			"order_id": order_id,
+		},
+		success: function (data) {
+			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+		}
+	});
+}
 
 /* Refresh Actions */
 function CastBack_offers_draw_order_page_button( order_id, targetDiv ) {	

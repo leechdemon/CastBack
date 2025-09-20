@@ -152,7 +152,7 @@ function castback_cron_noExpiredDate( $AJAX = false ) {
 						
 						$offer_expired = strtotime( '+5 minutes', strtotime( $offer['offer_date'] ) );
 						$currentTime = strtotime( date('F j, Y g:i a') );
-						if( $currentTime > $offer_expired ) { castback_offer_expiration( $order_id, $key ); }
+						if( $currentTime > $offer_expired ) { CastBack_action_expire_offer( $order_id, $key ); }
 					}
 				}
 		}

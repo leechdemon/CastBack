@@ -54,7 +54,7 @@ function CastBack_Listings( $method, $page = false, $AJAX = true ) {
 		} else {
 			foreach( $listings as $key => $listing ) {
 				if( $key+1 == $orderLimit ) {
-					$output .= '<span><a style="font-size: smaller;" href="'.$title_url.'">View More...</a></span>';
+					$output .= '<span><a class="view_more" style="font-size: smaller;" href="'.$title_url.'">View More...</a></span>';
 				}
 				else {
 					if($listing) {
@@ -73,7 +73,7 @@ function CastBack_Listings( $method, $page = false, $AJAX = true ) {
 	if( $AJAX ) { echo $output; wp_die(); }
 	else { echo $output; }
 }
-function CastBack_listings_draw_listing( $listing_id, $templateOverride = false, $AJAX = true ) {
+function CastBack_listings_draw_listing( $listing_id = '', $templateOverride = false, $AJAX = true ) {
 	$listingTemplate = '822';
 	if( $templateOverride ) { $listingTemplate = $templateOverride; }
 	
@@ -169,86 +169,3 @@ function Castback_edit_listing( $listing_id, $AJAX = true ) {
 // $url = '<img style="max-width: 100%; height: auto;" src="'.$imageURL.'">';
 // $url = '<a style="padding-right: 1rem;" href=""><img style="max-width: 15rem;" src="'.$imageURL.'"></a>';
 
-
-
-/* Actions */
-function CastBack_action_listing_status( $post_id ) {
-	$product = wc_get_product( $post_id );
-	if( $product ) {
-		$product->set_status( $_POST['acf']['field_688ce497d2c30'] );
-		// $product->set_name( 'Listing ' . $_POST['acf']['field_688ce497d2c30'] );
-		$product->save();
-	}
-
-	return $post_id;
-} add_filter('acf/pre_save_post' , 'CastBack_action_listing_status', 10, 1 );
-function CastBack_action_listing_featured_image( $post_id ) {
-	$images = get_field( 'images', $post_id );
-	if( $images ) {
-	    $newImageID = '';
-    	for( $r = count($images); $r >= 0; $r-- ) { 
-    	    if( $images[$r-1]['image'] ) { $newImageID = $images[$r-1]['image']; }
-    	}
-    	if( $newImageID ) {
-    	    set_post_thumbnail( $post_id, $newImageID );
-    	} else {
-	    delete_post_thumbnail( $post_id );
-	}
-    } else {
-	    delete_post_thumbnail( $post_id );
-	}
-	return $post_id;
-} add_filter('acf/save_post' , 'CastBack_action_listing_featured_image', 10, 1 );
-function CastBack_action_add_listing($atts, $content = null, $AJAX = true ) {
-	extract(shortcode_atts(array( 'name' => null, 'class' => null ), $atts));
-	
-	ob_start();
-	
-	$product = new WC_Product_Simple();
-	$product->set_name( 'My New Listing' );
-	$product->set_status( 'draft' ); // 'publish', 'draft', 'pending', etc.
-	// $product->set_catalog_visibility( 'visible' ); // 'visible', 'catalog', 'search', 'hidden'
-	// $product->set_description( 'This is a detailed description of my new simple product.' );
-	// $product->set_short_description( 'A brief summary of the product.' );
-	// $product->set_sku( 'MYSIMPLEPROD001' ); // Unique SKU
-	// $product->set_price( 25.99 );
-	// $product->set_regular_price( 25.99 );
-	// $product->set_sale_price( '' ); // Optional: set a sale price
-	// $product->set_manage_stock( true ); // Enable stock management
-	// $product->set_stock_quantity( 100 );
-	// $product->set_stock_status( 'instock' ); // 'instock', 'outofstock'
-	// $product->set_backorders( 'no' ); // 'no', 'notify', 'yes'
-	// $product->set_reviews_allowed( true );
-	// $product->set_sold_individually( false );
-
-	// Set product categories (replace with actual category IDs)
-	// $product->set_category_ids( array( 10, 12 ) ); 
-
-	// Save the product
-	$product_id = $product->save();
-	update_field( 'seller_id', get_current_user_id(), $product_id );
-	// if ( $product_id ) {
-			// echo "Product '{$product->get_name()}' created successfully with ID: {$product_id}";
-	// } else {
-			// echo "Error creating product.";
-	// }
-	
-	echo $product_id;
-	if($AJAX) { wp_die(); }
-	
-} add_shortcode('CastBack_action_add_listing', 'CastBack_action_add_listing');
-add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing' );
-function castback_action_populate_seller_id($field) {
-		// Only run on the front-end
-		if (is_admin()) { return $field; }
-		$field['value'] = get_current_user_id(); // Set the value from a GET parameter
-		
-		return $field;
-} add_filter('acf/prepare_field/key=field_68c043d8de002', 'castback_action_populate_seller_id');
-function CastBack_action_acf_formatPriceFields($field) {
-	$field['value'] = number_format( $field['value'], 2 );
-	
-	return $field;
-}
-add_filter('acf/prepare_field/key=acf-field_68964c94355ed', 'CastBack_action_acf_formatPriceFields');
-add_filter('acf/prepare_field/key=acf-field-68964cb9355ee', 'CastBack_action_acf_formatPriceFields');

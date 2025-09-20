@@ -37,43 +37,51 @@ function CastBack_MakeOffer_Button($atts, $content = null) {
 } add_shortcode('CastBack_MakeOffer_Button', 'CastBack_MakeOffer_Button');
 
 
-function CastBack_MyOffers( $atts, $content = null ) {
-	extract(shortcode_atts(array( 'page' => null, 'class' => null ), $atts));
-	if( $page ) { $page = $page; }
-	else { $page = 'MyOffers'; }
-
-
-	ob_start();
-
+function CastBack_MyOffers( $page, $posts_per_page ) {
 	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 	if( !$order_id && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
 	
-	echo '<div id="CastBack-MyOffers">';
-		if( $order_id ) { echo CastBack_offers_draw_order_page( $order_id, 'CastBack-'.$page, false ); }
-		else { echo CastBack_Offers( 'MyOffers', $page ); }
-	echo '</div>';
-	
-	return ob_get_clean();
-} add_shortcode('CastBack_MyOffers', 'CastBack_MyOffers');
-function CastBack_MyOrders( $atts, $content = null ) {
-	extract(shortcode_atts(array( 'page' => null, 'class' => null ), $atts));
-	if( $page ) { $page = $page; }
-	else { $page = 'MyOrders'; }
-	
-	// acf_form_head();
-	
-	ob_start();
+	$output = '<div id="CastBack-'.$page.'">';
+		if( $order_id ) { $output .= CastBack_offers_draw_order_page( $order_id, 'CastBack-'.$page, false ); }
+		else {  $output .= CastBack_Offers( $page, $page, $posts_per_page ); }
+	$output .= '</div>';
+	return $output;
+}
+function CastBack_MyOrders( $page, $post_per_page ) {
+	return CastBack_MyOffers( $page, $post_per_page );
+}
 
-	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
-	if( !$order_id && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
-	
-	echo '<div id="CastBack-MyOrders">';
-		if( $order_id ) { echo CastBack_offers_draw_order_page( $order_id, 'CastBack-'.$page, false ); }
-		else { echo CastBack_Offers( 'MyOrders', $page ); }
-	echo '</div>';
-	
-	return ob_get_clean();
-} add_shortcode('CastBack_MyOrders', 'CastBack_MyOrders');
+function CastBack_ShortcodeHandler( $atts, $content = null ) {
+		global $castbackVersion;
+		extract(shortcode_atts(array( 'page' => null, 'class' => null, 'posts_per_page' => null ), $atts));
+		
+
+		
+		ob_start();
+		wp_enqueue_style( 'CastBack' );
+
+		// echo do_shortcode('[CastBack_'.$page.' page="'.$page.'"]');		
+		if( $page && function_exists('CastBack_'.$page) ) { echo call_user_func('CastBack_'.$page, $page, $posts_per_page); }
+		else { echo 'function not found.'; }
+			
+		return ob_get_clean();
+} add_shortcode('CastBack', 'CastBack_ShortcodeHandler');
+
+
+
+
+
+// function custom_shortcode_styles() {
+    // global $post;
+    // if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'CastBack') ) {
+        // wp_enqueue_style( 'CastBack-MyOffers', plugins_url() . '/castback.css', array(), $castbackVersion, 'all' );
+        // wp_enqueue_style( 'CastBack' );
+    // }
+// } add_action( 'wp_enqueue_scripts', 'custom_shortcode_styles');
+
+
+
+
 function CastBack_MyListings( $atts, $content = null ) {
 	extract(shortcode_atts(array( 'listing_id' => null, 'page' => null, 'class' => null ), $atts));
 	if( $page ) { $page = 'CastBack-'.$page; }
@@ -93,45 +101,6 @@ function CastBack_MyListings( $atts, $content = null ) {
 	ob_get_flush();
 } add_shortcode('CastBack_MyListings', 'CastBack_MyListings');
 
-function CastBack_MyAccount( $atts, $content = null ) {
-	ob_start();
-
-	// if( $_GET['order_id'] ) { echo CastBack_offers_draw_order_page( $_GET['order_id'], false ); }
-	// else if( $_GET['listing_id'] ) { echo Castback_edit_listing( $_GET['listing_id'], false ); }
-	// else {
-
-		
-		echo '<style>
-			#CastBack-MyAccount, #CastBack-MyListings, #CastBack-MyOffers, #CastBack-MyOrders, #castback-order { display: inline-block; width:50%; float: left; padding: 1rem; margin: 1rem; background-color: tan; }
-			#CastBack-MyAccount { float: left; background: unset; }
-			#CastBack-Logout { float: right; width: fit-content; }
-		</style>';
-		if( is_user_logged_in() ) {
-			echo '<div id="CastBack-MyAccount">';
-				// echo do_shortcode('[CastBack_Inbox page="MyAccount"]');
-				// echo do_shortcode('[CastBack_MyListings page="MyAccount"]');
-				echo do_shortcode('[CastBack_MyOffers page="MyAccount"]');
-				echo do_shortcode('[CastBack_MyOrders page="MyAccount"]');
-			echo '</div>';
-			// echo '<div id="CastBack-Logout" class="button"><a class="button" href="/wp-login.php/?action=logout&redirect_to='.get_site_url().'/login">Log out</a></div>';
-		
-		} else {
-			// echo do_shortcode('[CastBack_ForcedLoginPage]');
-			echo 'Please <a href="/login">log in</a>.';
-		}
-		// echo do_shortcode('[dokan_dashboard]');
-		
-		// dokan_get_template_part( 'dashboard/new-dashboard' );
-		// dokan_get_template_part( 'dashboard/dashboard' );
-		// dokan_get_template_part( 'dashboard/edit-account' );
-		// dokan_get_template_part( 'settings/payment' );
-		// dokan_get_template_part( 'settings/store' );
-		// dokan_get_template_part( 'orders/orders' );
-		
-	// }
-	
-	return ob_get_clean();
-} add_shortcode('CastBack_MyAccount', 'CastBack_MyAccount');
 // function CastBack_ForcedLoginPage( $atts, $content = null ) {
 	// echo '<script>window.location.href="'.get_site_url() . '/login";</script>';
 

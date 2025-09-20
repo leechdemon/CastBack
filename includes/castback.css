@@ -8,21 +8,26 @@
 
 .listing-tag-category { background-color: #0088ff; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; }
 .listing-tag-category a { color: #ffffff !important; font-size: small; }
-.listing-tag-category a:hover { color: #ffffff88 !important; 
+.listing-tag-category a:hover { color: #ffffff88 !important; }
 .listing-tag-msrp { text-decoration: line-through; }
 
 .acf-hidden, .acf-castback-hidden { display: none; }
 
 #CastBack-Logout { float: right; width: 10%; }
-#CastBack-MyAccount { float: left; }
-#CastBack-MyAccount, #CastBack-MyListings, #CastBack-MyOffers, #CastBack-MyOrders, #castback-order { display: inline-block; width: fit-content !important; float: left; padding-bottom: 1rem; margin-bottom: 1rem; }
+#CastBack-MyListings, #CastBack-MyOffers, #CastBack-MyOrders, #castback-order { display: inline-block; min-width: 45%; width: fit-content !important; float: left; padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; }
+#CastBack-MyListing h3, #CastBack-MyOffers h3, #CastBack-MyOrders h3, #castback-order h3 { margin-bottom: 0.5rem; }
+#CastBack-MyListing a.item, #CastBack-MyOffers a.item, #CastBack-MyOrders a.item, #castback-order a.item { display: flex; padding: 0rem 0.25rem; }
+#CastBack-MyListing a.view_more, #CastBack-MyOffers a.view_more, #CastBack-MyOrders a.view_more, #castback-order a.view_more { margin-top: 0.5rem; font-size: smaller; display: block; }
+#CastBack-MyListings { background-color: tan; }
+#CastBack-MyOffers, #castback-offer, #castback-sidebar .offer_history { background-color: lightgoldenrodyellow; }
+#CastBack-MyOrders, #castback-order, #castback-sidebar .order_history { background-color: lightgreen; }
 
 #castback-sidebar { width: 35%; display: inline-block; float: right; margin-bottom: 1rem; }
 
 #CastBack-MyListings .acf-form-submit, #CastBack-MyOffers .acf-form-submit, #CastBack-MyOrders .acf-form-submit, a#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; }
 
 .castback-order-listing { max-width: 575px; float: left; padding: 1rem; padding: 1rem; }
-.castback-order-listing { max-width: 200px; }
+/* .castback-order-listing { max-width: 200px; } */
 .castback-order-details { width: fit-content; }
 
 .castback-order-listing .listing { background-color: #DDDDDD;  }
@@ -35,16 +40,15 @@
 .e-con-full .e-flex:has(> .listing-details) { flex-direction: row; }
 .castback-order-listing .listing-details .e-con-inner { display: block; }
 
-.order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
-.order_history_item  { width: 100%; background-color: #dddddd; float: left; padding: 0.5rem; }
-.order_history_item.customer { background-color: #d4efef; }
-.order_history_item.seller { background-color: #aad3d3; }
-.order_history_subitem { width: 100%; float: left; }
-.order_history_subitem.date { font-size: small; }
-.order_history_subitem.offer_expired { text-decoration: line-through; }
-.order_history_subitem.offer_expired:after { content: " (expired)"; color: red; font-size: smaller; }
-.customer .order_history_subitem { text-align: left; }
-.seller .order_history_subitem { text-align: right; }
+.offer_history, .order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
+.offer_history_item, .order_history_item  { width: 100%; float: left; padding: 0.5rem; }
+.offer_history_item.seller, .order_history_item.seller { background-color: rgba(127,127,127,0.5); }
+.offer_history_subitem, .order_history_subitem { width: 100%; float: left; }
+.offer_history_subitem.date, .order_history_subitem.date { font-size: small; }
+.offer_history_subitem.offer_expired, .order_history_subitem.offer_expired { text-decoration: line-through; }
+.offer_history_subitem.offer_expired:after, .order_history_subitem.offer_expired:after { content: " (expired)"; color: red; font-size: smaller; }
+.customer .order_history_subitem, .customer .offer_history_subitem { text-align: left; }
+.seller .order_history_subitem, .seller .offer_history_subitem { text-align: right; }
 
 .acf_offers, .acf_messages, .acf_shipping, .acf_dispute { width: fit-content; clear: both; float: left; margin: 1rem 0; }
 .acf-field-68a0f1c63178a, .acf-field-68af2cd79c27b, .acf-field-68b1c614b344d { display: none; }
