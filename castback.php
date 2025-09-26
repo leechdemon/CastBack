@@ -10,7 +10,11 @@ require_once plugin_dir_path(__FILE__) . 'tools.php';
 
 require_once plugin_dir_path(__FILE__) . 'includes/actions.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filters.php';
-require_once plugin_dir_path(__FILE__) . 'includes/queries.php';
+
+	/* v0.5 - 9-26-2025 */
+		require_once plugin_dir_path(__FILE__) . 'includes/queries.php';
+	/* Remove ?? */
+	
 require_once plugin_dir_path(__FILE__) . 'includes/shortcodes.php';
 require_once plugin_dir_path(__FILE__) . 'includes/listings.php';
 require_once plugin_dir_path(__FILE__) . 'includes/offers.php';
@@ -21,7 +25,7 @@ $castbackVersion = "0.4.2";
 function CastBack_enqueue_scripts() {
 	global $castbackVersion;
 
-	wp_enqueue_script( 'castback_ajax', plugins_url() . '/castback_ajax.js', array(), $castbackVersion, true );
+	wp_enqueue_script( 'castback_ajax', plugins_url() . '/castback-plugin/includes/castback_ajax.js', array(), $castbackVersion, true );
 
 	/* Also do CSS, which is Preregistered */
 	// wp_enqueue_style( 'CastBack' );

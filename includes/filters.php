@@ -33,6 +33,13 @@ function CastBack_filter_listings_populate_seller_id($field) {
 		
 		return $field;
 } add_filter('acf/prepare_field/key=field_68c043d8de002', 'CastBack_filter_listings_populate_seller_id');
+function CastBack_filter_listings_populate_listing_id($field) {
+		// Only run on the front-end
+		if (is_admin()) { return $field; }
+		$field['value'] = get_the_ID(); // Set the value from a GET parameter
+		
+		return $field;
+} add_filter('acf/prepare_field/key=field_68d42a88bab0f', 'CastBack_filter_listings_populate_listing_id');
 function CastBack_action_acf_formatPriceFields($field) {
 	$field['value'] = number_format( $field['value'], 2 );
 	
@@ -40,3 +47,14 @@ function CastBack_action_acf_formatPriceFields($field) {
 }
 add_filter('acf/prepare_field/key=acf-field_68964c94355ed', 'CastBack_action_acf_formatPriceFields');
 add_filter('acf/prepare_field/key=acf-field-68964cb9355ee', 'CastBack_action_acf_formatPriceFields');
+
+
+
+/* Orders */
+function CastBack_filter_offers_populate_offer_id($field) {
+		// Only run on the front-end
+		if (is_admin()) { return $field; }
+		$field['value'] = get_the_ID(); // Set the value from a GET parameter
+		
+		return $field;
+} add_filter('acf/prepare_field/key=field_68d429cd0734e', 'CastBack_filter_offers_populate_offer_id');

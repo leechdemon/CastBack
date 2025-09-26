@@ -94,12 +94,15 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 		// echo '';
 		if($AJAX) { wp_die(); }
 	} add_action( 'wp_ajax_CastBack_action_send_message', 'CastBack_action_send_message' );
-	function CastBack_action_submit_offer( $order_id = '', $order_amount = '', $AJAX = true ) {
-		if( !$order_id ) { $order_id = $_POST['order_id']; }
-		if( !$order_amount ) { $order_amount = $_POST['order_amount']; }
+	function CastBack_action_submit_offer( ) {
+		if( isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( isset( $_POST['order_amount'] ) ) { $order_amount = $_POST['order_amount']; }
+		
+
+		ob_start();
 		
 		/* Expire "last offer" BEFORE adding the new row! */
-		CastBack_action_expire_offer( $order_id );
+		CastBack_action_expire_offer( $order_id, $AJAX );
 
 		$row = array(
 			'offer_date' => date('F j, Y g:i a'),
@@ -116,8 +119,7 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 		else { $waitingOn = $customer_id; }
 		
 		update_field( 'waiting_on', $waitingOn, $order_id );
-		
-		if($AJAX) { wp_die(); }
+		if($AJAX) { echo ob_get_clean(); wp_die(); }
 	} add_action( 'wp_ajax_CastBack_action_submit_offer', 'CastBack_action_submit_offer' );
 	function CastBack_action_accept_offer( $order_id = '', $AJAX = true ) {
 		if( !$order_id ) { $order_id = $_POST['order_id']; }
@@ -179,8 +181,9 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 		// echo '';
 		if($AJAX) { wp_die(); }
 	} add_action( 'wp_ajax_CastBack_action_accept_offer', 'CastBack_action_accept_offer' );
-	function CastBack_action_expire_offer( $order_id = '', $AJAX = true ) {
-		if( !$order_id ) { $order_id = $_POST['order_id']; }
+	function CastBack_action_expire_offer( $order_id = null, $AJAX = true ) {
+		if( !isset($order_id) ) { $order_id = $_POST['order_id']; }
+		
 		
 		if( $order_id ) {
 			$offers = get_field( 'offers', $order_id );
@@ -193,7 +196,7 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 		}
 		
 		if($AJAX) { echo $output; wp_die(); }
-		else { /* return $output; */ }
+		else { return $output; }
 	} add_action( 'wp_ajax_CastBack_action_expire_offer', 'CastBack_action_expire_offer' );
 
 	/* Processing Orders */

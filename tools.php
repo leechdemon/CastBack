@@ -52,7 +52,7 @@ function castback_admin_edit_order( $wp_admin_bar ) {
 } 
 add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
 
-function castback_login_redirect( $redirect, $user ) {
+// function castback_login_redirect( $redirect, $user ) {
   // Get the first of all the roles assigned to the user
   // $role = $user->roles[0];
   // $myaccount = '/my-account/';
@@ -60,11 +60,15 @@ function castback_login_redirect( $redirect, $user ) {
   // if( $role == '123123123' ) { $redirect = $myaccount; }
   // if( $role == 'administrator' ) { $redirect = $myaccount; }
 	// elseif ( $role == 'customer' || $role == 'vendor' || $role == 'dc_vendor' ) { $redirect = $myaccount; }
-	// $redirect = 'my-account';
-	echo $redirect;
+	// $redirect = '';
+	// echo $redirect;
 	// $redirect = '123';
-  return $redirect;
-} add_filter( 'woocommerce_login_redirect', 'castback_login_redirect', 10, 2 ); 
+  // return $redirect;
+// } add_filter( 'woocommerce_login_redirect', 'castback_login_redirect', 10, 2 ); 
+
+function CastBack_MyNotifications( $page = null, $location = null ) {
+	return;
+}
 
 function castback_cron_noOffers( $AJAX = true ) {
 	if( get_field( 'run_automations', 'option' ) ) { 

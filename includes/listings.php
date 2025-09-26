@@ -71,7 +71,7 @@ function CastBack_Listings( $method, $page = false, $AJAX = true ) {
 	}
 	
 	if( $AJAX ) { echo $output; wp_die(); }
-	else { echo $output; }
+	else { return $output; }
 }
 function CastBack_listings_draw_listing( $listing_id = '', $templateOverride = false, $AJAX = true ) {
 	$listingTemplate = '822';
@@ -89,11 +89,9 @@ function CastBack_listings_draw_listing( $listing_id = '', $templateOverride = f
 	if ( $custom_query->have_posts() ) {
 		while ( $custom_query->have_posts() ) {
 			$custom_query->the_post();
-			echo '<style>.acf-form, .woocommerce-js div.product { display: inline-block !important;</style>';
-			echo '<div class="castback-order-listing" style="width: 100%; float: left; padding: 1rem; padding: 1rem;">';
+			// echo '<style>.acf-form, .woocommerce-js div.product { display: inline-block !important;</style>';
 				echo apply_filters('the_content', '[elementor-template id="'.$listingTemplate.'"]'); 
 				// echo do_shortcode('[elementor-template id="'.$listingTemplate.'"]');
-			echo '</div>';
 			wp_reset_postdata();
 		}
 	}

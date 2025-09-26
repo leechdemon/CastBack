@@ -1,5 +1,5 @@
 <?php
-function CastBack_Offers( $method, $page = null, $orderLimit = null, $AJAX = false ) {
+function CastBack_Offers( $method, $page = null, $orderLimit = null, $AJAX = true ) {
 	$output = '';
 	if( $method == 'MyOffers' ) {
 		$title = 'My Offers';
@@ -17,12 +17,13 @@ function CastBack_Offers( $method, $page = null, $orderLimit = null, $AJAX = fal
 		$orderStatus = array( 'checkout-draft', 'pending', 'on-hold', 'processing', 'completed' );
 		$offersOrders = 'orders';
 	}
-if( $orderLimit ) { $orderLimit++; }
+	if( $orderLimit ) { $orderLimit++; }
 	
 	$args = array(
 		'status' => $orderStatus, // Get completed orders
 		'limit'  => $orderLimit,           // Retrieve up to 10 orders
 		'orderby' => 'date',      // Order by date
+		// 'post_type'  => 'shop_order',  
 		'order'  => 'DESC',  
 		'meta_query' => array(
 			array(
@@ -35,9 +36,10 @@ if( $orderLimit ) { $orderLimit++; }
 	$orders = wc_get_orders( $args );
 	
 	/* Draw Results */	
-	if( $title_url ) { $output .= '<h3><a href="'.$title_url.'">'.$title.'</a></h3>'; }
-	else { $output .= '<h3>'.$title.'</h3>'; }
+	// if( $title_url ) { $output .= '<h3><a href="'.$title_url.'">'.$title.'</a></h3>'; }
+	// else { $output .= '<h3>'.$title.'</h3>'; }
 	
+	$orderCount = 0;
 	foreach( $orders as $key => $order ) {
 		if( $key+1 == $orderLimit ) {
 			$output .= '<a class="view_more" href="'.$title_url.'">View More...</a>';
@@ -45,12 +47,48 @@ if( $orderLimit ) { $orderLimit++; }
 		else {
 			if($order) {
 				$order_id = $order->get_id();
-			
+				
 				$offers = get_field( 'offers', $order_id );
-				// if( $offers[0]['offer_amount'] || get_field( 'customer_id', $order_id ) == get_current_user_id() ) {
-				// if( $offers[0]['offer_amount'] ) {
-					$orderCount++;
-					$output .= '<a class="item" href="'.get_site_url().$title_url.'/?order_id='.$order_id.'">Order #' .$order_id .' - '.CastBack_offers_orderStatus_cosmetic( $order->get_status() ).'</a>';
+				$orderCount++;
+
+				// $output .= CastBack_offers_draw_order_page( $order_id, 'CastBack-'.$page, false );
+
+				// $listingTemplate = '1257';
+				// echo apply_filters('the_content', '[elementor-template id="'.$listingTemplate.'"]'); 
+
+				// $listingTemplate = '822'; //default
+				// $listingTemplate = '949';
+				// $listingTemplate = '824';
+				// $listingTemplate = '822';
+				$buttonTemplate = '1257';
+				
+				$output .= '<div class="castback-order-listing">';
+					$output .= '<h4 style="width: 100%; ">Order #'.$order_id.'</h4>';
+						$listing_id = get_field( 'listing_id', $order_id );
+						$output .= '<div style="padding: 0.5rem 0;">';
+							$output .= '<div style="width: 75%; float: left;">'. CastBack_listings_draw_listing( $listing_id, $listingTemplate, false ).'</div>';
+							
+							/* Replace with "CastBack_offer_buttonpanel()"? Does this exist?? */
+							$output .= '<div style="width: 25%; float: right;">'.do_shortcode('[elementor-template id="'.$buttonTemplate.'"]'). '</div>';
+						$output .= '</div>';
+				$output .= '</div>';
+		
+				
+
+				// $listing_id = get_field( 'listing_id', $order_id );
+				// if( $listing_id ) {
+						// $output .= '<a style="width: 100%; float: left; clear: both;" href="'.get_site_url().$title_url.'/?order_id='.$order_id.'"><h4>Order #'.$order_id.'</h4></a>';
+						// $output .= CastBack_listings_draw_listing( $listing_id, '719', false );
+				// } else {
+					
+
+				
+					/* Text Method */
+					// $output .= '<a class="item" href="'.get_site_url().$title_url.'/?order_id='.$order_id.'">Order #' .$order_id .' - '.CastBack_offers_orderStatus_cosmetic( $order->get_status() ).'</a>';
+				// }
+
+
+
 					// AJAX "View" URL removed for v0.5 Release
 					// echo '<a class="button" href="javascript:CastBack_edit_listing_button(\''.$listing_id.'\', \''.$user_id.'\', \'CastBack-MyListings\');">Edit Listing</a>';
 
@@ -66,7 +104,8 @@ if( $orderLimit ) { $orderLimit++; }
 		$output .= 'You have no '.$offersOrders.'.';
 	}
 	
-	if($AJAX) { echo ob_get_clean(); wp_die(); }
+	// Jason broke the AJAX on MyOffers-refresh to fix Elementor in v0.5
+	// if($AJAX) { ob_start(); echo $output; return ob_get_clean(); wp_die(); }
 	else {
 		ob_start();
 		echo $output;
@@ -139,7 +178,7 @@ function CastBack_offers_draw_order_page( $order_id = '', $page = '', $AJAX = tr
 		/* Display Sidebar */
 		echo '<div id="castback-sidebar" style="width: 35%; display: inline-block; float: right; margin-bottom: 1rem;">';
 			echo CastBack_offers_draw_sidebar( $order_id, $page, false );
-			echo CastBack_offers_draw_sidebar_notes( $order_id, $page, false );
+			// echo CastBack_offers_draw_sidebar_notes( $order_id, $page, false );
 		echo '</div>';
 		
 		if($AJAX) { echo $output; wp_die(); } else { return $output; }
