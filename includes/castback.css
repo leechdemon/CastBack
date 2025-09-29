@@ -16,9 +16,11 @@
 .listing-tag-msrp { text-decoration: line-through; }
 
 .acf-hidden, .acf-castback-hidden { display: none; }
-
+.acf-fields { display: contents; }
 /* #CastBack-Logout { float: right; width: 10%; } */
 /* #CastBack-MyListings a, #CastBack-MyOffers a, #CastBack-MyOrders a, #castback-order a  { color: var(--e-global-color-text); } */
+
+.d-none { display: none !important; }
 #CastBack-MyListings, #CastBack-MyOffers, #CastBack-MyOrders, #castback-order {
 	display: inline-block; /* min-width: 45%; width: fit-content !important; float: left; 
 	padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; */ }
@@ -26,7 +28,7 @@
 /* #castback-order { display: inline-block; min-width: 45%; width: fit-content !important; float: left; padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; } */ */
 /* #CastBack-MyListing h3, #CastBack-MyOffers h3, #CastBack-MyOrders h3, #castback-order h3 { margin-bottom: 0.5rem; } */
 #CastBack-MyListing a.item, #CastBack-MyOffers a.item, #CastBack-MyOrders a.item, #castback-order a.item { display: flex; padding: 0rem 0.25rem; }
-#CastBack-MyListing a.view_more, #CastBack-MyOffers a.view_more, #CastBack-MyOrders a.view_more, #castback-order a.view_more { padding: 0.5rem; display: block; text-align: center;
+a.view_more { width: 100%; padding: 0.5rem; display: flex; text-align: center;
 background-color: var(--e-global-color-primary); color: var(--e-global-color-01b2f71);
 font-family: var(--e-global-typography-secondary-font-family);
 font-weight: var(--e-global-typography-secondary-font-weight);
@@ -39,7 +41,24 @@ font-size: var(--e-global-typography-secondary-font-size);  }
 
 #CastBack-MyListings .acf-form-submit, #CastBack-MyOffers .acf-form-submit, #CastBack-MyOrders .acf-form-submit, a#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; }
 
-.castback-order-listing { display: flex; flex-direction: column; padding: 1.25rem; padding-bottom: 0; }
+.castback-order { display: flex; /* height: fit-content;  */ flex-direction: column; padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
+.castback-listing { display: flex; height: fit-content; }
+.castback-listing .castback-listing-panel  { width: 75%; }
+.castback-listing.disabled .castback-listing-panel  { width: 100%; }
+/* .castback-order, .castback-listing { background-color: var(--e-global-color-01b2f71); } */
+
+#MyOffers, #MyOrders { padding: 1.25rem; }
+#MyListings .castback-listing { background-color:  var(--e-global-color-938a83b); padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
+#MyOffers .castback-order, #MyOffers .castback-listing { background-color: var(--e-global-color-f64482c); }
+#MyOrders .castback-order, #MyOrders .castback-listing { background-color: var(--e-global-color-0a1cea8); }
+#MyOffers .castback-listing, #MyOrders .castback-listing { padding: 0rem; }
+/* .castback-listing:not(:has(> .castback-listing-panel)) { background-color: lightgreen; } */
+
+/* .castback-order, .castback-listing:not(:has(> ..castback-listing-panel)) { background-color: darkyellow); } */
+
+/* .castback-listing .castback-listing-panel { border: solid 2px red; } */
+/* .castback-listing .castback-listing-panel { background-color: white; } */
+/* .castback-order .castback-listing-panel, .castback-listing .castback-listing-panel { background-color: green; } */
 /* .castback-order-details { width: fit-content; } */
 
 /* .castback-order-listing .listing { background-color: #DDDDDD;  } */
@@ -50,7 +69,7 @@ font-size: var(--e-global-typography-secondary-font-size);  }
 /* #CastBack-MyListings .castback-order-listing .listing-buttons { display: unset; } */
 /* .castback-order-listing .listing-details { background-color: white; } */
 /* .e-con-full .e-flex:has(> .listing-details) { flex-direction: row; } */
-/* .castback-order-listing .listing-details .e-con-inner { display: block; } */
+/* .castback-order, .castback-listing .listing-details .e-con-inner { display: block; } */
 
 .offer_history, .order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
 .offer_history_item, .order_history_item  { width: 100%; float: left; padding: 0.5rem; }

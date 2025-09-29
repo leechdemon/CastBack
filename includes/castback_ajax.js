@@ -42,7 +42,7 @@ function CastBack_action_send_message_button( targetDiv ) {
 			"new_message": new_message,
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
@@ -60,7 +60,7 @@ function CastBack_action_submit_offer_button( targetDiv ) {
 			"order_amount": order_amount,
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
@@ -76,7 +76,7 @@ function CastBack_action_accept_offer_button( targetDiv ) {
 			"order_id": order_id, 
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
@@ -94,7 +94,7 @@ function CastBack_action_add_tracking_button( targetDiv ) {
 			"new_tracking_number": new_tracking_number, 
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
@@ -110,7 +110,7 @@ function CastBack_action_complete_order_button( targetDiv ) {
 			"order_id": order_id,
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
@@ -126,7 +126,7 @@ function CastBack_action_dispute_order_button( targetDiv ) {
 			"order_id": order_id,
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
@@ -142,20 +142,20 @@ function CastBack_action_remove_dispute_button( targetDiv ) {
 			"order_id": order_id,
 		},
 		success: function (data) {
-			CastBack_offers_draw_order_page_button( order_id, targetDiv );
+			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
 		}
 	});
 }
 
 /* Refresh Actions */
-function CastBack_offers_draw_order_page_button( order_id, targetDiv ) {	
+function CastBack_Offers_DrawOrderPage_button( order_id, targetDiv ) {	
 	document.getElementById( targetDiv ).style.opacity = "0.5";
 	
 	jQuery.ajax({
 		type: "POST",
 		url: castback_object.url,
 		data: {
-			"action": "CastBack_offers_draw_order_page",
+			"action": "CastBack_Offers_DrawOrderPage",
 			"targetDiv": targetDiv,
 			"order_id": order_id,
 		},
