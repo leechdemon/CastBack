@@ -40,9 +40,11 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 			);
 			$listings = wc_get_products( $args ); 
 	
+			$output .= '<div style="padding: 1.25rem;"><a class="elementor-button elementor-button-link" href="javascript:CastBack_action_add_listing_button();">Add Listing</a></div>';
+	
 			/* Draw Listings */	
 			if ( count($listings) >= 1 ) {
-				foreach( $listings as $key => $listing ) {
+				foreach( $listings as $key => $listing ) {					
 					if( $listing && ($key+1 != $posts_per_page) ) {
 						$listing_id = $listing->get_id();
 						$output .= CastBack_Listings_drawListing( $listing_id, null, true, false );
@@ -78,6 +80,7 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 			while ( $custom_query->have_posts() ) {
 				$custom_query->the_post();
 
+				$disabled = '';
 				if( !$buttonPanelEnabled ) { $disabled = ' disabled'; }
 				else { echo '<h4 style="width: 100%; ">'.get_the_title( $listing_id ).'</h4>'; }
 				

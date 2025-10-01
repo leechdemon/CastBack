@@ -1,47 +1,4 @@
-<?php
-/* Draw Button Panel */
-function CastBack_action_DrawButtonPanel( $post_id ) {
-		
-		ob_start();
-		
-		if( $post_id ) {
-			if( get_post_type( $post_id ) == 'product' ) {
-					echo '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'' .get_the_permalink( $post_id ).'\'">View Listing</button>';
-			    
-					if( is_user_logged_in() ) {
-						if( get_post_field( 'post_author', $post_id ) == get_current_user_id() ) {
-							echo '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\''.get_site_url().'/selling/listings/?listing_id='.$post_id.'\'">Edit Listing</button>';
-						} else {
-							echo '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_action_make_offer_button('.$post_id.')">Make Offer</button>';
-						}
-					}
-			}
-			if( get_post_type( $post_id ) == 'shop_order_placehold' ) {
-				if( is_user_logged_in() ) {
-					$user_id = get_current_user_id();
-					if( $user_id == get_field( 'customer_id', $post_id ) ) { $isCustomer = true; }
-					if( $user_id == get_field( 'seller_id', $post_id ) ) { $isSeller = true; }
-						
-					if( $isCustomer ) {
-						/* Display View Button */
-						echo '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'/buying/offers/?order_id=' .$post_id.'\'">View Offer</button>';
-					} else if( $isSeller ) {
-						/* Display View Button */
-						echo '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'/selling/my-orders/?order_id=' .$post_id.'\'">View Order</button>';
-					} else {
-						echo 'This is not your order. (a27-09272025)';
-					}
-				} else {
-					echo 'Please log in. (a25-09272025)';
-				}
-			}
-		} else {
-			echo 'Missing data. a51-09262025';
-		}
-		
-		return ob_get_clean();
-	}
-	
+<?php	
 /* Listing Actions */
 function CastBack_action_add_listing($atts, $content = null, $AJAX = true ) {
 		extract(shortcode_atts(array( 'name' => null, 'class' => null ), $atts));
@@ -71,6 +28,7 @@ function CastBack_action_add_listing($atts, $content = null, $AJAX = true ) {
 		// Save the product
 		$product_id = $product->save();
 		update_field( 'seller_id', get_current_user_id(), $product_id );
+		update_field( 'listing_id', $product_id, $product_id );
 		// if ( $product_id ) {
 				// echo "Product '{$product->get_name()}' created successfully with ID: {$product_id}";
 		// } else {
@@ -83,13 +41,24 @@ function CastBack_action_add_listing($atts, $content = null, $AJAX = true ) {
 add_shortcode('CastBack_action_add_listing', 'CastBack_action_add_listing');
 add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing' );
 
+
 /* Order Actions */
 	/* Draft Offers */
-	function CastBack_action_make_offer( $listing_id = '', $AJAX = true ) {
-		if( !$listing_id ) { $listing_id = $_POST['listing_id']; }
+	function CastBack_action_make_offer( $listing_id = null, $AJAX = false ) {
+		/* 9/30/25 */
+		/* Works on Listing (Grid)+(Row), but different methods? 
+		/*
+
+		/* 9/30/25 */
+		/* Works on Listing AJAX vs inline. Shortcode->inline us current method. */
+		/*  */
+		
+		if( isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; $AJAX = true; }
+		if( !isset( $listing_id ) && isset( $_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; $AJAX = false; }
+		$success = true;
 		
 		$customer_id = get_current_user_id();
-		
+				
 		$args = array(
 				'status'        => 'wc-checkout-draft',
 				'customer_id'   => $customer_id,
@@ -98,15 +67,17 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 		// Save the order to the database
 		$order->save();
 		$order_id = $order->get_id();
-		
+		if( !$order_id ) { $success = false; }
+
 
 
 		/* Set ACF fields */
-		update_field( 'customer_id', $customer_id, $order_id );
-		update_field( 'seller_id', get_post_field( 'post_author', $listing_id ), $order_id );
-		update_field( 'waiting_on', $customer_id, $order_id );
-		update_field( 'listing_id', $listing_id, $order_id );
-		update_field( 'order_amount', get_field( 'listing_price', $listing_id ), $order_id );
+		if( $success && !update_field( 'customer_id', $customer_id, $order_id ) ) { $success = false; }
+		if( $success && !update_field( 'seller_id', get_post_field( 'post_author', $listing_id ), $order_id ) ) { $success = false; }
+		if( $success && !update_field( 'waiting_on', $customer_id, $order_id ) ) { $success = false; }
+		if( $success && !update_field( 'listing_id', $listing_id, $order_id ) ) { $success = false; }
+		if( $success && !update_field( 'order_amount', get_field( 'listing_price', $listing_id ), $order_id ) ) { $success = false; }
+
 
 		// ob_start();
 
@@ -116,31 +87,38 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 				// $output .= "Failed to create new order.";
 		// }
 		
-		$output .= $order_id;
-		if($AJAX) { echo $output; wp_die(); } else { return $output; }
+		if( $success ) {
+			if( $AJAX ) {
+				echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				wp_die();
+			} else {
+				wp_safe_redirect( esc_url_raw( add_query_arg( 'order_id', $order_id, get_site_url(). '/buying/offers/' ) ) );
+			}
+		} else {
+			// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+		}
 	} add_action( 'wp_ajax_CastBack_action_make_offer', 'CastBack_action_make_offer' );
-	function CastBack_action_send_message( $order_id = '', $new_message = '', $AJAX = true ) {
-		if( !$order_id ) { $order_id = $_POST['order_id']; }
-		if( !$new_message ) { $new_message = $_POST['new_message']; }
-		// $new_message = get_field( 'new_message', $order_id );
+	function CastBack_action_send_message( $order_id = null ) {
+		if( isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( isset( $_POST['new_message'] ) ) { $new_message = $_POST['new_message']; }
 		
-		if( $new_message ) {
+		if( isset( $order_id ) && isset( $new_message ) ) {
 			$row = array(
 				'message_date' => date('F j, Y g:i a'),
 				'message_text' => $new_message,
 				'message_user_id' => get_current_user_id(),
 			);
-			add_row( 'messages', $row, $order_id );
-			// update_field( 'new_message', '', $order_id );
+			if( add_row( 'messages', $row, $order_id ) ) {
+				echo CastBack_Offers_drawOrderDetails( $order_id ); 
+			}
 		}
 		
-		// echo '';
-		if($AJAX) { wp_die(); }
+		wp_die();
 	} add_action( 'wp_ajax_CastBack_action_send_message', 'CastBack_action_send_message' );
-	function CastBack_action_submit_offer( ) {
+	function CastBack_action_submit_offer( $order_id = null ) {
 		if( isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 		if( isset( $_POST['order_amount'] ) ) { $order_amount = $_POST['order_amount']; }
-		
+		$success = true;
 
 		ob_start();
 		
@@ -152,8 +130,9 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 			'offer_amount' => number_format( $order_amount, 2 ),
 			'offer_user_id' => get_current_user_id(),
 		);
-		add_row( 'offers', $row, $order_id );
-		update_field( 'order_amount', number_format( $order_amount, 2 ), $order_id );
+		if( !add_row( 'offers', $row, $order_id ) ) { $success = false; }
+		
+		if( $success && !update_field( 'order_amount', number_format( $order_amount, 2 ), $order_id ) ) { $success = false; }
 
 		$customer_id = get_field( 'customer_id', $order_id );
 		$seller_id = get_field( 'seller_id', $order_id );
@@ -161,11 +140,22 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 		if( get_current_user_id() == $customer_id ) { $waitingOn = $seller_id; }
 		else { $waitingOn = $customer_id; }
 		
-		update_field( 'waiting_on', $waitingOn, $order_id );
-		if($AJAX) { echo ob_get_clean(); wp_die(); }
+		if( $success & !update_field( 'waiting_on', $waitingOn, $order_id ) ) { $success = false; }
+		
+		
+		if( $success ) {
+			if( $AJAX ) {
+				echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				wp_die();
+			} else {
+				wp_safe_redirect( esc_url_raw( add_query_arg( 'order_id', $order_id, get_site_url(). '/buying/offers/' ) ) );
+			}
+		} else {
+			// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+		}
 	} add_action( 'wp_ajax_CastBack_action_submit_offer', 'CastBack_action_submit_offer' );
-	function CastBack_action_accept_offer( $order_id = '', $AJAX = true ) {
-		if( !$order_id ) { $order_id = $_POST['order_id']; }
+	function CastBack_action_accept_offer( $order_id = null ) {
+		if( isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 		
 		$offers = get_field( 'offers', $order_id );
 		if( !( end($offers)['offer_expired_date'] ) ) {
@@ -220,13 +210,21 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 			
 			/* "Waiting On" is toggled via "woocommerce_payment_complete" */
 		}
-		
-		// echo '';
-		if($AJAX) { wp_die(); }
+				
+		if( $success ) {
+			if( $AJAX ) {
+				echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				wp_die();
+			} else {
+				wp_safe_redirect( esc_url_raw( add_query_arg( 'order_id', $order_id, get_site_url(). '/buying/offers/' ) ) );
+			}
+		} else {
+			// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+		}
 	} add_action( 'wp_ajax_CastBack_action_accept_offer', 'CastBack_action_accept_offer' );
-	function CastBack_action_expire_offer( $order_id = null, $AJAX = true ) {
+	function CastBack_action_expire_offer( $order_id = null ) {
 		if( !isset($order_id) ) { $order_id = $_POST['order_id']; }
-		
+		$success = false;
 		
 		if( $order_id ) {
 			$offers = get_field( 'offers', $order_id );
@@ -234,12 +232,20 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 				$row = array(
 						'offer_expired_date'	=>	date( 'F j, Y g:i a' ),
 				);
-				update_row( 'offers', count($offers), $row, $order_id );
+				$success = update_row( 'offers', count($offers), $row, $order_id );
 			}
 		}
 		
-		if($AJAX) { echo $output; wp_die(); }
-		else { return $output; }
+		if( $success ) {
+			if( $AJAX ) {
+				echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				wp_die();
+			} else {
+				wp_safe_redirect( esc_url_raw( add_query_arg( 'order_id', $order_id, get_site_url(). '/buying/offers/' ) ) );
+			}
+		} else {
+			// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+		}
 	} add_action( 'wp_ajax_CastBack_action_expire_offer', 'CastBack_action_expire_offer' );
 
 	/* Processing Orders */
@@ -289,52 +295,69 @@ add_action( 'wp_ajax_CastBack_action_add_listing', 'CastBack_action_add_listing'
 			else { echo $output; wp_die(); }
 		}	else { return $output; }
 	} add_action( 'wp_ajax_CastBack_action_remove_dispute', 'CastBack_action_remove_dispute' );
-	function CastBack_action_add_tracking( $order_id = '', $trackingNumber = '', $AJAX = true ) {
+	function CastBack_action_add_tracking( $order_id = null, $trackingNumber = null ) {
 			if( !$order_id ) { $order_id = $_POST['order_id']; }
 			if( !$trackingNumber ) { $trackingNumber = $_POST['new_tracking_number']; }
+			$success = true;
 			
-			if( $trackingNumber ) {
-				$trackingDate = date('F j, Y g:i a');
-				$row = array(
-					'tracking_date' => $trackingDate,
-					'tracking_number' => $trackingNumber,
-					'tracking_user_id' => get_current_user_id(),
-				);
-				add_row( 'tracking', $row, $order_id );			
-				update_field( 'new_tracking_number', '', $order_id );
+			if( isset( $order_id ) ) {
+				if( $trackingNumber ) {
+					$trackingDate = date('F j, Y g:i a');
+					$row = array(
+						'tracking_date' => $trackingDate,
+						'tracking_number' => $trackingNumber,
+						'tracking_user_id' => get_current_user_id(),
+					);
+					if( $success && !add_row( 'tracking', $row, $order_id ) ) { $success = false; }
+					if( $success && !update_field( 'new_tracking_number', '', $order_id ) ) { $success = false; }
+					
+					$shippedDate = get_field( 'shipped_date', $order_id );
+					if( !$shippedDate ) {
+						if( $success && !update_field( 'shipped_date', $trackingDate, $order_id ) ) { $success = false; }
+						if( $success && !update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id ) ) { $success = false; }
+						$order = wc_get_order($order_id);
+						if( $success && !$order->update_status('wc-processing') ) { $success = false; }
+					}
+					$customer_id = get_field( 'customer_id', $order_id );
+					$seller_id = get_field( 'seller_id', $order_id );
 				
-				$shippedDate = get_field( 'shipped_date', $order_id );
-				if( !$shippedDate ) {
-					update_field( 'shipped_date', $trackingDate, $order_id );
-					update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
-					$order = wc_get_order($order_id);
-					$order->update_status('wc-processing');
-				}	$customer_id = get_field( 'customer_id', $_GET['order_id'] );
-				$seller_id = get_field( 'seller_id', $_GET['order_id'] );
-			
-				if( get_current_user_id() == $customer_id ) { $waitingOn = $seller_id; }
-				else { $waitingOn = $customer_id; }
-				
-				update_field( 'waiting_on', $waitingOn, $_GET['order_id'] );
+					if( get_current_user_id() == $customer_id ) { $waitingOn = $seller_id; }
+					else { $waitingOn = $customer_id; }
+					
+					if( $success && !update_field( 'waiting_on', $waitingOn, $order_id ) ) { $success = false; }
+				} else {
+					echo 'Missing tracking number. (a327-09302025)';
+				}
 			} else {
-				// do nothing
+				echo 'Missing order_id. (a329-09302025)';
 			}
 			
-			// echo '';
-			if($AJAX) { wp_die(); }
+			if( $success ) {
+				echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				wp_die();
+			} else {
+				// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				echo 'failed';
+				wp_die();
+			}
 		} add_action( 'wp_ajax_CastBack_action_add_tracking', 'CastBack_action_add_tracking' );
-	function CastBack_action_complete_order( $order_id = '', $AJAX = true ) {
-		if( !$order_id ) { $order_id = $_POST['order_id']; }
+	function CastBack_action_complete_order( $order_id = null ) {
+		if( !isset( $order_id ) ) { $order_id = $_POST['order_id']; }
+		$success = true;
 		
-		// echo $order_id;
-		
-		update_field( 'completed_date', date('F j, Y g:i a'), $order_id );
+		if( $success && !update_field( 'completed_date', date('F j, Y g:i a'), $order_id ) ) { $success = false; }
 
 		$order = wc_get_order($order_id);
-		$order->update_status('wc-completed');
+		if( $success && !$order->update_status('wc-completed') ) { $success = false; }
 		
-		// echo '';
-		if($AJAX) { wp_die(); }
+		if( $success ) {
+			echo CastBack_Offers_drawOrderDetails( $order_id ); 
+			wp_die();
+		} else {
+			// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+			echo 'failed';
+			wp_die();
+		}
 	} add_action( 'wp_ajax_CastBack_action_complete_order', 'CastBack_action_complete_order' );
 
 /* Admin Actions */

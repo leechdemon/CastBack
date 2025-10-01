@@ -1,45 +1,46 @@
 .yith-wcwl-add-to-wishlist-button { padding: 0.5rem 1rem !important; margin-bottom: 0.5rem; }
+.yith-add-to-wishlist-button-block { margin: unset !important; }
 
 /* Hide Woo/Dokan Sidebar UI's */
 .woocommerce-MyAccount-navigation, .dokan-dash-sidebar { display: none !important; }
 .woocommerce-MyAccount-content, .dokan-dashboard-content .dokan-settings-content { width: 100% !important; padding: 1.25rem !important; }
 
-.listing-status-Published { display: none; }
- #CastBack-MyListings .listing-status-Published { display: flex; }
-.listing-status-Draft { background-color: #ff0000; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; }
-.listing-status-Published { background-color: #00ff00; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; }
-.listing-status-unknown { background-color: #888888; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; }
 
-.listing-tag-category { background-color: #0088ff; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; }
-.listing-tag-category a { color: #ffffff !important; font-size: small; }
-.listing-tag-category a:hover { color: #ffffff88 !important; }
-.listing-tag-msrp { text-decoration: line-through; }
+
+/* .listing-status-Published { display: none; } */
+ /* #CastBack-MyListings .listing-status-Published { display: flex; } */
+/* .listing-status-Draft { background-color: #ff0000; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */
+/* .listing-status-Published { background-color: #00ff00; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */
+/* .listing-status-unknown { background-color: #888888; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */
+
+/* .listing-tag-category { background-color: #0088ff; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */
+/* .listing-tag-category a { color: #ffffff !important; font-size: small; } */
+/* .listing-tag-category a:hover { color: #ffffff88 !important; } */
+/* .listing-tag-msrp { text-decoration: line-through; } */
 
 .acf-hidden, .acf-castback-hidden { display: none; }
 .acf-fields { display: contents; }
+.d-none { display: none !important; }
 /* #CastBack-Logout { float: right; width: 10%; } */
 /* #CastBack-MyListings a, #CastBack-MyOffers a, #CastBack-MyOrders a, #castback-order a  { color: var(--e-global-color-text); } */
 
-.d-none { display: none !important; }
-#CastBack-MyListings, #CastBack-MyOffers, #CastBack-MyOrders, #castback-order {
-	display: inline-block; /* min-width: 45%; width: fit-content !important; float: left; 
-	padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; */ }
+/* #CastBack-MyListings, #CastBack-Listing, #CastBack-MyOffers, #CastBack-MyOrders, #castback-order { display: inline-block; } */
+/* min-width: 45%; width: fit-content !important; float: left; 
+	padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; } */
 /* Below is a duplicate, if 'castback-order' is needed.... */
 /* #castback-order { display: inline-block; min-width: 45%; width: fit-content !important; float: left; padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; } */ */
 /* #CastBack-MyListing h3, #CastBack-MyOffers h3, #CastBack-MyOrders h3, #castback-order h3 { margin-bottom: 0.5rem; } */
-#CastBack-MyListing a.item, #CastBack-MyOffers a.item, #CastBack-MyOrders a.item, #castback-order a.item { display: flex; padding: 0rem 0.25rem; }
-a.view_more { width: 100%; padding: 0.5rem; display: flex; text-align: center;
-background-color: var(--e-global-color-primary); color: var(--e-global-color-01b2f71);
-font-family: var(--e-global-typography-secondary-font-family);
-font-weight: var(--e-global-typography-secondary-font-weight);
-font-size: var(--e-global-typography-secondary-font-size);  }
+/* #CastBack-MyListing a.item, #CastBack-MyOffers a.item, #CastBack-MyOrders a.item, #castback-order a.item { display: flex; padding: 0rem 0.25rem; } */
+
+/* a.elementor-button { display: none; } */
+/* button.woocommerce-button.button.woocommerce-form-login__submit { background-color: red !important; color: blue !important; } */
 /* #CastBack-MyListings { background-color: tan; } */
 /* #CastBack-MyOffers, #castback-offer, #castback-sidebar .offer_history { background-color: lightgoldenrodyellow; } */
 /* #CastBack-MyOrders, #castback-order, #castback-sidebar .order_history { background-color: lightgreen; } */
 
 #castback-sidebar { width: 35%; display: inline-block; float: right; margin-bottom: 1rem; }
 
-#CastBack-MyListings .acf-form-submit, #CastBack-MyOffers .acf-form-submit, #CastBack-MyOrders .acf-form-submit, a#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; }
+/* #CastBack-MyListings .acf-form-submit, #CastBack-MyOffers .acf-form-submit, #CastBack-MyOrders .acf-form-submit, a#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; } */
 
 .castback-order { display: flex; /* height: fit-content;  */ flex-direction: column; padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
 .castback-listing { display: flex; height: fit-content; }
@@ -47,11 +48,11 @@ font-size: var(--e-global-typography-secondary-font-size);  }
 .castback-listing.disabled .castback-listing-panel  { width: 100%; }
 /* .castback-order, .castback-listing { background-color: var(--e-global-color-01b2f71); } */
 
-#MyOffers, #MyOrders { padding: 1.25rem; }
-#MyListings .castback-listing { background-color:  var(--e-global-color-938a83b); padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
-#MyOffers .castback-order, #MyOffers .castback-listing { background-color: var(--e-global-color-f64482c); }
-#MyOrders .castback-order, #MyOrders .castback-listing { background-color: var(--e-global-color-0a1cea8); }
-#MyOffers .castback-listing, #MyOrders .castback-listing { padding: 0rem; }
+#CastBack-MyOffers, #CastBack-MyOrders, #CastBack-Listings, #CastBack-DrawListing, #CastBack-Shop { padding: 1.25rem; }
+#CastBack-MyListings .castback-listing, #CastBack-DrawListing .castback-listing, #CastBack-Shop .castback-listing { background-color:  var(--e-global-color-938a83b); padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
+#CastBack-MyOffers .castback-order, #CastBack-MyOffers .castback-listing { background-color: var(--e-global-color-f64482c); }
+#CastBack-MyOrders .castback-order, #CastBack-MyOrders .castback-listing { background-color: var(--e-global-color-0a1cea8); }
+#CastBack-MyOffers .castback-listing, #CastBack-MyOrders .castback-listing { padding: 0rem; }
 /* .castback-listing:not(:has(> .castback-listing-panel)) { background-color: lightgreen; } */
 
 /* .castback-order, .castback-listing:not(:has(> ..castback-listing-panel)) { background-color: darkyellow); } */
@@ -71,6 +72,10 @@ font-size: var(--e-global-typography-secondary-font-size);  }
 /* .e-con-full .e-flex:has(> .listing-details) { flex-direction: row; } */
 /* .castback-order, .castback-listing .listing-details .e-con-inner { display: block; } */
 
+#acf-form input.acf-button { margin: 1rem; }
+#acf-form { background-color: var(--e-global-color-primary); }
+/* #acf-form .acf-label label { color: white; } */
+#acf-form a.acf-button { color: var(--e-global-color-01b2f71); }
 .offer_history, .order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
 .offer_history_item, .order_history_item  { width: 100%; float: left; padding: 0.5rem; }
 .offer_history_item.seller, .order_history_item.seller { background-color: rgba(127,127,127,0.5); }

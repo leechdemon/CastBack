@@ -28,9 +28,8 @@ function CastBack_action_make_offer_button( listing_id ) {
 		}
 	});
 }
-function CastBack_action_send_message_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_send_message_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	var new_message = document.getElementById("castback_new_message").value;
 
 	jQuery.ajax({
@@ -42,13 +41,13 @@ function CastBack_action_send_message_button( targetDiv ) {
 			"new_message": new_message,
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
-function CastBack_action_submit_offer_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_submit_offer_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	var order_amount = document.getElementById("castback_offer_amount").value;
 	
 	jQuery.ajax({
@@ -60,13 +59,13 @@ function CastBack_action_submit_offer_button( targetDiv ) {
 			"order_amount": order_amount,
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
-function CastBack_action_accept_offer_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_accept_offer_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	
 	jQuery.ajax({
 		type: "POST",
@@ -76,13 +75,13 @@ function CastBack_action_accept_offer_button( targetDiv ) {
 			"order_id": order_id, 
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
-function CastBack_action_add_tracking_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_add_tracking_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	var new_tracking_number = document.getElementById("castback_new_tracking_number").value;
 	
 	jQuery.ajax({
@@ -94,13 +93,13 @@ function CastBack_action_add_tracking_button( targetDiv ) {
 			"new_tracking_number": new_tracking_number, 
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
-function CastBack_action_complete_order_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_complete_order_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	
 	jQuery.ajax({
 		type: "POST",
@@ -110,13 +109,13 @@ function CastBack_action_complete_order_button( targetDiv ) {
 			"order_id": order_id,
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
-function CastBack_action_dispute_order_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_dispute_order_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	
 	jQuery.ajax({
 		type: "POST",
@@ -126,13 +125,12 @@ function CastBack_action_dispute_order_button( targetDiv ) {
 			"order_id": order_id,
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			CastBack_Offers_drawOrderDetails_button( order_id );
 		}
 	});
 }
-function CastBack_action_remove_dispute_button( targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
-	var order_id = document.getElementById("castback_order_id").innerHTML;
+function CastBack_action_remove_dispute_button( order_id ) {
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	
 	jQuery.ajax({
 		type: "POST",
@@ -142,31 +140,32 @@ function CastBack_action_remove_dispute_button( targetDiv ) {
 			"order_id": order_id,
 		},
 		success: function (data) {
-			CastBack_Offers_DrawOrderPage_button( order_id, targetDiv );
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
 
 /* Refresh Actions */
-function CastBack_Offers_DrawOrderPage_button( order_id, targetDiv ) {	
-	document.getElementById( targetDiv ).style.opacity = "0.5";
+function CastBack_Offers_drawOrderDetails_button( order_id ) {	
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	
 	jQuery.ajax({
 		type: "POST",
 		url: castback_object.url,
 		data: {
-			"action": "CastBack_Offers_DrawOrderPage",
-			"targetDiv": targetDiv,
+			"action": "CastBack_Offers_drawOrderDetails",
+			"AJAX": true,
 			"order_id": order_id,
 		},
 		success: function (data) {
-			document.getElementById( targetDiv ).innerHTML = data;
-			document.getElementById( targetDiv ).style.opacity = "1.0";
+			document.getElementById( 'CastBack-Order-' + order_id ).innerHTML = data;
+			document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "1.0";
 		}
 	});
 }
 function CastBack_edit_listing_button( listing_id, user_id, targetDiv ) {
-	document.getElementById( targetDiv ).style.opacity = "0.5";
+	document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 
 	jQuery.ajax({
 		type: "POST",
@@ -178,7 +177,7 @@ function CastBack_edit_listing_button( listing_id, user_id, targetDiv ) {
 		},
 		success: function (data) {
 			document.getElementById( targetDiv ).innerHTML = data;
-		document.getElementById( targetDiv ).style.opacity = "1.0";
+			document.getElementById( targetDiv ).style.opacity = "1.0";
 		}
 	});
 }
