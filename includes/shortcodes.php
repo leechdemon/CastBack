@@ -1,46 +1,8 @@
 <?php  
 
-
-function print_menu_shortcode($atts, $content = null) {
-	extract(shortcode_atts(array( 'name' => null, 'class' => null ), $atts));
-	return wp_nav_menu( array( 'menu' => $name, 'menu_class' => 'myclass', 'echo' => false ) );
-} add_shortcode('menu', 'print_menu_shortcode');
-
-
-function CastBack_AddListing_Button($atts, $content = null) {
-	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null ), $atts));
-	ob_start();
-	
-	if( is_user_logged_in() ) {
-		$url = get_site_url().'/selling/listings/';
-		echo '<a class="button" href="javascript:CastBack_action_add_listing_button();">Add Listing</a>';
-	} else {
-		// echo '<a class="button" href="'. get_site_url().'/login?redirect_to=javascript:CastBack_action_make_offer_button('.$listing_id.');">Add Listing (login)</a>';
-		echo '<a class="button" href="'. get_site_url().'/login">Add Listing (login)</a>';
-	}
-
-	return ob_get_clean();
-} 
-// add_shortcode('CastBack_AddListing_Button', 'CastBack_AddListing_Button');
-function CastBack_MakeOffer_Button($atts, $content = null) {
-	extract(shortcode_atts(array( 'listing_id' => null, 'class' => null ), $atts));
-	ob_start();
-	
-	if( is_user_logged_in() ) {
-		$url = get_site_url().'/buying/offers/';
-		echo '<a class="button" href="javascript:CastBack_action_make_offer_button('.$listing_id.');">Make Offer</a>';
-	} else {
-		// echo '<a class="button" href="'. get_site_url().'/login?redirect_to=javascript:CastBack_action_make_offer_button('.$listing_id.');">Make Offer (login)</a>';
-		echo '<button" href="'. get_site_url().'/login">Make Offer (login)</a>';
-	}
-
-	return ob_get_clean();
-} 
-// add_shortcode('CastBack_MakeOffer_Button', 'CastBack_MakeOffer_Button');
-
 function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		global $castbackVersion;
-		extract(shortcode_atts(array( 'page' => null, 'action' => null, 'button' => null, 'listing_id' => null, 'order_id' => null, 'featuredImage' => null, 'class' => null, 'setQuery' => null, 'posts_per_page' => null, 'location' => null ), $atts));
+		extract(shortcode_atts(array( 'page' => null, 'action' => null, 'button' => null, 'listing_id' => null, 'order_id' => null, 'featuredImage' => null, 'class' => null, 'setQuery' => null, 'posts_per_page' => null, 'location' => null, 'post_status' => null ), $atts));
 		
 
 		if( !isset( $listing_id ) && isset( $_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; }
@@ -53,7 +15,9 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		wp_enqueue_style( 'CastBack' );
 	
 		if( $page ) {
+			
 			/* We only show pages to logged-in users... */
+			/* ... or 'DrawListing'... */
 			if( is_user_logged_in() || $page == 'DrawListing' ) {
 				echo '<div id="CastBack-'.$page.'">';
 				// if( $page == 'LogOut' ) { 
@@ -71,62 +35,75 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 					if( isset( $listing_id ) ) {
 						echo CastBack_Listings_drawListing( $listing_id, null, true, false );
 					}
+				} else if( $page == 'MarkSold' ) {
+					// echo CastBack_Listings_drawListing( $listing_id, null, true, false );
+					echo CastBack_Action_DrawButtonPanel_markSold( $listing_id );
 				} else if( $page == 'MyOffers' ) { 
-						if( isset( $listing_id ) ) {
-							echo CastBack_Listings_drawListing( $listing_id, null, true, false );
-							$order_id = CastBack_action_make_offer( $listing_id, false );
-						} else {
-							if( isset( $order_id ) ) {
+					// if( isset( $listing_id ) ) {
+						// echo CastBack_Listings_drawListing( $listing_id, null, true, false );
+						// $order_id = CastBack_Action_makeOffer( $listing_id, false );
+					// } else {
+						if( isset( $order_id ) ) {
+							if( CastBack_Offers_customerSeller( $order_id ) ) {
 								echo CastBack_Offers( $order_id, 1 );
 								echo CastBack_Offers_drawOrderDetails( $order_id );
 							} else {
-								echo CastBack_Offers( $page, $posts_per_page );
+								echo 'This is not your order. Please try again. (S51-10022025).';
 							}
-						}
-				} else if( $page == 'MyOrders' ) { 
-						if( isset( $order_id ) ) {
+						} else { echo CastBack_Offers( $page, $posts_per_page ); }
+					// }
+				} else if( $page == 'MyOrders' ) {
+					if( isset( $order_id ) ) {
+
+						if( CastBack_Offers_customerSeller( $order_id ) ) {
 							echo CastBack_Offers( $order_id, 1 );
 							echo CastBack_Offers_drawOrderDetails( $order_id );
 						} else {
-							echo CastBack_Offers( $page, $posts_per_page );
+							echo 'This is not your order. Please try again. (S51-10022025).';
 						}
+					} else { echo CastBack_Offers( $page, $posts_per_page ); }
 				} else {
-					echo 'function "'.$page.'" not "page" found. (s74-09232025)';
+					echo 'function "'.$page.'" not found. (s74-09232025)';
 				}
 				echo '</div>'; // close <div id="$page">
 			} else {
 				echo 'Please log in. (s90-09292025)';
 			}
 		// } else if( $button == 'drawButtonPanel' ) {
-			// echo CastBack_action_DrawButtonPanel( $listing_id );
+			// echo CastBack_Action_DrawButtonPanel( $listing_id );
 		} else if( $button ) {
-			// echo CastBack_action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+			
+			// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 			// if( $button == 'makeOffer' ) {
-				// echo 'javascript:CastBack_action_make_offer_button("'.$post_id.'")';
-				// echo CastBack_action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo 'javascript:CastBack_Action_makeOffer_button("'.$post_id.'")';
+				// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 			// if( $button == ['sendMessage', 'submitOffer', 'acceptOffer', 'expireOffer', 'paymentComplete', 'disputeOrder', 'removeDispute', 'addTracking', 'completeOrder', ] ) {
-				// echo CastBack_action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 			// if( $button == [ 'remove_dispute' ] ) {
-				// echo CastBack_action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 		} else if( $action ) {
-			if( $action == "makeOffer" ) {
-				if( is_user_logged_in() ) {
-					if( isset( $listing_id ) ) {
-						CastBack_action_make_offer( $listing_id );
+			if( is_user_logged_in() ) {
+				if( $action == "addListing" ) {
+					if( isset( $listing_id ) && $listing_id == $action ) {
+						CastBack_Action_addListing( false );
 					} else {
-						echo 'No Listing ID found. (s121-09302025)';
+						echo 'Wrong listing_id set. (s85-10012025)';
 					}
+				} else if( $action == "makeOffer" ) {
+					if( isset( $listing_id ) ) { CastBack_Action_makeOffer( $listing_id ); }
+					else { echo 'No Listing ID found. (s95-09302025)'; }
 				} else {
-					echo 'Please log in. (s118-09302025)';
+					echo 'Action "'.$action.' not found". (s98-09302025)';
 				}
+			} else {
+				echo 'Please log in. (s98-09302025)';
 			}
-			
 		} else {
-			echo 'nothing found. ("'.get_the_ID().'", s75-09232025)';
+			echo 'no shortcode found. ("'.get_the_ID().'", s75-09232025)';
 		}
 			
 		return ob_get_clean();

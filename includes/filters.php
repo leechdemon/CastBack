@@ -1,31 +1,30 @@
 <?php
 function CastBack_filter_listings_status_update( $post_id ) {
 	$product = wc_get_product( $post_id );
-	if( $product ) {
+	if( $product && isset ( $_POST['acf']['field_688ce497d2c30'] ) ) {
 		$product->set_status( $_POST['acf']['field_688ce497d2c30'] );
-		// $product->set_name( 'Listing ' . $_POST['acf']['field_688ce497d2c30'] );
 		$product->save();
 	}
 
 	return $post_id;
 } add_filter('acf/pre_save_post' , 'CastBack_filter_listings_status_update', 10, 1 );
-function CastBack_filter_listings_featured_image( $post_id ) {
-	$images = get_field( 'images', $post_id );
-	if( $images ) {
-	    $newImageID = '';
-    	for( $r = count($images); $r >= 0; $r-- ) { 
-    	    if( $images[$r-1]['image'] ) { $newImageID = $images[$r-1]['image']; }
-    	}
-    	if( $newImageID ) {
-    	    set_post_thumbnail( $post_id, $newImageID );
-    	} else {
-	    delete_post_thumbnail( $post_id );
-	}
-    } else {
-	    delete_post_thumbnail( $post_id );
-	}
-	return $post_id;
-} add_filter('acf/save_post' , 'CastBack_filter_listings_featured_image', 10, 1 );
+// function CastBack_filter_listings_featured_image( $post_id ) {
+	// $images = get_field( 'images', $post_id );
+	// if( $images ) {
+	    // $newImageID = '';
+    	// for( $r = count($images); $r >= 0; $r-- ) { 
+    	    // if( $images[$r-1]['image'] ) { $newImageID = $images[$r-1]['image']; }
+    	// }
+    	// if( $newImageID ) {
+    	    // set_post_thumbnail( $post_id, $newImageID );
+    	// } else {
+	    // delete_post_thumbnail( $post_id );
+	// }
+    // } else {
+	    // delete_post_thumbnail( $post_id );
+	// }
+	// return $post_id;
+// } add_filter('acf/save_post' , 'CastBack_filter_listings_featured_image', 10, 1 );
 function CastBack_filter_listings_populate_seller_id($field) {
 		// Only run on the front-end
 		if (is_admin()) { return $field; }

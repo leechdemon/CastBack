@@ -5,6 +5,7 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 	// if( !isset( $listing_id ) && isset( $_POST['listing_id'] ) ){ $listing_id = $_POST['listing_id']; }
 	// if( !$listing_id && isset( $_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; }
 	if( $listing_id ) { $posts_per_page = 1; }
+	else { $posts_per_page = 50; }
 
 	$title_url = '/selling/listings';
 	$output = '';
@@ -17,18 +18,20 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 	
 	
 	if( $user_id ) {
-		if( $listing_id ) {
-			$output .= CastBack_Listings_drawListing( $listing_id, null, true, false );
-			
-			
-			
+		if( isset( $listing_id ) ) {
+			if( wc_get_product( $listing_id ) ) {
+				$output .= CastBack_Listings_drawListing( $listing_id, null, true, false );
+			} else {
+				$output .= 'Listing #'.$listing_id.' cannot be found. (l24-10012025)';				
+			}
 		} else {
 			/* Build Product List */
 			$args = array(
-				'posts_per_page'  => $posts_per_page,	// Retrieve up to 10 orders
+				'limit'  => $posts_per_page,	// Retrieve up to 10 orders
 				'orderby' => 'date',
 				'order'  => 'DESC',  
-				'author'  => $user_id,  
+				'author'  => $user_id,
+				'post_status'  => 'publish',
 				// 'meta_query' => array(
 					// array(
 						// 'key'     => 'seller_id',
@@ -38,13 +41,15 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 					// 'relation' => 'AND', // Optional: 'AND' or 'OR' to combine multiple conditions
 				// ),
 			);
-			$listings = wc_get_products( $args ); 
-	
-			$output .= '<div style="padding: 1.25rem;"><a class="elementor-button elementor-button-link" href="javascript:CastBack_action_add_listing_button();">Add Listing</a></div>';
-	
+			echo CastBack_Queries_addFilterButtons();
+			$listings = wc_get_products( CastBack_Queries_processFilters( $args ) ); 
+
+			// $output .= '<div style="padding: 1.25rem;"><a class="elementor-button elementor-button-link" href="javascript:CastBack_Action_addListing_button();">Add Listing</a></div>';
+			
 			/* Draw Listings */	
 			if ( count($listings) >= 1 ) {
-				foreach( $listings as $key => $listing ) {					
+				
+				foreach( $listings as $key => $listing ) {
 					if( $listing && ($key+1 != $posts_per_page) ) {
 						$listing_id = $listing->get_id();
 						$output .= CastBack_Listings_drawListing( $listing_id, null, true, false );
@@ -93,7 +98,7 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 							
 					if( $buttonPanelEnabled ) {
 						echo '<div style="width: 25%; float: right; padding-left: 0.5rem;">';
-							echo CastBack_action_DrawButtonPanel( $listing_id );
+							echo CastBack_Action_DrawButtonPanel( $listing_id );
 						echo '</div>';
 					}
 				echo '</div>';
@@ -125,3 +130,18 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
 } add_action( 'wp_ajax_CastBack_Listings_drawListing', 'CastBack_Listings_drawListing' );
+function CastBack_Listings_markSold( $listing_id = null ) {
+	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
+	
+	$listing = wc_get_product( $listing_id );
+	
+	echo json_encode( $listing );
+	
+	// if( isset( $listing ) ) { echo 'Deleting Listing #' .$listing_id. '...<br><br>'; }
+	// else { 'Listing #'.$listing_id.' not found. (L133-10012025)'; }
+	$listing->set_stock_status( 'outofstock' );
+	$listing->save();
+	// if( !$listing->save() ) { echo 'Something went wrong. Please try again. (L143-10012025)'; }
+
+	// echo '<br><br><a class="button button-elementor button-elementor-link" href="/selling/listings/">View My Listings</a>';
+} add_action( 'wp_ajax_CastBack_Listings_markSold', 'CastBack_Listings_markSold' );

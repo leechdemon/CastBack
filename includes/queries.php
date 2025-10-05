@@ -7,13 +7,62 @@ function custom_query_shop( $query ) {
 	/* */
 	
 	$query->set( 'post_type', 'product' );
-	// $query->set( 'posts_per_page', '12' );
-	// if( get_query_var('paged') { $query->set( 'paged' => 1 ); }
-	// $query->set( 'meta_key', 'post_status' );
-	// $query->set( 'meta_value', 'publish' );
+	$query->set( 'post_status', 'publish' );
+
+	$query->set( 'meta_query', '_stock_status' );
+	$query->set( 'meta_value', 'instock' );
 	
 	// $query->set( 'post_category', $_POST['acf'][''] );
 } add_action( 'elementor/query/shop' , 'custom_query_shop'  ); 
+
+function CastBack_Queries_addFilterButtons() {
+	ob_start();
+	
+		/* Post Status */
+	echo '<div style="margin-bottom: 1.25rem;">';
+		if( isset( $_GET['listing_status'] ) ) {
+			foreach( [ 'publish', 'draft', 'all' ] as $var ) {
+				if( $_GET['listing_status'] == $var ) { $active['listing_status'][$var] = ' active'; }
+			}
+		} else { $active['listing_status']['publish'] = ' active'; }
+		
+		echo '<a class="castback-button'.$active['listing_status']['publish'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'publish', get_the_permalink() ) ).'">Active</a>';
+		echo '<a class="castback-button'.$active['listing_status']['draft'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'draft', get_the_permalink() ) ).'">Hidden</a>';
+		echo '<a class="castback-button'.$active['listing_status']['all'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'all', get_the_permalink() ) ).'">Show All</a>';
+	echo '</div>';
+	
+	/* Stock Status */
+	echo '<div style="margin-bottom: 1.25rem;">';
+		if( isset( $_GET['stock_status'] ) ) {
+			foreach( [ 'instock', 'outofstock' ] as $var ) {
+				if( $_GET['stock_status'] == $var ) { $active['stock_status'][$var] = ' active'; }
+			}
+		} else { $active['stock_status']['instock'] = ' active'; }
+		
+		echo '<a class="castback-button'.$active['stock_status']['instock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'instock', get_the_permalink() ) ).'">Unsold</a>';
+		echo '<a class="castback-button'.$active['stock_status']['outofstock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'outofstock', get_the_permalink() ) ).'">Sold</a>';
+		echo '<a class="castback-button'.$active['stock_status']['all'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'all', get_the_permalink() ) ).'">Show All</a>';
+	echo '</div>';
+	
+	return ob_get_clean();
+}
+function CastBack_Queries_processFilters( $args ) {
+	
+	// remove_query_arg( 'listing_id' );
+	// wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/listings/' ) ) );
+	// wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_status', $listing_id, get_site_url(). '/selling/listings/' ) ) );
+	
+	if( isset( $_GET['listing_status'] ) ) { $args['post_status'] = $_GET['listing_status']; }
+	// else { $args['post_status'] = 'instock'; }
+	if( $args['post_status'] == 'all' ) { $args['post_status'] = null; }
+	
+	if( isset( $_GET['stock_status'] ) ) { $args['stock_status'] = $_GET['stock_status']; }
+	else { $args['stock_status'] = 'instock'; }
+	if( $args['stock_status'] == 'all' ) { $args['stock_status'] = null; }
+
+	
+	return $args;
+}
 
 /* Buying/Selling Subpages */
 // function custom_query_recent( $query ) {

@@ -115,7 +115,7 @@ function castback_cron_noOffers( $AJAX = true ) {
 				$currentTime = strtotime( date('F j, Y g:i a') );
 				
 				if( $currentTime > $offer_expired ) {
-						CastBack_action_complete_order( $order_id, $AJAX );
+						CastBack_Action_completeOrder( $order_id, $AJAX );
 				}
 			}
 			
@@ -156,7 +156,7 @@ function castback_cron_noExpiredDate( $AJAX = false ) {
 						
 						$offer_expired = strtotime( '+5 minutes', strtotime( $offer['offer_date'] ) );
 						$currentTime = strtotime( date('F j, Y g:i a') );
-						if( $currentTime > $offer_expired ) { CastBack_action_expire_offer( $order_id, $key ); }
+						if( $currentTime > $offer_expired ) { CastBack_Action_expireOffer( $order_id, $key ); }
 					}
 				}
 		}
@@ -247,7 +247,7 @@ function castback_cron_noCompletedDate( $AJAX = false ) {
 					$currentTime = strtotime( date('F j, Y g:i a') );
 					
 					if( $currentTime > $offer_expired ) {
-							CastBack_action_complete_order( $order_id, $AJAX );
+							CastBack_Action_completeOrder( $order_id, $AJAX );
 					}
 			}
 		}

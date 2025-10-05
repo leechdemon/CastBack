@@ -3,10 +3,10 @@
 Plugin Name: CastBack
 Description: A Wordpress plugin to manage Listings, Offers, and other CastBack tools. Creates Shortcodes for use with Elementor.
 Author: Leechdemon
-Version: 0.5.2.09302025
+Version: 0.5.3
 */
 global $castbackVersion;
-$castbackVersion = "0.5.2.09302025";
+$castbackVersion = "0.5.3";
 
 require_once plugin_dir_path(__FILE__) . 'tools.php';
 
@@ -31,11 +31,13 @@ function CastBack_enqueue_scripts() {
 	// wp_enqueue_style( 'CastBack' );
 	
 	$data_to_pass = array(
-			'url' => admin_url( 'admin-ajax.php' ),
-			// 'nonce'    => wp_create_nonce(  ),
-			// 'message'  => __( 'Hello from PHP!', 'text-domain' ),
+		/* variables to pass to JS... */ 
+		'url' => admin_url( 'admin-ajax.php' ),
+		'user_id' => get_current_user_id(),
+		// 'nonce'    => wp_create_nonce(  ),
+		// 'message'  => __( 'Hello from PHP!', 'text-domain' ),
 	);
-	wp_localize_script( 'castback_ajax', 'castback_object', $data_to_pass );
+	wp_localize_script( 'castback_ajax', 'CastBack', $data_to_pass );
 } add_action( 'wp_enqueue_scripts', 'CastBack_enqueue_scripts' );
 function CastBack_register_styles() {
 	global $castbackVersion;
