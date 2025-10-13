@@ -422,7 +422,6 @@ function CastBack_Offers_drawSidebar( $order_id, $AJAX = true ) {
 
 	if($AJAX) { echo $output; wp_die(); } else { return $output; }
 } add_action( 'wp_ajax_CastBack_Offers_drawSidebar', 'CastBack_Offers_drawSidebar' );
-
 function CastBack_Offers_customerSeller( $order_id ) {
 	$user_id = get_current_user_id();
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }

@@ -43,16 +43,16 @@
 /* #CastBack-MyListings .acf-form-submit, #CastBack-MyOffers .acf-form-submit, #CastBack-MyOrders .acf-form-submit, a#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; } */
 
 .castback-order { display: flex; /* height: fit-content;  */ flex-direction: column; padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
-.castback-listing { display: flex; height: fit-content; }
-.castback-listing .castback-listing-panel  { width: 75%; }
-.castback-listing.disabled .castback-listing-panel  { width: 100%; }
+/* .castback-listing { display: flex; height: fit-content; } */
+/* .castback-listing .castback-listing-panel  { width: 75%; } */
+/* .castback-listing.disabled .castback-listing-panel  { width: 100%; } */
 /* .castback-order, .castback-listing { background-color: var(--e-global-color-01b2f71); } */
 
 #CastBack-MyOffers, #CastBack-MyOrders, #CastBack-Listings, #CastBack-DrawListing, #CastBack-Shop { padding: 1.25rem; }
-#CastBack-MyListings .castback-listing, #CastBack-DrawListing .castback-listing, #CastBack-Shop .castback-listing { background-color:  var(--e-global-color-938a83b); padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
-#CastBack-MyOffers .castback-order, #CastBack-MyOffers .castback-listing { background-color: var(--e-global-color-f64482c); }
-#CastBack-MyOrders .castback-order, #CastBack-MyOrders .castback-listing { background-color: var(--e-global-color-0a1cea8); }
-#CastBack-MyOffers .castback-listing, #CastBack-MyOrders .castback-listing { padding: 0rem; }
+/* #CastBack-MyListings .castback-listing, #CastBack-DrawListing .castback-listing, #CastBack-Shop .castback-listing { background-color:  var(--e-global-color-938a83b); padding: 0.5rem; margin: 0.5rem 0 1.25rem; } */
+/* #CastBack-MyOffers .castback-order, #CastBack-MyOffers .castback-listing { background-color: var(--e-global-color-f64482c); } */
+/* #CastBack-MyOrders .castback-order, #CastBack-MyOrders .castback-listing { background-color: var(--e-global-color-0a1cea8); } */
+/* #CastBack-MyOffers .castback-listing, #CastBack-MyOrders .castback-listing { padding: 0rem; } */
 /* .castback-listing:not(:has(> .castback-listing-panel)) { background-color: lightgreen; } */
 
 /* .castback-order, .castback-listing:not(:has(> ..castback-listing-panel)) { background-color: darkyellow); } */

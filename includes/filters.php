@@ -8,23 +8,83 @@ function CastBack_filter_listings_status_update( $post_id ) {
 
 	return $post_id;
 } add_filter('acf/pre_save_post' , 'CastBack_filter_listings_status_update', 10, 1 );
-// function CastBack_filter_listings_featured_image( $post_id ) {
-	// $images = get_field( 'images', $post_id );
-	// if( $images ) {
-	    // $newImageID = '';
-    	// for( $r = count($images); $r >= 0; $r-- ) { 
-    	    // if( $images[$r-1]['image'] ) { $newImageID = $images[$r-1]['image']; }
-    	// }
-    	// if( $newImageID ) {
-    	    // set_post_thumbnail( $post_id, $newImageID );
-    	// } else {
-	    // delete_post_thumbnail( $post_id );
-	// }
+
+// function CastBack_Filters_userUploadCSV( $username, $email, $password, $custom_field_value ) {
+    // $userdata = array(
+        // 'user_login' => $username,
+        // 'user_pass'  => $password,
+        // 'user_email' => $email,
+        // 'role'       => 'subscriber', // Or your desired role
+    // );
+
+    // $user_id = wp_insert_user( $userdata );
+
+    // if ( ! is_wp_error( $user_id ) ) {
+        // update_user_meta( $user_id, 'my_custom_field', $custom_field_value );
+        // return "User {$username} created with custom meta.";
     // } else {
-	    // delete_post_thumbnail( $post_id );
-	// }
-	// return $post_id;
-// } add_filter('acf/save_post' , 'CastBack_filter_listings_featured_image', 10, 1 );
+        // return "Error creating user {$username}: " . $user_id->get_error_message();
+    // }
+// }
+
+
+function CastBack_Filters_changeAttribute( $post_id, $tax = null, $slug = null, $append = false ) {
+	$product = wc_get_product( $post_id );
+	if( $product ) {
+			if( isset ( $_POST['acf']['field_68644913a0ab7'] ) ) { /* Cat */
+				$tax = 'product_cat';
+				$slug = $_POST['acf']['field_68644913a0ab7'];
+			}
+			// if( isset ( $_POST['acf']['field_68644913a0ab7'] ) ) { /* Subcat */
+				// $tax = 'product_cat';
+				// $slug = $_POST['acf']['field_68644913a0ab7'];
+			// }
+			// if( isset ( $_POST['acf']['field_68644913a0ab7'] ) ) { /* Sub-Subcat */
+					// $tax = 'product_cat';
+				// $slug = $_POST['acf']['field_68644913a0ab7'];
+			// }
+			// if( isset ( $_POST['acf']['field_68644913a0ab7'] ) ) { /* Brand */
+				// $tax = 'product_brand';
+				// $slug = $_POST['acf']['field_68644913a0ab7'];
+			// }
+		
+		if( isset( $slug ) ) {
+			wp_set_object_terms( $post_id, $slug, $tax, $append );
+		}
+	}
+
+	return $post_id;
+} add_filter('acf/pre_save_post' , 'CastBack_Filters_changeAttribute', 10, 1 );
+
+function CastBack_Filter_updateListing_imageHandling( $post_id ) {
+	$images = get_field( 'images', $post_id );
+	$attachment_ids = array();
+	
+	/* Assign Featured Image */
+	if( $images ) {
+		$newImageID = '';
+		for( $r = count($images); $r >= 0; $r-- ) { 
+				if( $images[$r-1]['image'] ) { $newImageID = $images[$r-1]['image']; }
+		}
+		if( $newImageID ) {
+				set_post_thumbnail( $post_id, $newImageID );
+		} else {
+			delete_post_thumbnail( $post_id );
+		}
+	} else {
+		delete_post_thumbnail( $post_id );
+	}
+	
+	/* Repopulate Product Image Gallery */
+	if( $images ) {
+		foreach( $images as $image ) { $attachment_ids []= $image['image']; }
+	}
+	
+	// serialize( $attachment_ids );
+	update_post_meta( $post_id, '_product_image_gallery', implode( ',', $attachment_ids ) );
+	
+	return $post_id;
+} add_filter('acf/save_post' , 'CastBack_Filter_updateListing_imageHandling', 10, 1 );
 function CastBack_filter_listings_populate_seller_id($field) {
 		// Only run on the front-end
 		if (is_admin()) { return $field; }

@@ -27,8 +27,7 @@ function castback_admin_edit_listing( $wp_admin_bar ) {
 				$wp_admin_bar->add_node( $args );
 			}
 	}
-}
-add_action( 'admin_bar_menu', 'castback_admin_edit_listing', 90 );
+} add_action( 'admin_bar_menu', 'castback_admin_edit_listing', 90 );
 function castback_admin_edit_order( $wp_admin_bar ) {
 	if( !is_admin() ) {
 		$order_id = '';
@@ -49,8 +48,7 @@ function castback_admin_edit_order( $wp_admin_bar ) {
 			$wp_admin_bar->add_node( $args );
 		}
 	}
-} 
-add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
+} add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
 
 // function castback_login_redirect( $redirect, $user ) {
   // Get the first of all the roles assigned to the user
@@ -65,6 +63,19 @@ add_action( 'admin_bar_menu', 'castback_admin_edit_order', 90 );
 	// $redirect = '123';
   // return $redirect;
 // } add_filter( 'woocommerce_login_redirect', 'castback_login_redirect', 10, 2 ); 
+
+// function remove_wpautop_from_product_description() { /* prevents "<p>" from being removed from product descriptions */
+    // remove_filter( 'the_content', 'wpautop' );
+// } add_action( 'woocommerce_single_product_summary', 'remove_wpautop_from_product_description', 1 );
+// function ikreativ_tinymce_fix( $init ) {
+		// $init['remove_linebreaks'] = false;
+		// $init['convert_newlines_to_brs'] = true;
+		// $init['remove_redundant_brs'] = false;
+		// return $init;
+// }
+// add_filter('tiny_mce_before_init', 'ikreativ_tinymce_fix');
+
+
 
 function CastBack_MyNotifications( $page = null, $location = null ) {
 	return;

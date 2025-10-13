@@ -15,6 +15,17 @@ function custom_query_shop( $query ) {
 	// $query->set( 'post_category', $_POST['acf'][''] );
 } add_action( 'elementor/query/shop' , 'custom_query_shop'  ); 
 
+function custom_query_edit( $query ) {	
+	$query->set( 'post_type', 'product' );
+	$query->set( 'p', $_GET['listing_id'] );
+	// $query->set( 'post_status', 'publish' );
+
+	// $query->set( 'meta_query', '_stock_status' );
+	// $query->set( 'meta_value', 'instock' );
+	
+	// $query->set( 'post_category', $_POST['acf'][''] );
+} add_action( 'elementor/query/edit' , 'custom_query_edit'  ); 
+
 function CastBack_Queries_addFilterButtons() {
 	ob_start();
 	
