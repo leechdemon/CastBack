@@ -23,7 +23,6 @@ function CastBack_Action_addListing_button() {
 	// }
 // }
 function CastBack_Action_markSold( listing_id ) {
-	// Listing version?
 	// document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
 	jQuery.ajax({
 		type: "POST",
@@ -31,12 +30,63 @@ function CastBack_Action_markSold( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_markSold",
 			"AJAX": true,
-			// "user_id": CastBack.user_id,
+			"user_id": CastBack.user_id,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
 			console.log( data );
-			window.location.href = "/selling/listings/";
+			window.location.href = "/selling/edit-listing/?listing_id="+listing_id;
+		}
+	});
+}
+function CastBack_Action_markUnsold( listing_id ) {
+	// document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
+	jQuery.ajax({
+		type: "POST",
+		url: CastBack.url,
+		data: {
+			"action": "CastBack_Listings_markUnsold",
+			"AJAX": true,
+			"user_id": CastBack.user_id,
+			"listing_id": listing_id,
+		},
+		success: function (data) {
+			console.log( data );
+			window.location.href = "/selling/edit-listing/?listing_id="+listing_id;
+		}
+	});
+}
+function CastBack_Action_publishListing( listing_id ) {
+	// document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
+	jQuery.ajax({
+		type: "POST",
+		url: CastBack.url,
+		data: {
+			"action": "CastBack_Listings_publishListing",
+			"AJAX": true,
+			"user_id": CastBack.user_id,
+			"listing_id": listing_id,
+		},
+		success: function (data) {
+			console.log( data );
+			window.location.href = "/selling/edit-listing/?listing_id="+listing_id;
+		}
+	});
+}
+function CastBack_Action_hideListing( listing_id ) {
+	// document.getElementById( 'CastBack-Order-' + order_id ).style.opacity = "0.5";
+	jQuery.ajax({
+		type: "POST",
+		url: CastBack.url,
+		data: {
+			"action": "CastBack_Listings_hideListing",
+			"AJAX": true,
+			"user_id": CastBack.user_id,
+			"listing_id": listing_id,
+		},
+		success: function (data) {
+			console.log( data );
+			window.location.href = "/selling/edit-listing/?listing_id="+listing_id;
 		}
 	});
 }

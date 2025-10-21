@@ -78,7 +78,7 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 						$output .= '</div>';
 						
 						$output .= '<div style="width: 25%; float: right; padding-left: 0.5rem; ">';
-							$output .= CastBack_Action_DrawButtonPanel( $order_id );
+							$output .= CastBack_Buttons_DrawButtonPanel( $order_id );
 						$output .= '</div>';
 					$output .= '</div>';
 			$output .= '</div>';

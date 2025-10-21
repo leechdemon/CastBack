@@ -24,6 +24,7 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 			'order'  => 'DESC',  
 			'author'  => $user_id,
 			'post_status'  => 'publish',
+			// 'post_status'  => 'any',
 			// 'meta_query' => array(
 				// array(
 					// 'key'     => 'seller_id',
@@ -75,23 +76,23 @@ function CastBack_Listings_editListing_ACF( $listing_id, $listingTemplate = null
 		if ( $custom_query->have_posts() ) {
 			while ( $custom_query->have_posts() ) {
 				$custom_query->the_post();
-					if( is_user_logged_in() ) {
-						if( get_current_user_id() == get_field( 'seller_id', $listing_id ) ) {
-							acf_form_head();
-							acf_form(array(
-								'form_attributes'   => array(
-									'method'	=>	'post',
-									'class'		=>	'acf-form',
-								),
-								'post_title'   => true,
-								'post_id'   => $listing_id,
-								'field_groups' => array(503,),
-								'uploader'		=> 'basic',
-								'submit_value' => 'Save Listing',
-								'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
-							));
-						}
+				if( is_user_logged_in() ) {
+					if( get_current_user_id() == get_field( 'seller_id', $listing_id ) || current_user_can( 'manage_options' ) ) {
+						acf_form_head();
+						acf_form(array(
+							'form_attributes'   => array(
+								'method'	=>	'post',
+								'class'		=>	'acf-form',
+							),
+							'post_title'   => true,
+							'post_id'   => $listing_id,
+							'field_groups' => array(503,),
+							'uploader'		=> 'basic',
+							'submit_value' => 'Save Listing',
+							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
+						));
 					}
+				}
 			}
 		}
 		
@@ -128,7 +129,7 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 							
 					if( $buttonPanelEnabled ) {
 						echo '<div style="width: 25%; float: right; padding-left: 0.5rem;">';
-							echo CastBack_Action_DrawButtonPanel( $listing_id );
+							echo CastBack_Buttons_DrawButtonPanel( $listing_id );
 						echo '</div>';
 					}
 				echo '</div>';
@@ -160,18 +161,59 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
 } add_action( 'wp_ajax_CastBack_Listings_drawListing', 'CastBack_Listings_drawListing' );
+function CastBack_Listings_publishListing( $listing_id = null ) {
+	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
+	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
+	
+	ob_start();	
+	if( CastBack_Offers_customerSeller( $listing_id ) ) {
+		$listing = wc_get_product( $listing_id );
+		
+		$listing->set_status( 'publish' );
+		$listing->save();
+	}
+	
+	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
+} add_action( 'wp_ajax_CastBack_Listings_publishListing', 'CastBack_Listings_publishListing' );
+function CastBack_Listings_hideListing( $listing_id = null ) {
+	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
+	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
+	
+	ob_start();	
+	if( CastBack_Offers_customerSeller( $listing_id ) ) {
+		$listing = wc_get_product( $listing_id );
+		
+		$listing->set_status( 'draft' );
+		$listing->save();
+	}
+	
+	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
+} add_action( 'wp_ajax_CastBack_Listings_hideListing', 'CastBack_Listings_hideListing' );
 function CastBack_Listings_markSold( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
+	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
-	$listing = wc_get_product( $listing_id );
+	ob_start();	
+	if( CastBack_Offers_customerSeller( $listing_id ) ) {
+		$listing = wc_get_product( $listing_id );
+		
+		$listing->set_stock_status( 'outofstock' );
+		$listing->save();
+	}
 	
-	echo json_encode( $listing );
-	
-	// if( isset( $listing ) ) { echo 'Deleting Listing #' .$listing_id. '...<br><br>'; }
-	// else { 'Listing #'.$listing_id.' not found. (L133-10012025)'; }
-	$listing->set_stock_status( 'outofstock' );
-	$listing->save();
-	// if( !$listing->save() ) { echo 'Something went wrong. Please try again. (L143-10012025)'; }
-
-	// echo '<br><br><a class="button button-elementor button-elementor-link" href="/selling/listings/">View My Listings</a>';
+	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
 } add_action( 'wp_ajax_CastBack_Listings_markSold', 'CastBack_Listings_markSold' );
+function CastBack_Listings_markUnsold( $listing_id = null ) {
+	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
+	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
+	
+	ob_start();	
+	if( CastBack_Offers_customerSeller( $listing_id ) ) {
+		$listing = wc_get_product( $listing_id );
+		
+		$listing->set_stock_status( 'instock' );
+		$listing->save();
+	}
+	
+	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
+} add_action( 'wp_ajax_CastBack_Listings_markUnsold', 'CastBack_Listings_markUnsold' );

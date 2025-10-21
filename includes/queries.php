@@ -1,19 +1,42 @@
 <?php
 
 function custom_query_shop( $query ) {
-	/* WARNING */
-	/* DO NOT DELETE */
-	/* "/Shop/" page query. */
-	/* */
+	$query->set( 'post_type', 'product' );
+	$query->set( 'post_status', 'publish' );
+	$query->set( 'meta_query', '_stock_status' );
+	$query->set( 'meta_value', 'instock' );
+} add_action( 'elementor/query/castback-shop' , 'custom_query_shop'  ); 
+function custom_query_archive( $query ) {
+	/* This querry is not currently in use. */
+	
+	/* This is for use on the Taxonomy pages (Categories, Materials, etc) */
+	/* Pro's - filters sidebar by current query */
+	/* Con's - is designed for a true Taxonomy filter (vs the cached Elementor Filter) */
 	
 	$query->set( 'post_type', 'product' );
 	$query->set( 'post_status', 'publish' );
-
 	$query->set( 'meta_query', '_stock_status' );
 	$query->set( 'meta_value', 'instock' );
 	
-	// $query->set( 'post_category', $_POST['acf'][''] );
-} add_action( 'elementor/query/shop' , 'custom_query_shop'  ); 
+	$post_id = get_the_ID();
+	// $meta_query[] = [
+		// 'taxonomy' => 'product_cat',
+		// 'value' => get_the_terms( $post_id, 'product_cat' )[0]->slug,
+		// 'compare' => 'in',
+	// ];
+	$meta_query[] = [
+		'taxonomy' => 'product_brand',
+		'value' => get_the_terms( $post_id, 'product_brand' )[0]->slug,
+		'compare' => 'in',
+	];
+	// $meta_query[] = [
+		// 'taxonomy' => 'product_condition',
+		// 'value' => get_the_terms( $post_id, 'product_condition' )[0]->slug,
+		// 'compare' => 'in',
+	// ];
+	$query->set( 'meta_query', $meta_query );
+} 
+// add_action( 'elementor/query/castback-archive' , 'custom_query_archive'  ); 
 
 function custom_query_edit( $query ) {	
 	$query->set( 'post_type', 'product' );

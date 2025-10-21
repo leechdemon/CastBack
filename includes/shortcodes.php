@@ -14,13 +14,15 @@ function TestProductActions() {
 	// update_post_meta( 1953, '_product_image_gallery', implode( ',', $attachment_ids ) );
 	// wp_delete_post( 1953 );
 	
-	// $skipAll = true;
+	$skipAll = true;
 	if( !$skipAll ) {
 		// $filePath = ABSPATH . 'wp-content/uploads/castback';
 		// $items = scandir($filePath);
 		
 		
 		$args = array(
+			// 'p'  => '2496',
+			// 'p'  => '1991',
 			// 'limit'  => 25,
 			// 'limit'  => 10,
 			'limit'  => -1,
@@ -43,8 +45,200 @@ function TestProductActions() {
 		$listings = wc_get_products( $args ); 
 		
 
+			
 		foreach( $listings as $listing ) {
-			// CastBack_Filter_updateListing_imageHandling( $listing->get_id() );
+			
+		// } if( 1 == 2 ) {
+			// echo json_encode( $listing );
+			
+			$listing_id = $listing->get_id();
+			
+			$terms = [];
+			$terms['product_cat'] = get_the_terms( $listing->get_id(), 'product_cat' );
+			$terms['product_brand'] = get_the_terms( $listing->get_id(), 'product_brand' );
+			$terms['product_condition'] = get_the_terms( $listing->get_id(), 'product_condition' );
+			$terms['size_waders'] = get_the_terms( $listing->get_id(), 'size_waders' );
+			$terms['size_boots'] = get_the_terms( $listing->get_id(), 'size_boots' );
+			$terms['material'] = get_the_terms( $listing->get_id(), 'material' );
+			$terms['handedness'] = get_the_terms( $listing->get_id(), 'handedness' );
+			$terms['rod_sections'] = get_the_terms( $listing->get_id(), 'rod_sections' );
+			$terms['product_length'] = get_the_terms( $listing->get_id(), 'product_length' );
+			$terms['product_weight'] = get_the_terms( $listing->get_id(), 'product_weight' );
+			
+			$terms['product_weight'] = get_the_terms( $listing->get_id(), 'product_weight' );
+			
+			
+			echo '<strong><a href="/selling/edit-listing/?listing_id='. $listing_id .'">'.$listing->get_name().'</a></strong><br>';
+			// update_field( 'listing_price', $listing->get_regular_price(), $listing_id );
+			// update_field( 'MSRP', $listing->get_description(), $listing_id );
+			// update_field( 'shipping_price', $listing->get_description(), $listing_id );
+			
+			// echo json_encode( get_field( 'description', $listing_id ) ).'<br>';
+			// echo json_encode( $listing_description ).'<br>';
+			
+			echo '   Description: ';
+			if( !get_field( 'description', $listing_id ) ) {
+				update_field( 'description', $listing->get_description(), $listing_id );
+				// echo json_encode(get_field( 'description', $listing_id ) ).'<br>';
+				echo '(CHANGE)<br>';
+			} else { echo '(no change)<br>'; }
+			
+			
+			
+		/* Cat */
+		if( isset ( $terms['product_cat'] ) ) {
+			$taxSlug = 'product_cat';
+			// $termSlug = $_POST['acf']['field_68644913a0ab7'];
+			// wp_set_object_terms( $post_id, $termSlug, $taxSlug, false );
+			
+			foreach( $terms['product_cat'] as $cat ) {	
+				// Test( $listing->get_name() );			
+				// Test( $cat );			
+				
+				if( $cat->parent == 0 ) { 
+					/* cat */
+					update_field( 'listing_type', $cat->slug, $listing_id ); }
+				else {
+					/* subcat */
+					if( get_term( $cat->parent )->parent == 0 ) {
+						// Test( $cat );
+						
+						if( $cat->parent == 584 ) {
+							$details = get_field( 'accessory_details', $listing_id );
+							$details['accessory_type'] = $cat->slug;
+							update_field( 'accessory_details', $details, $listing_id );
+						}
+						if( $cat->parent == 582 ) {
+							$details = get_field( 'flies_and_fly_tying_details', $listing_id );
+							$details['type'] = $cat->slug;
+							update_field( 'flies_and_fly_tying_details', $details, $listing_id );
+						}
+						if( $cat->parent == 579 ) {
+							$details = get_field( 'packs_bags_and_vests_details', $listing_id );
+							$details['type'] = $cat->slug;
+							update_field( 'packs_bags_and_vests_details', $details, $listing_id );
+						}
+						if( $cat->parent == 581 ) {
+							$details = get_field( 'reel_details', $listing_id );
+							$details['reel_type'] = $cat->slug;
+							update_field( 'reel_details', $details, $listing_id );
+						}
+						// if( $cat->parent == 583 ) { update_sub_field( 'field_01234', $cat->slug, $listing_id ); }
+						if( $cat->parent == 580 ) {
+							// $details = get_field( 'wader_details', $listing_id );
+							// $details['wader_type'] = $cat->slug;							
+							
+							// Test( $details );
+							// Test( $cat->slug );
+							// Test( $terms['size_boots'][0]->slug );
+							// Test( get_the_terms( $listing_id, 'boots_size' )[0]->slug );
+							
+							// if( $cat->slug == 'wading-boots' ) { $details['boot_size'] = $terms['size_waders'][0]->slug; }
+							// else { $details['wader_size'] = $terms['size_boots'][0]->slug; }
+
+							// update_field( 'wader_details', $details, $listing_id );
+							// Test( $details );
+							// Test( get_field( 'wader_details', $listing_id ) );
+						}
+						
+					} else {
+						// Test( 'Not 0' );
+					}
+					// Test('not top-level cat');
+					// Test( $cat );
+				}
+			}
+			
+			// /* Subcat */
+			// $termSlug = null;
+			// if( isset ( $_POST['acf']['field_68644c210394b'] ) ) { /* Subcat: Accessory Details */
+				// $termSlug = $_POST['acf']['field_68644c210394b']['field_68644c210394c'];
+			// }
+			// if( isset ( $_POST['acf']['field_68644bd503949'] ) ) { /* Subcat: Flies Fly Tying Details*/
+				// $termSlug = $_POST['acf']['field_68644bd503949']['field_68644bd50394a'];
+			// }
+			// if( isset ( $_POST['acf']['field_68644b5e8fdaa'] ) ) { /* Subcat: Packs, Bags, & Vests Details*/
+				// $termSlug = $_POST['acf']['field_68644b5e8fdaa']['field_68644b5f8fdab'];
+			// }
+			// if( isset ( $_POST['acf']['field_68644b2f8fda8'] ) ) { /* Subcat: Reels Details */
+				// $termSlug = $_POST['acf']['field_68644b2f8fda8']['field_68644b488fda9'];
+			// }
+			// if( isset ( $_POST['acf']['field_68644ae28fda2'] ) ) { /* Subcat: Rods Details (Rod Type) */
+				// /* No Rod subcat */
+			// }
+			// if( isset ( $_POST['acf']['field_686449fd15740'] ) ) { /* Subcat: Waders Details (Wader Type) */
+				// $termSlug = $_POST['acf']['field_686449fd15740']['field_68644a1215741'];
+			// }				
+				
+			if( isset( $termSlug ) ) { wp_set_object_terms( $post_id, $termSlug, $taxSlug, true ); }
+		}
+	
+		echo '   Brand: ';
+		if( !get_field( 'brand', $listing_id ) && $terms['product_brand'][0] ) {
+			update_field( 'brand', $terms['product_brand'][0]->slug, $listing_id );
+			echo 'CHANGE<br>';
+		} else { echo 'no change<br>'; }
+		
+		echo '   Condition: ';
+		if( !get_field( 'condition', $listing_id ) && $terms['product_condition'][0] ) {
+			update_field( 'condition', $terms['product_condition'][0]->slug, $listing_id );
+			echo 'CHANGE<br>';
+		} else { echo 'no change<br>'; }
+		
+		echo '   Listing Price: ';
+		if( !get_field( 'listing_price', $listing_id ) ) {
+			if( !in_array( $listing_id, array(145, 113, 1559) ) ) {
+				update_field( 'listing_price', $listing->get_regular_price(), $listing_id );
+				echo 'EDIT<br>';
+				// echo ' - '.get_field( 'listing_price', $listing_id ).'<br>';
+				// echo ' - '. ( $listing->get_regular_price() ) .'<br>';
+			} else { echo '(skipped)<br>'; }
+		} else { echo 'no change<br>'; }
+		
+		// /* Size (Waders) */
+		// $taxSlug = 'size_waders';
+		// if( isset ( $_POST['acf']['field_686449fd15740']['field_68644a3215742'] ) ) {
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_686449fd15740']['field_68644a3215742'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }	
+		// /* Size (Boots) */
+		// $taxSlug = 'size_boots';
+		// if( isset ( $_POST['acf']['field_686449fd15740']['field_68644a4115743'] ) ) {
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_686449fd15740']['field_68644a4115743'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
+
+		// /* Material */
+		// $taxSlug = 'material';
+		// if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68644ae28fda3'] ) ) {
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68644ae28fda3'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
+		// /* Handedness */
+		// $taxSlug = 'handedness';
+		// if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68644b058fda6'] ) ) {
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68644b058fda6'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
+		// /* Rod Sections */
+		// $taxSlug = 'rod_sections';
+		// if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68e5666addfd1'] ) ) {
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68e5666addfd1'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
+		
+		// /* Length */
+		// $taxSlug = 'product_length';
+		// if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68eebc8032860'] ) ) {
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68eebc8032860'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
+		// /* Weight */
+		// $taxSlug = 'product_weight';
+		// if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68eebc08d9579'] ) ) {
+			// /* Check if Rods */
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68eebc08d9579'], $taxSlug, false );
+		// } else if ( isset ( $_POST['acf']['field_68644b2f8fda8']['field_68eebee22cdbc'] ) ) {
+			// /* Check if Reels */
+			// wp_set_object_terms( $post_id, $_POST['acf']['field_68644b2f8fda8']['field_68eebee22cdbc'], $taxSlug, false );
+		// } else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
+		
+
+			echo '<pre style="text-wrap: auto;">'.json_encode( $terms ).'</pre>';
 		}
 		if( 1 == 2) { /* Skip the rest... */
 
@@ -410,81 +604,58 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 			/* ... or 'DrawListing'... */
 			if( is_user_logged_in() || $page == 'DrawListing' ) {
 				echo '<div id="CastBack-'.$page.'">';
-				// if( $page == 'LogOut' ) { 
-					// echo '<button onclick="window.location.href=\''.esc_url( wp_logout_url( get_site_url() .'/login' ) ).'\'">Log out</button>';
-				if( $page == 'MyNotifications' ) {
-					/* $location unused? */
-					/* logged-in header, but hidden */
-					// echo CastBack_MyNotifications( $page, $location );
-				} else if( $page == 'TestProductActions' ) {
-					TestProductActions();
-				} else if( $page == 'MyAccount' ) {
-						echo 'CastBack_MyAccount'; 
-						// echo CastBack_MyAccount( $page, $posts_per_page ); 
-				} else if( $page == 'EditListing_ACF' ) {
-					if( $listing_id ) {
-						echo CastBack_Listings_editListing_ACF( $listing_id, null, false, false );
-					}
-				} else if( $page == 'MyListings' ) {
-						echo CastBack_Listings( $listing_id, $posts_per_page ); 
-				} else if( $page == 'DrawListing' ) {
-					if( isset( $listing_id ) ) {
-						echo CastBack_Listings_drawListing( $listing_id, null, false, false );
-					}
-				} else if( $page == 'MarkSold' ) {
+				if( $page == 'TestProductActions' ) { /* TestProductActions(); */ }
+				else if( $page == 'MyAccount' ) {
+					echo 'CastBack_MyAccount'; 
+					// echo CastBack_MyAccount( $page, $posts_per_page ); 
+				}
+				else if( $page == 'EditListing_ACF' ) { 	echo CastBack_Listings_editListing_ACF( $listing_id, null, false, false ); }
+				else if( $page == 'MyListings' ) { echo CastBack_Listings( $listing_id, $posts_per_page ); }
+				else if( $page == 'DrawListing' ) { echo CastBack_Listings_drawListing( $listing_id, null, false, false ); }
+				else if( $page == 'MarkSold' ) {
 					// echo CastBack_Listings_drawListing( $listing_id, null, true, false );
-					echo CastBack_Action_DrawButtonPanel_markSold( $listing_id );
-				} else if( $page == 'MyOffers' ) { 
-					// if( isset( $listing_id ) ) {
-						// echo CastBack_Listings_drawListing( $listing_id, null, true, false );
-						// $order_id = CastBack_Action_makeOffer( $listing_id, false );
-					// } else {
-						if( isset( $order_id ) ) {
-							if( CastBack_Offers_customerSeller( $order_id ) ) {
-								echo 'TITLE<br>';
-								echo CastBack_Listings_drawListing( get_field( 'listing_id', $order_id ), null, true, false );
-								// echo CastBack_Offers( $order_id, 1 );
-								// echo CastBack_Offers_drawOrderDetails( $order_id );
-							} else {
-								echo 'This is not your order. Please try again. (S51-10022025).';
-							}
-						} else { echo CastBack_Offers( $page, $posts_per_page ); }
-					// }
-				} else if( $page == 'MyOrders' ) {
+					echo CastBack_Buttons_DrawButtonPanel_markSold( $listing_id );
+				}
+				else if( $page == 'MyOffers' ) {  echo CastBack_Offers( $page, $posts_per_page ); }
+				else if( $page == 'MyOrders' ) { echo CastBack_Offers( $page, $posts_per_page ); }
+				else if( $page == 'ViewOffer' ) {
 					if( isset( $order_id ) ) {
-
 						if( CastBack_Offers_customerSeller( $order_id ) ) {
 							echo CastBack_Offers( $order_id, 1 );
 							echo CastBack_Offers_drawOrderDetails( $order_id );
 						} else {
 							echo 'This is not your order. Please try again. (S51-10022025).';
 						}
-					} else { echo CastBack_Offers( $page, $posts_per_page ); }
+					} else { echo 'Offer ID not found. (s668-10172025)'; }
 				} else {
 					echo 'function "'.$page.'" not found. (s74-09232025)';
 				}
+				
 				echo '</div>'; // close <div id="$page">
 			} else {
 				echo 'Please log in. (s90-09292025)';
 			}
 		// } else if( $button == 'drawButtonPanel' ) {
-			// echo CastBack_Action_DrawButtonPanel( $listing_id );
+			// echo CastBack_Buttons_DrawButtonPanel( $listing_id );
 		} else if( $button ) {
 			
-			// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+			// echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
-			if( $button == 'editListing' ) {
-				echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+			if( $button == 'drawButtonPanel' ) {
+				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			}
-			// if( $button == 'makeOffer' ) {
+			if( $button == 'editListing' ) {
+				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+			}
+			if( $button == 'makeOffer' ) {
 				// echo 'javascript:CastBack_Action_makeOffer_button("'.$post_id.'")';
-				// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
-			// }
+				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+			}
 			// if( $button == ['sendMessage', 'submitOffer', 'acceptOffer', 'expireOffer', 'paymentComplete', 'disputeOrder', 'removeDispute', 'addTracking', 'completeOrder', ] ) {
-				// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 			// if( $button == [ 'remove_dispute' ] ) {
-				// echo CastBack_Action_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 		} else if( $action ) {
 			if( is_user_logged_in() ) {

@@ -39,13 +39,13 @@ function CastBack_Action_addListing( $AJAX = false ) {
 				// success
 				// echo CastBack_Listings_drawListing( $listing_id, null, false, $AJAX );
 				remove_query_arg( 'listing_id' );
-				wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/listings/' ) ) );				
+				wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/edit-listing/' ) ) );				
 				
 				wp_die();
 			}
 			else {
 				remove_query_arg( 'listing_id' );
-				wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/listings/' ) ) );		
+				wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/edit-listing/' ) ) );		
 				// echo do_shortcode('[CastBack page="MyListings"]');
 				// echo ob_get_clean();
 			}

@@ -3,10 +3,10 @@
 Plugin Name: CastBack
 Description: A Wordpress plugin to manage Listings, Offers, and other CastBack tools. Creates Shortcodes for use with Elementor.
 Author: Leechdemon
-Version: 0.5.5.10102025
+Version: 0.5.6.10212025
 */
 global $castbackVersion;
-$castbackVersion = "0.5.5.10102025";
+$castbackVersion = "0.5.6.10212025";
 
 require_once plugin_dir_path(__FILE__) . 'tools.php';
 
