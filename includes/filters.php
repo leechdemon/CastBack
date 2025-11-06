@@ -11,7 +11,7 @@ function CastBack_filter_listings_status_update( $post_id ) {
 
 function CastBack_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
 	$product = wc_get_product( $post_id );
-	// if( $product ) {
+	if( $product ) {
 		
 	// if( isset( $termSlug ) ) {
 		/* This function was called manually. Do something. */
@@ -117,9 +117,9 @@ function CastBack_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug 
 		if( isset ( $_POST['acf']['field_68e55d2432a2c'] ) && $_POST['acf']['field_68e55d2432a2c'] != '' ) { /* Listing > Shipping Price */
 			update_field( 'shipping_price', CastBack_Filter_formatPriceField( $_POST['acf']['field_68e55d2432a2c'] ), $post_id );
 		}
-	// }			
-
-	$product->save();
+		
+		$product->save();
+	}
 
 	return $post_id;
 } add_filter('acf/save_post' , 'CastBack_Filters_changeAttribute' );
@@ -186,3 +186,61 @@ function CastBack_filter_offers_populate_offer_id($field) {
 		
 		return $field;
 } add_filter('acf/prepare_field/key=field_68d429cd0734e', 'CastBack_filter_offers_populate_offer_id');
+function CastBack_Filter_renameHoldStatus( $order_statuses ) {
+    foreach ( $order_statuses as $key => $status ) {
+        if ( 'wc-on-hold' === $key ) {
+					$order_statuses['wc-on-hold'] = _x( 'Disputed', 'Order status', 'woocommerce' );
+				}
+        if ( 'checkout-draft' === $key ) {
+					$order_statuses['checkout-draft'] = _x( 'Offer Pending', 'Order status', 'woocommerce' );
+				}
+    }
+    return $order_statuses;
+} add_filter( 'wc_order_statuses', 'CastBack_Filter_renameHoldStatus' );
+
+/* Users */
+function CastBack_Filter_shopAddress( $user_id ) {
+	// $shop_address_1 = get_user_meta( $user_id, 'dokan_store_address[street_1]', true );
+	// $shop_address_2 = get_user_meta( $user_id, 'dokan_store_address[street_2]', true );
+	// $shop_city = get_user_meta( $user_id, 'dokan_store_address[city]', true );
+	// $shop_state = get_user_meta( $user_id, 'dokan_store_address[state]', true );
+	// $shop_country = get_user_meta( $user_id, 'dokan_store_address[country]', true );
+	// $shop_postcode = get_user_meta( $user_id, 'dokan_store_address[zip]', true );
+	// $shop_phone = get_user_meta( $user_id, 'dokan_store_phone', true );
+	
+	// if( !$shop_address_1 ) { $shop_address_1 = get_user_meta( $user_id, 'billing_address_1', true ); }
+	// if( !$shop_address_2 ) { $shop_address_2 = get_user_meta( $user_id, 'billing_address_2', true ); }
+	// if( !$shop_city ) { $shop_city = get_user_meta( $user_id, 'billing_city', true ); }
+	// if( !$shop_state ) { $shop_state = get_user_meta( $user_id, 'billing_state', true ); }
+	// if( !$shop_country ) { $shop_country = get_user_meta( $user_id, 'billing_country', true ); }
+	// if( !$shop_postcode ) { $shop_postcode = get_user_meta( $user_id, 'billing_postcode', true ); }
+	// if( !$shop_phone ) { $shop_phone = get_user_meta( $user_id, 'billing_phone', true ); }
+	// $shop_address_1 = 
+	// $shop_address_2 = get_user_meta( $user_id, 'billing_address_2' );
+	// $shop_city =
+	// $shop_state = get_user_meta( $user_id, 'billing_state' );
+	// $shop_country = get_user_meta( $user_id, 'billing_country' );
+	// $shop_postcode = get_user_meta( $user_id, 'billing_postcode' );
+	// $shop_phone = get_user_meta( $user_id, 'billing_phone' );
+
+	// update_user_meta( $user_id, 'shop_address_1', $shop_address_1 );
+	// update_user_meta( $user_id, 'shop_address_2', $shop_address_2 );
+	// update_user_meta( $user_id, 'shop_city', $shop_city );
+	// update_user_meta( $user_id, 'shop_state', $shop_state );
+	// update_user_meta( $user_id, 'shop_country', $shop_country);
+	// update_user_meta( $user_id, 'shop_postcode', $shop_postcode );
+	
+	$address_data = array(
+    'street_1'    => get_user_meta( $user_id, 'billing_address_1' ),
+    'street_2'    => get_user_meta( $user_id, 'billing_address_2' ),
+    'city'        => get_user_meta( $user_id, 'billing_city' ),
+    'zip'         => get_user_meta( $user_id, 'billing_postcode' ),
+    'country'     => get_user_meta( $user_id, 'billing_country' ),
+	);
+
+	update_user_meta( $user_id, 'dokan_address', $address_data );
+	// update_user_meta( $user_id, 'shop_phone', $shop_phone );
+} 
+// add_action( 'profile_update', 'CastBack_Filter_shopAddress' );
+
+

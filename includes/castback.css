@@ -1,12 +1,3 @@
-.yith-wcwl-add-to-wishlist-button { padding: 0.5rem 1rem !important; margin-bottom: 0.5rem; }
-.yith-add-to-wishlist-button-block { margin: unset !important; }
-
-/* Hide Woo/Dokan Sidebar UI's */
-.woocommerce-MyAccount-navigation, .dokan-dash-sidebar { display: none !important; }
-.woocommerce-MyAccount-content, .dokan-dashboard-content .dokan-settings-content { width: 100% !important; padding: 1.25rem !important; }
-
-
-
 /* .listing-status-Published { display: none; } */
  /* #CastBack-MyListings .listing-status-Published { display: flex; } */
 /* .listing-status-Draft { background-color: #ff0000; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */
@@ -18,6 +9,16 @@
 /* .listing-tag-category a:hover { color: #ffffff88 !important; } */
 /* .listing-tag-msrp { text-decoration: line-through; } */
 
+.CastBack-shopFilter-taxLabel h3 { padding: 0.25rem 0.5rem; background-color: var(--e-global-color-primary); color: var(--e-global-color-01b2f71); }
+.CastBack-shopFilter-taxLabel { background-color: var(--e-global-color-01b2f71); border: solid 2px var(--e-global-color-primary); margin-bottom: 0.5rem; }
+
+.CastBack-shopFilter-taxLabel.active h3 { background-color: var(--e-global-color-text); color: var(--e-global-color-01b2f71); }
+.CastBack-shopFilter-taxLabel.active { border: solid 2px var(--e-global-color-text); }
+
+/* a.CastBack-shopFilter-termLabel { margin: 0.5rem; }  */
+/* a.CastBack-shopFilter-termLabel:hover { color: var(--e-global-color-accent); } */
+
+.castback-button-important { background-color: var(--e-global-color-text) !important; }
 .acf-hidden, .acf-castback-hidden { display: none; }
 .acf-fields { display: contents; }
 .d-none { display: none !important; }
@@ -28,7 +29,7 @@
 /* min-width: 45%; width: fit-content !important; float: left; 
 	padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; } */
 /* Below is a duplicate, if 'castback-order' is needed.... */
-/* #castback-order { display: inline-block; min-width: 45%; width: fit-content !important; float: left; padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; } */ */
+/* #castback-order { display: inline-block; min-width: 45%; width: fit-content !important; float: left; padding: 0.5rem; margin: 0 1rem 1rem 0; border: solid 0.25rem darkslategray; } */
 /* #CastBack-MyListing h3, #CastBack-MyOffers h3, #CastBack-MyOrders h3, #castback-order h3 { margin-bottom: 0.5rem; } */
 /* #CastBack-MyListing a.item, #CastBack-MyOffers a.item, #CastBack-MyOrders a.item, #castback-order a.item { display: flex; padding: 0rem 0.25rem; } */
 
@@ -38,17 +39,25 @@
 /* #CastBack-MyOffers, #castback-offer, #castback-sidebar .offer_history { background-color: lightgoldenrodyellow; } */
 /* #CastBack-MyOrders, #castback-order, #castback-sidebar .order_history { background-color: lightgreen; } */
 
-#castback-sidebar { width: 35%; display: inline-block; float: right; margin-bottom: 1rem; }
+/* #castback-sidebar { width: 35%; display: inline-block; float: right; margin-bottom: 1rem; } */
 
 /* #CastBack-MyListings .acf-form-submit, #CastBack-MyOffers .acf-form-submit, #CastBack-MyOrders .acf-form-submit, a#castback-order .acf-form-submit { margin: 0 1rem 1rem 0; } */
 
+#CastBack-ListingPrice, #CastBack-ShippingPrice, #CastBack-TotalPrice { text-align: right; }
+#CastBack-ListingPrice::before, #CastBack-ShippingPrice::before
+#CastBack-TotalPrice::before { content: '$'; font-weight: 800; }
+#castback_offer_amount { text-align: right; padding: 0.25rem; height: 100%; width: 85%; float: left; }
+#castback_MOT_flag { padding: 0.25rem; width: 10%; }
+.castback_offer_amount_wrapper { float: left; width: 100%; text-align: right; margin-left: 1.25rem; }
+.castback_offer_amount_plusShipping { font-size: small; color: red; width: 100%; float: left; }
 .castback-order { display: flex; /* height: fit-content;  */ flex-direction: column; padding: 0.5rem; margin: 0.5rem 0 1.25rem; }
 /* .castback-listing { display: flex; height: fit-content; } */
 /* .castback-listing .castback-listing-panel  { width: 75%; } */
+.castback-listing-panel .e-con, .castback-listing-panel .e-con-inner  { padding: 0; }
 /* .castback-listing.disabled .castback-listing-panel  { width: 100%; } */
 /* .castback-order, .castback-listing { background-color: var(--e-global-color-01b2f71); } */
 
-#CastBack-MyOffers, #CastBack-MyOrders, #CastBack-Listings, #CastBack-DrawListing, #CastBack-Shop { padding: 1.25rem; }
+#CastBack-MyOffers, #CastBack-MyOrders, #CastBack-Listings, #CastBack-Shop { padding: 1.25rem; }
 /* #CastBack-MyListings .castback-listing, #CastBack-DrawListing .castback-listing, #CastBack-Shop .castback-listing { background-color:  var(--e-global-color-938a83b); padding: 0.5rem; margin: 0.5rem 0 1.25rem; } */
 /* #CastBack-MyOffers .castback-order, #CastBack-MyOffers .castback-listing { background-color: var(--e-global-color-f64482c); } */
 /* #CastBack-MyOrders .castback-order, #CastBack-MyOrders .castback-listing { background-color: var(--e-global-color-0a1cea8); } */

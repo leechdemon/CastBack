@@ -3,10 +3,10 @@
 Plugin Name: CastBack
 Description: A Wordpress plugin to manage Listings, Offers, and other CastBack tools. Creates Shortcodes for use with Elementor.
 Author: Leechdemon
-Version: 0.5.6.10212025
+Version: 1.0.0
 */
 global $castbackVersion;
-$castbackVersion = "0.5.6.10212025";
+$castbackVersion = "1.0.0";
 
 require_once plugin_dir_path(__FILE__) . 'tools.php';
 
@@ -14,9 +14,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/actions.php';
 require_once plugin_dir_path(__FILE__) . 'includes/buttons.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filters.php';
 
-	/* v0.5 - 9-26-2025 */
-		require_once plugin_dir_path(__FILE__) . 'includes/queries.php';
-	/* Remove ?? */
+require_once plugin_dir_path(__FILE__) . 'includes/queries.php';
 	
 require_once plugin_dir_path(__FILE__) . 'includes/shortcodes.php';
 require_once plugin_dir_path(__FILE__) . 'includes/listings.php';
@@ -30,10 +28,14 @@ function CastBack_enqueue_scripts() {
 	/* Also do CSS, which is Preregistered */
 	// wp_enqueue_style( 'CastBack' );
 	
+	$current_user = wp_get_current_user();
+	
 	$data_to_pass = array(
 		/* variables to pass to JS... */ 
 		'url' => admin_url( 'admin-ajax.php' ),
 		'user_id' => get_current_user_id(),
+		// 'user_login' => $current_user->user_login,
+		// 'MOT' => get_field( 'minimum_offer_total', 'option' ),
 		// 'nonce'    => wp_create_nonce(  ),
 		// 'message'  => __( 'Hello from PHP!', 'text-domain' ),
 	);
@@ -41,5 +43,6 @@ function CastBack_enqueue_scripts() {
 } add_action( 'wp_enqueue_scripts', 'CastBack_enqueue_scripts' );
 function CastBack_register_styles() {
 	global $castbackVersion;
+	
 	wp_register_style( 'CastBack', plugins_url().'/castback-plugin/includes/castback.css', array(), $castbackVersion, 'all' );
 } add_action( 'init', 'CastBack_register_styles' );
