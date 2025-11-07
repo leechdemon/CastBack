@@ -46,12 +46,13 @@ function custom_query_edit( $query ) {
 	$query->set( 'post_type', 'product' );
 	$query->set( 'posts_per_page', -1 );
 	// $query->set( 'limit', -1 );
-	$query->set( 'author', get_current_user_id() );
 	
 	if( isset( $_GET['listing_id'] ) ) {
 		$query->set( 'posts_per_page', 1 );
 		$query->set( 'p', $_GET['listing_id'] );
 		$listing_status = array( 'draft', 'publish', 'trash' );
+	} else {
+		$query->set( 'author', get_current_user_id() );
 	}
 	
 	// if( !$listing_status || $listing_status == 'all' ) { $listing_status = array('instock','outofstock'); }

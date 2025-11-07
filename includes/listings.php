@@ -190,7 +190,7 @@ function CastBack_Listings_editListing_ACF( $listing_id, $listingTemplate = null
 			while ( $custom_query->have_posts() ) {
 				$custom_query->the_post();
 				if( is_user_logged_in() ) {
-					if( get_current_user_id() == get_field( 'seller_id', $listing_id ) || current_user_can( 'manage_options' ) ) {
+					if( get_current_user_id() == get_field( 'seller_id', $listing_id ) || current_user_can( 'administrator' ) ) {
 						acf_form_head();
 						acf_form(array(
 							'form_attributes'   => array(

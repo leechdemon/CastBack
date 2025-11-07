@@ -141,8 +141,10 @@ function CastBack_customerSeller( $post_id ) {
 function CastBack_userIsStripeConnected( $user_id = null ) {
 	if( !$user_id && is_user_logged_in() ) { $user_id == get_current_user_id(); }
 	
-	$dokan_settings = get_user_meta( $user_id, 'dokan_profile_settings', true );
-	return $dokan_settings['profile_completion']['dokan_stripe_express'];
+	if( is_user_logged_in() ) {		
+		$dokan_settings = get_user_meta( $user_id, 'dokan_profile_settings', true );
+		return $dokan_settings['profile_completion']['dokan_stripe_express'];
+	} else { return false; }
 }
 function CastBack_vendorRegistrationPrompt() {
 	$output = "";

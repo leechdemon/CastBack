@@ -75,22 +75,27 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 			// }
 		}
 		else if( $action ) {
-			if( is_user_logged_in() ) {
-				/* All actions can assume user is logged in. */
+			if( $action == "userIsAuthor" ) {
+				if( get_current_user_id() == get_post( $listing_id )->post_author || current_user_can( 'administrator' ) ) { /* do nothing*/ }
+				else { echo 'd-none'; }
+			} else if( $action == "userIsStripeConnected" ) {
+				if( is_user_logged_in() && CastBack_userIsStripeConnected() ) { /* do nothing */ }
+				else { echo 'd-none'; }
+			}
+			/* All actions below can assume user is logged in. */
+			else if( is_user_logged_in() ) {
 				if( $action == "addListing" ) {
 					if( isset( $listing_id ) && $listing_id == $action ) { CastBack_Listings_addListing(); }
 					else { echo 'Wrong listing_id set. (s85-10012025)'; }
-				} else if( $action == "buyNow" ) {
-					if( isset( $listing_id ) ) { CastBack_Action_buyNow( $listing_id ); }
-					else { echo 'No Listing ID found. (s671-10212025)'; }
-				} else if( $action == "userIsStripeConnected" ) {
-					if( !CastBack_userIsStripeConnected() ) { echo 'd-none'; }
 				} else if( $action == "isPublished" ) {
 					if( isset( $listing_id ) ) {
 							$listing = wc_get_product( $listing_id );
 							if( $listing->get_status() != 'publish' ) { echo 'd-none'; }
 					}
 					else { echo 'No Listing ID found. (s90-11052025)'; }
+				} else if( $action == "buyNow" ) {
+					if( isset( $listing_id ) ) { CastBack_Action_buyNow( $listing_id ); }
+					else { echo 'No Listing ID found. (s671-10212025)'; }
 				} else if( $action == "makeOffer" ) {
 					if( isset( $listing_id ) ) { CastBack_Action_makeOffer( $listing_id ); }
 					else { echo 'No Listing ID found. (s95-09302025)'; }
@@ -114,17 +119,27 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				echo '$' . get_field( 'listing_price', $listing_id );
 			}
 			else if( $field == 'test' ) {
-
-
-				// $user_ids = array( get_current_user_id(), 482 );
-				// foreach( $user_ids as $user_id ) {
-				$user_id = get_current_user_id();
-					if ( CastBack_userIsStripeConnected() ) {
-						Test("User ". $user_id ." is connected to Stripe.");
-					} else {
-						Test("User ". $user_id ." is not connected to Stripe.");
-					}
+				// $args = array(
+					// 'limit'  => -1,	// Retrieve up to 10 orders
+					// 'orderby' => 'date',
+					// 'order'  => 'DESC',  
+					// 'post_status'  => 'any',
+				// );
+				
+				// $listings = wc_get_products( $args );
+				// foreach( $listings as $listing ) {
+					// $listing_id = $listing->get_id();
+					// update_field( 'listing_id', $listing_id, $listing_id );
+									
+					// if( get_field( 'seller_id' , $listing_id ) ) {
+						// $arg = array(
+							// 'ID' => $post_id,
+							// 'post_author' => $seller_id,
+						// );
+						// wp_update_post( $arg );
+					// }
 				// }
+				
 
 			}
 			else if( $field == 'order_status' ) {
