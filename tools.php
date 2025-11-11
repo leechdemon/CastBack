@@ -5,7 +5,7 @@ if (!function_exists('Test')) {
     function Test($output, $with_script_tags = false) {
         $js_code = json_encode($output, JSON_HEX_TAG);
         if ($with_script_tags === false) {
-            echo '<script>console.log("Test: " + ' .json_encode($js_code). ');</script>';
+            echo '<script>console.log(' .json_encode($js_code). ');</script>';
         } else {
             echo "<pre>" .var_dump($js_code). "</pre>";
         }
@@ -117,9 +117,9 @@ function CastBack_Tools_hideDokanFields() {
 	echo '<style>.form-row.form-group:has( #seller-url ) { display: none; }</style>';
 } add_action('wp_footer', 'CastBack_Tools_hideDokanFields');
 
-function CastBack_customerSeller( $post_id ) {
-	if( isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
-	else { $user_id = get_current_user_id(); }
+function CastBack_customerSeller( $post_id, $user_id = null ) {
+	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
+	if( !$user_id ) { $user_id = get_current_user_id(); }
 	
 	$ids = array();
 	$ids['user_id'] = $user_id;
@@ -141,15 +141,25 @@ function CastBack_customerSeller( $post_id ) {
 function CastBack_userIsStripeConnected( $user_id = null ) {
 	if( !$user_id && is_user_logged_in() ) { $user_id == get_current_user_id(); }
 	
-	if( is_user_logged_in() ) {		
+	if( $user_id ) {
 		$dokan_settings = get_user_meta( $user_id, 'dokan_profile_settings', true );
-		return $dokan_settings['profile_completion']['dokan_stripe_express'];
+		// Test( $dokan_settings );
+		// Test( $dokan_settings['profile_completion'] );
+		// Test( $dokan_settings['profile_completion']['progress'] );
+		
+		// return true;
+		if( $dokan_settings['profile_completion']['progress'] > 30 ) {
+			return true;
+		} else {
+			return false; }
 	} else { return false; }
 }
 function CastBack_vendorRegistrationPrompt() {
 	$output = "";
-	$output .= '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem;">';
-	$output .= '<h5>Please complete <a href="/my-account/vendor/settings/payment-manage-dokan_stripe_express/" class="castback-button castback-button-important" target="_blank">Vendor Registration</a> to continue.</h5>';
+	$output .= '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem; border: solid 2px; border-radius: 0.5rem;">';
+	$output .= '<h5>Please complete Vendor Registration.</h5>';
+	$output .= '<a href="/about/why-register/" class="castback-button" target="_blank">Why Register?</a>';
+	$output .= '<a href="/my-account/account-migration/" class="castback-button castback-button-important" target="_blank">Vendor Registration</a>';
 	$output .= '</div>';
 
 	return $output;

@@ -11,7 +11,7 @@ function custom_query_shop( $query ) {
 	if( isset( $_GET['order_id'] ) ) { $listing_id = get_field( 'listing_id', $_GET['order_id'] ); }
 	if( isset( $_GET['listing_id'] ) ) { $listing_id = get_field( 'listing_id', $_GET['listing_id'] ); } 	
 
-	if( $listing_id || is_admin() ) {
+	if( isset( $_GET['listing_id'] ) || is_admin() ) {
 		$query->set( 'p', $listing_id );
 		$query->set( 'posts_per_page', '1' );
 	} else { $query->set( 'posts_per_page', '20' ); }
@@ -24,8 +24,8 @@ function custom_query_offer( $query ) {
 	$query->set( 'post_status', 'publish' );
 	// $query->set( 'order', 'DESC' );
 	// $query->set( 'orderby', 'date' );
-	// $query->set( 'meta_query', '_stock_status' );
-	// $query->set( 'meta_value', 'instock' );
+	$query->set( 'meta_query', '_stock_status' );
+	$query->set( 'meta_value', 'instock' );
 	
 	// if( isset( $_GET['order_id'] ) ) {
 		// $query->set( 'p', get_field( 'listing_id', $_GET['order_id'] ) );
@@ -117,6 +117,7 @@ function CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 		$isActive = ' active';
 	}
 	else {
+		$isActive = '';
 		if( $tax->name == 'product_cat' ) { $order = ' style="order: 1;"'; }
 		else if( $tax->name == 'product_condition' ) { $order = ' style="order: 2;"'; }
 		else if( $tax->name == 'product_brand' ) {
@@ -144,7 +145,7 @@ function CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 			array(
 				'taxonomy' => $tax->name, // Replace 'recipe_tx' with your custom taxonomy slug
 				'field'    => 'slug',      // Can be 'slug', 'term_id', or 'name'
-				'terms'    => $term->slug,  // The slug of the term you want to query
+				// 'terms'    => $term->slug,  // The slug of the term you want to query
 			),
     ),
 	);
@@ -220,9 +221,15 @@ function CastBack_Queries_listingFilterButtons() {
 	echo '<div style="margin-bottom: 1.25rem;">';
 		if( isset( $_GET['stock_status'] ) ) {
 			foreach( [ 'instock', 'outofstock' ] as $var ) {
+				$active['stock_status']['all'] = '';
 				if( $_GET['stock_status'] == $var ) { $active['stock_status'][$var] = ' active'; }
+				else { $active['stock_status'][$var] = ''; }
 			}
-		} else { $active['stock_status']['all'] = ' active'; }
+		} else {
+			$active['stock_status']['instock'] = '';
+			$active['stock_status']['outofstock'] = '';
+			$active['stock_status']['all'] = ' active';
+		}
 		
 		echo '<a class="castback-button'.$active['stock_status']['all'].'" href="'.esc_url_raw( remove_query_arg( 'stock_status', get_the_permalink() ) ).'">Show All</a>';
 		echo '<a class="castback-button'.$active['stock_status']['instock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'instock', get_the_permalink() ) ).'">Available</a>';

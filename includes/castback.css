@@ -1,3 +1,5 @@
+#order_status { text-align: right; float: right; padding-left: 0.5rem; text-transform: none; font-size: small; }
+
 /* .listing-status-Published { display: none; } */
  /* #CastBack-MyListings .listing-status-Published { display: flex; } */
 /* .listing-status-Draft { background-color: #ff0000; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */

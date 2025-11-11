@@ -51,7 +51,9 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		}
 		else if( $button ) {
 			if( $button == 'drawButtonPanel' ) {
-				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				$user_id = get_current_user_id();
+				if( !CastBack_userIsStripeConnected( $user_id ) ) { return CastBack_vendorRegistrationPrompt(); }
+				else { echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button ); }
 			}
 			if( $button == 'deleteListing' ) {
 				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
@@ -75,15 +77,27 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 			// }
 		}
 		else if( $action ) {
-			if( $action == "userIsAuthor" ) {
+			if( $action == "isUserLoggedIn" ) {
+				if( is_user_logged_in() ) { /* do nothing */ }
+				else { echo 'd-none'; }
+			} else if( $action == "userIsAuthor" ) {
 				if( get_current_user_id() == get_post( $listing_id )->post_author || current_user_can( 'administrator' ) ) { /* do nothing*/ }
 				else { echo 'd-none'; }
 			} else if( $action == "userIsStripeConnected" ) {
-				if( is_user_logged_in() && CastBack_userIsStripeConnected() ) { /* do nothing */ }
+				if( is_user_logged_in() && CastBack_userIsStripeConnected( get_current_user_id() ) ) { /* do nothing */ }
 				else { echo 'd-none'; }
-			}
-			/* All actions below can assume user is logged in. */
-			else if( is_user_logged_in() ) {
+			} else if( $action == "displayDokanVendorDashboard" ) {
+				if( !is_admin() ) {
+					$redirect = true;
+					$user = wp_get_current_user();
+					if ( in_array( 'seller', (array) $user->roles ) ) { $redirect = false; }
+					if ( in_array( 'administrator', (array) $user->roles ) ) { $redirect = false; }
+					
+					if ( $redirect ) { wp_safe_redirect( '/about/why-register/' ); }
+					else { wp_safe_redirect( '/my-account/vendor/settings/payment-manage-dokan_stripe_express/' ); }
+				}
+			} else if( is_user_logged_in() ) {
+				/* Customer / Vendor actions below this point */
 				if( $action == "addListing" ) {
 					if( isset( $listing_id ) && $listing_id == $action ) { CastBack_Listings_addListing(); }
 					else { echo 'Wrong listing_id set. (s85-10012025)'; }
@@ -140,7 +154,26 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 					// }
 				// }
 				
+				// $user_ids = new array( 1, 3 );
+				// Test( CastBack_userIsStripeConnected( 1 ) );
+				// Test( CastBack_userIsStripeConnected( 2 ) );
+				// Test( CastBack_userIsStripeConnected( 3 ) );
+				// Test( CastBack_userIsStripeConnected( 536 ) );
 
+			}
+			else if( $field == 'customerAddress' ) {
+				echo '<div style="text-align: left;">';
+					echo '<h6>Customer Address:</h6>';
+					echo '<div style="padding: 1rem;">';
+						echo 'First L.'.'<br>';
+						echo 'customerAddress 1'.'<br>';
+						echo 'customerAddress 2'.'<br>';
+						echo 'city, state ZIP'.'<br>';
+					echo '</div>';
+				echo '</div>';
+			}
+			else if( $field == 'sellerAddress' ) {
+				// Do something
 			}
 			else if( $field == 'order_status' ) {
 				echo CastBack_Offers_orderStatus_cosmetic( $order_id, true );

@@ -183,19 +183,21 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 	
 	if( !$disputedDate ) {
 		/* Accept / Submit Offer */
-		if( $orderStatus == 'checkout-draft' && $user_id == $waitingOn ) {
-			if( get_field( 'offers', $order_id ) ) {
-				$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
-			}
+		if( $orderStatus == 'checkout-draft' && $user_id == $waitingOn ) {		
+			if( !CastBack_userIsStripeConnected( get_current_user_id() ) ) { return CastBack_vendorRegistrationPrompt(); }
+			else {
+				if( get_field( 'offers', $order_id ) ) {
+					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
+				}
 
-			$output .= '<p style="width: 100%; text-align: center;">(You may also make a counter-offer below)</p>';
-			
-			$output .= CastBack_Offers_ViewOfferPanel( $order_id );
-			$output .= '<div class="acf_offers" style="float: left; clear: both; width: 100%;">';
-				// $output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
-				$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
-			$output .= '</div>';
-			
+				$output .= '<p style="width: 100%; text-align: center;">(You may also make a counter-offer below)</p>';
+				
+				$output .= CastBack_Offers_ViewOfferPanel( $order_id );
+				$output .= '<div class="acf_offers" style="float: left; clear: both; width: 100%;">';
+					// $output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
+					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
+				$output .= '</div>';
+			}
 		}		
 		/* Submit Payment */
 		if( $orderStatus == 'pending' && get_current_user_id() == $waitingOn ) {
@@ -211,8 +213,10 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 			else if( get_field( 'shipped_date', $order_id ) ) { $displayShipping = true; }
 			
 			if( $displayShipping ) {
+				$output .= do_shortcode('[CastBack field="customerAddress"]');
 				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
-					$output .= '<input style="width: 100px;"id="castback_new_tracking_number" type="text">';
+					$output .= '<h6 style="width: fit-content;">Tracking Number:</h6>';
+					$output .= '<input style="width: 100%; margin: 0.5rem 0;" id="castback_new_tracking_number" type="text">';
 					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_addTracking_button(\''.$order_id.'\')">Add Tracking Number</a>';
 				$output .= '</div>';
 			}

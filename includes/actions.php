@@ -260,9 +260,10 @@
 	/* - Security: CastBack_customerSeller() */
 	function CastBack_Action_paymentComplete( $order_id = '' ) {
 	if( isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+	if( isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	// if( isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
-	if( !CastBack_customerSeller( $order_id ) ) { $success = false; }
+	if( !CastBack_customerSeller( $order_id, $user_id ) ) { $success = false; }
 	else {
 		$success = true;
 		
