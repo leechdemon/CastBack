@@ -168,12 +168,11 @@ function CastBack_filter_listings_populate_listing_id($field) {
 		
 		return $field;
 } add_filter('acf/prepare_field/key=field_68d42a88bab0f', 'CastBack_filter_listings_populate_listing_id');
-function CastBack_Filter_formatPriceField( $val ) {
+function CastBack_Filter_formatPriceField( $val = null ) {
 	// $field['value'] = number_format( $field['value'], 2 );
-	// if( (float)$val ) {
+	if( (float)$val ) {
 		$val = number_format( (float)$val, 2 );
-	// }
-	
+	}
 	return $val;
 }
 

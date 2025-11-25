@@ -5,20 +5,20 @@
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 		if( !isset( $listing_id ) && isset( $_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; }
+		if( !$order_amount && isset( $_POST['order_amount'] ) ) { $order_amount = $_POST['order_amount']; }
 		$success = true;
 		
 		if( isset( $_POST['user_id'] ) ) { $customer_id = $_POST['user_id']; }		
 		else { $customer_id = get_current_user_id(); }
+		
 		$args = array(
 				'status'        => 'wc-checkout-draft',
-				'customer_id'   => $customer_id,
 		);
 		$order = wc_create_order( $args );
-		// Save the order to the database
 		$order->save();
+	
 		$order_id = $order->get_id();
 		if( !$order_id ) { $success = false; }
-
 
 		/* Set ACF fields */
 		if( $success && !update_field( 'customer_id', $customer_id, $order_id ) ) { $success = false; }
@@ -28,7 +28,32 @@
 		if( !$order_amount ) { $order_amount = get_field( 'listing_price', $listing_id ); }
 		if( $success && !update_field( 'order_amount', $order_amount, $order_id ) ) { $success = false; }
 		
+		/* Set User Address */
+		$billing_address = CastBack_getAddress( $customer_id, 'billing', 'return' );
+		$shipping_address = CastBack_getAddress( $customer_id, 'shipping', 'return' );
+		
+		$order->set_address( $billing_address, 'billing' );
+		$order->set_address( $shipping_address, 'shipping' );
+		$order->save();
+		if( $success && !$order->get_billing_first_name() ) { $success = false; }
+
+		
+		/* Add to User Records */
+		$row = array( 'order_id' => $order_id, 'listing_id' => $listing_id, 'role' => '', 'last_viewed' => '', 'notifications_cleared' => '' );
+		$row['role'] = 'customer';
+		if( $success && !add_row( 'current_orders', $row, $customer_id ) ) { $success = false; }
+		$row['role'] = 'seller';
+		$seller_id = get_field( 'seller_id', $listing_id );
+		if( $success && !add_row( 'current_orders', $row, $seller_id ) ) { $success = false; }
+
+		// $order = array( 'order_id' => $order_id, 'listing_id' => $listing_id );
+		// add_row( 'orders', $order, $customer_id );
+
+		$order->set_customer_id( $customer_id );
+		$order->save();
+		
 		/* buyNow auto-submits an initial offer */
+		
 		CastBack_Action_submitOffer( $order_id, $order_amount, $AJAX );
 		
 		if( $success ) {
@@ -52,24 +77,34 @@
 		
 		if( CastBack_customerSeller( $order_id ) ) {
 
+			if( !$user_id ) { $user_id = get_current_user_id(); }
 			if( isset( $order_id ) && isset( $new_message ) ) {
 				$row = array(
 					'message_date' => wp_date('F j, Y g:i:s a' ),
 					'message_text' => $new_message,
-					'message_user_id' => get_current_user_id(),
+					'message_user_id' => $user_id,
 				);
 				if( add_row( 'messages', $row, $order_id ) ) {
 					// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+					
+					$customer_id = get_field( 'customer_id', $order_id );
+					$seller_id = get_field( 'seller_id', $order_id );
+					if( $user_id == $customer_id ) { $recipient_id = $seller_id; }
+					if( $user_id == $seller_id ) { $recipient_id = $customer_id; }
+					
+					CastBack_sendEmailNotification( $order_id, 'CastBack_sendMessage', $recipient_id );
 				}
 			}
 		}
-		
+		CastBack_Offers_refreshRevisionDate( $order_id );
+
 		wp_die();
 	} add_action( 'wp_ajax_CastBack_Action_sendMessage', 'CastBack_Action_sendMessage' );
+	
 	function CastBack_Action_submitOffer( $order_id = null, $order_amount = false, $AJAX = false ) {
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
-		if( isset( $_POST['order_amount'] ) ) { $order_amount = $_POST['order_amount']; }
+		if( !$order_amount && isset( $_POST['order_amount'] ) ) { $order_amount = $_POST['order_amount']; }
 		
 		if( !CastBack_customerSeller( $order_id ) ) { $success = false; }
 		else {
@@ -102,6 +137,11 @@
 		
 		
 		if( $success ) {
+			// if( $user_id == $customer_id ) { $recipient_id = $seller_id; }
+			// if( $user_id == $seller_id ) { $recipient_id = $customer_id; }
+			
+			CastBack_sendEmailNotification( $order_id, 'CastBack_submitOffer', $waitingOn );
+			
 			if( $AJAX ) {
 				echo $order_id;
 				// echo '<script>CastBack_Offers_refreshOrder( '.$order_id.' );</script>'; 
@@ -122,6 +162,9 @@
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 		
+		$seller_id = get_field( 'seller_id', $order_id );
+		$customer_id = get_field( 'customer_id', $order_id );
+		
 		if( !CastBack_customerSeller( $order_id ) ) { $success = false; }
 		else {
 			$success = true;
@@ -133,7 +176,7 @@
 
 				// WaitingOnToggle();
 				/* force WaitingOn to buyer */
-				update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
+				update_field( 'waiting_on', $customer_id, $order_id );
 				
 				
 				
@@ -157,28 +200,7 @@
 				);
 				$order->add_product( wc_get_product( $listing_id ), $quantity, $args );
 				
-				
-				
-				
-				// Example: Setting billing and shipping addresses
-				// $billing_address = array(
-						// 'first_name' => 'John',
-						// 'last_name'  => 'Doe',
-						// 'address_1'  => '123 Main St',
-						// 'city'       => 'Anytown',
-						// 'state'      => 'CA',
-						// 'postcode'   => '12345',
-						// 'country'    => 'US',
-						// 'email'      => 'john.doe@example.com',
-						// 'phone'      => '555-123-4567',
-				// );
-				// $order->set_address( $billing_address, 'billing' );
-				// $order->set_address( $billing_address, 'shipping' ); // Can be different if needed
-				
-				
-				
-				
-				/* Add Shipping to Order */
+				/* Add Shipping costs to Order */
 				$shipping_item = new WC_Order_Item_Shipping();
 				$shipping_price = get_field( 'shipping_price', $listing_id );
 				$shipping_item->set_method_id( 'shipping:0' );
@@ -196,6 +218,8 @@
 		}
 				
 		if( $success ) {
+			CastBack_sendEmailNotification( $order_id, 'CastBack_acceptOffer', $seller_id );
+
 			if( $AJAX ) {
 				// echo CastBack_Offers_drawOrderDetails( $order_id ); 
 				echo $order_id;
@@ -220,7 +244,7 @@
 
 			if($offers) {
 				$row = array(
-						'offer_expired_date'	=>	date( 'F j, Y g:i:s a'  ),
+						'offer_expired_date'	=>	wp_date('F j, Y g:i:s a' ),
 				);
 				$success = update_row( 'offers', count($offers), $row, $order_id );
 			}

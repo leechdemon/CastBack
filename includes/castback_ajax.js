@@ -2,14 +2,14 @@
 /* - Security: Does not require security, since all Users can create Listings. */
 function CastBack_Action_addListing_button() {
 	// Listing version?
-	// document.getElementById( 'CastBack-ViewOfferButtons' ).style.opacity = "0.5";
+	// document.getElementById( 'CastBack-ViewOrderActionButtons' ).style.opacity = "0.5";
 	jQuery.ajax({
 		type: "POST",
 		url: CastBack.url,
 		data: {
 			"action": "CastBack_Listings_addListing",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 		},
 		success: function (data) {
 			CastBack_Action_refreshListing( listing_id, data );
@@ -24,7 +24,7 @@ function CastBack_Action_markSold( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_markSold",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
@@ -40,7 +40,7 @@ function CastBack_Action_markUnsold( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_markUnsold",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
@@ -56,7 +56,7 @@ function CastBack_Action_publishListing( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_publishListing",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
@@ -72,7 +72,7 @@ function CastBack_Action_hideListing( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_hideListing",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
@@ -88,7 +88,7 @@ function CastBack_Action_deleteListing( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_deleteListing",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
@@ -104,7 +104,7 @@ function CastBack_Action_restoreListing( listing_id ) {
 		data: {
 			"action": "CastBack_Listings_restoreListing",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id,
 		},
 		success: function (data) {
@@ -129,7 +129,7 @@ function CastBack_Action_makeOfferNow_button( listing_id ) {
 		data: {
 			"action": "CastBack_Action_buyNow",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id, 
 			"order_amount": order_amount, 
 		},
@@ -149,18 +149,19 @@ function CastBack_Action_buyNow_button( listing_id ) {
 		data: {
 			"action": "CastBack_Action_buyNow",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"listing_id": listing_id, 
 			"order_amount": order_amount, 
 		},
 		success: function (data) {
+			console.log( CastBack.user_id * 1 );
 			console.log( data );
 			window.location.href = "/offers/view-offer/?order_id=" + data;
 		}
 	});
 }
 function CastBack_Action_sendMessage_button( order_id ) {
-	document.getElementById( 'CastBack-ViewOfferButtons' ).style.opacity = "0.5";
+	document.getElementById( 'CastBack-ViewOrderActionButtons' ).style.opacity = "0.5";
 	var new_message = document.getElementById("castback_new_message").value;
 
 	jQuery.ajax({
@@ -169,7 +170,7 @@ function CastBack_Action_sendMessage_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_sendMessage",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id, 
 			"new_message": new_message,
 		},
@@ -190,7 +191,7 @@ function CastBack_Action_submitOffer_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_submitOffer",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 			"order_amount": order_amount,
 		},
@@ -208,7 +209,7 @@ function CastBack_Action_acceptOffer_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_acceptOffer",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id, 
 		},
 		success: function (data) {
@@ -226,7 +227,7 @@ function CastBack_Action_addTracking_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_addTracking",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id, 
 			"new_tracking_number": new_tracking_number, 
 		},
@@ -244,7 +245,7 @@ function CastBack_Action_completeOrder_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_completeOrder",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 		},
 		success: function (data) {
@@ -261,7 +262,7 @@ function CastBack_Action_disputeOrder_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_disputeOrder",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 		},
 		success: function (data) {
@@ -278,7 +279,7 @@ function CastBack_Action_removeDispute_button( order_id ) {
 		data: {
 			"action": "CastBack_Action_removeDispute",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 		},
 		success: function (data) {
@@ -296,6 +297,18 @@ function CastBack_Offers_refreshOrder( order_id ) {
 	/* Add this... */
 	// CastBack_Offers_refreshOrder_Status( order_id );
 }
+function CastBack_userHasOffers() {	
+	var offers = document.getElementsByClassName('castback-notification-customer');
+	for( var i = 0; i < offers.length; i++) {
+		offers[i].firstChild.innerHTML = "<span style='color: red; font-weight: 800;'>**</span>" + "My Offers";
+	}
+}
+function CastBack_userHasOrders() {	
+	var orders = document.getElementsByClassName('castback-notification-seller'); 
+	for( var i = 0; i < orders.length; i++) {
+		orders[i].firstChild.innerHTML = "<span style='color: red; font-weight: 800;'>**</span>" + "Orders";
+	}
+}
 function CastBack_Offers_refreshOrderAction_Buttons( order_id ) {	
 	document.getElementById( 'CastBack-ViewOrderActionButtons').style.opacity = "0.5";
 	
@@ -305,7 +318,7 @@ function CastBack_Offers_refreshOrderAction_Buttons( order_id ) {
 		data: {
 			"action": "CastBack_Offers_ViewOrderActionButtons",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 		},
 		success: function (data) {
@@ -323,7 +336,7 @@ function CastBack_Offers_refreshOffer_Buttons( order_id ) {
 		data: {
 			"action": "CastBack_Offers_ViewOfferButtons",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 		},
 		success: function (data) {
@@ -341,7 +354,7 @@ function CastBack_Offers_refreshOrder_Sidebar( order_id ) {
 		data: {
 			"action": "CastBack_Offers_ViewOfferSidebar",
 			"AJAX": true,
-			"user_id": CastBack.user_id,
+			"user_id": CastBack.user_id * 1,
 			"order_id": order_id,
 		},
 		success: function (data) {

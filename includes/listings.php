@@ -99,7 +99,7 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 			wp_reset_postdata();
 		}
 	} else {
-		echo 'This is not your order. Please try again. ("2856", L103-11052025)';
+		echo 'This is not your order. Please try again. ('.$listing_id.', L103-11052025)';
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
@@ -220,16 +220,21 @@ function CastBack_Listings_publishListing( $listing_id = null ) {
 	
 	ob_start();	
 	if( CastBack_customerSeller( $listing_id ) ) {
-		echo '1';
+		// echo '1';
 		$user = wp_get_current_user();
-		echo '2';
+		// echo '2';
 		if ( !in_array( 'customer', (array) $user->roles ) ) {
 			$listing = wc_get_product( $listing_id );
 			
 			$listing->set_status( 'publish' );
-			echo $listing->save();
+			$response =  $listing->save();
+			
+			if( $response ) { CastBack_sendEmailNotification( $listing_id, 'CastBack_publishListing', $user->ID ); }
+			
+			echo $response;
+			
 		} else {
-			echo '0';
+			// echo '0';
 		}
 	}
 	

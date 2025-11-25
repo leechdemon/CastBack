@@ -1,9 +1,11 @@
 <?php
 function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
+	$user_id = get_current_user_id();
 	$output = '';
 	if( $method == 'MyOffers' ) {
 		$title_url = '/buying/offers';
 		$buyerOrSeller = 'customer_id';
+		$role = 'customer';
 		$offersOrders = 'offers';
 		
 		$filterOrderID = null;
@@ -11,6 +13,7 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 	if( $method == 'MyOrders' ) {
 		$title_url = '/selling/my-orders';
 		$buyerOrSeller = 'seller_id';
+		$role = 'seller';
 		$offersOrders = 'orders';
 		
 		$filterOrderID = null;
@@ -45,7 +48,7 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 				// ),
 				array(
 					'key'     => $buyerOrSeller,
-					'value'   => get_current_user_id(),
+					'value'   => $user_id,
 					'compare' => 'IN', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
 				),
 			),
@@ -68,8 +71,10 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 			$order_id = $order->get_id();
 			
 			// $offers = get_field( 'offers', $order_id );
-			
-			$output .= '<h4 style="width: 100%; ">Order #<span id="castback_order_id">'.$order_id.'</span> <span class="castback-orderStatus" style="font-size: smaller;">('.CastBack_Offers_orderStatus_cosmetic( $order_id ).')</span></h4> ';
+			//$output .= $buyerOrSeller;
+			$notificationBubble = do_shortcode('[CastBack action="userHasNotification" order_id="'.$order_id.'" method="'.$role.'"]');
+			//$notificationBubble = do_shortcode('[CastBack action="userHasNotification" order_id="'.$order_id.'" user_id="'.$user_id.'" method="'.$buyerOrSeller.'"]');
+			$output .= '<h4 style="width: 100%; ">'.$notificationBubble.'Order #<span id="castback_order_id">'.$order_id.'</span> <span class="castback-orderStatus" style="font-size: smaller;">('.CastBack_Offers_orderStatus_cosmetic( $order_id ).')</span></h4> ';
 			$output .= '<div class="castback-order">';
 					$listing_id = get_field( 'listing_id', $order_id );
 					$output .= '<div class="castback-listing-panel">';
@@ -111,27 +116,29 @@ function CastBack_Offers_orderStatus_determine( $order_id ) {
 function CastBack_Offers_orderStatus_cosmetic( $order_id = null, $display = false ) {
 	if( $order_id ) {		
 		$order = wc_get_order( $order_id );	
-		switch( $order->get_status() ) {
-			case 'checkout-draft':
-				$orderStatusCosmetic = 'Offer Pending';
-				break;
-			case 'pending':
-				$orderStatusCosmetic = 'Pending Payment';
-				break;
-			case 'on-hold':
-				$orderStatusCosmetic = 'Disputed';
-				break;
-			case 'processing':
-				if( get_field( 'shipped_date', $order_id ) ) {  
-					$orderStatusCosmetic = 'Processing (Shipped)';
-				}
-				else {
-					$orderStatusCosmetic = 'Processing';
-				}
-				break;
-			case 'completed':
-				$orderStatusCosmetic = 'Complete';
-				break;
+		if( $order ) {
+			switch( $order->get_status() ) {
+				case 'checkout-draft':
+					$orderStatusCosmetic = 'Offer Pending';
+					break;
+				case 'pending':
+					$orderStatusCosmetic = 'Pending Payment';
+					break;
+				case 'on-hold':
+					$orderStatusCosmetic = 'Disputed';
+					break;
+				case 'processing':
+					if( get_field( 'shipped_date', $order_id ) ) {  
+						$orderStatusCosmetic = 'Processing (Shipped)';
+					}
+					else {
+						$orderStatusCosmetic = 'Processing';
+					}
+					break;
+				case 'completed':
+					$orderStatusCosmetic = 'Complete';
+					break;
+			}
 		}
 		
 		$disputedDate = get_field( 'disputed_date', $order_id );
@@ -146,7 +153,7 @@ function CastBack_Offers_orderStatus_cosmetic( $order_id = null, $display = fals
 function CastBack_Offers_minimumOfferPrice( $order_amount = null ) {
 	$MOT = get_field( 'minimum_offer_total', 'option' );
 	
-	if( !$order_amount ) { return CastBack_Filter_formatPriceField( $MOT ); }
+	if( !$order_amount ) { return $MOT; }
 	else {
 		if( !$listing_id && isset( $_GET['order_id'] ) ) { $listing_id = get_field( 'listing_id', $_GET['order_id'] ); }
 		if( !$listing_id && isset( $_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; }
@@ -156,10 +163,10 @@ function CastBack_Offers_minimumOfferPrice( $order_amount = null ) {
 		if( $listing_id ) {
 			$shipping_price = get_field( 'shipping_price', $listing_id );
 			if( !$shipping_price ) { $shipping_price = 0; }
-			
+						
 			if( ($order_amount + $shipping_price) < $MOT ) { $order_amount = $MOT - $shipping_price; }
 				
-			return CastBack_Filter_formatPriceField( $order_amount );
+			return $order_amount;
 		}
 	}
 }
@@ -184,7 +191,8 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 	if( !$disputedDate ) {
 		/* Accept / Submit Offer */
 		if( $orderStatus == 'checkout-draft' && $user_id == $waitingOn ) {		
-			if( !CastBack_userIsStripeConnected( get_current_user_id() ) ) { return CastBack_vendorRegistrationPrompt(); }
+			$reason = CastBack_userCanPurchase( get_current_user_id() );
+			if( $reason !== true ) { return $reason; }
 			else {
 				if( get_field( 'offers', $order_id ) ) {
 					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
@@ -237,7 +245,7 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {	
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
 	
-	if( CastBack_customerSeller( $order_id ) ) {
+	if( CastBack_customerSeller( $order_id ) || is_user_admin() ) {
 		$order = wc_get_order( $order_id );
 		if( $order ) {
 
@@ -269,7 +277,7 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 							if( !$displayName ) { $displayName = '(User #' . $offer['offer_user_id'].')'; }
 							
 							if( $offer['offer_expired_date'] ) { $offerExpired = ' offer_expired'; } else { $offerExpired = ''; }
-							$output .= '<div class="offer_history__subitem'.$offerExpired.'">'. $displayName . ' made an Offer of $'. $offer['offer_amount'].'</div>';
+							$output .= '<div class="offer_history__subitem'.$offerExpired.'">'. $displayName . ' made an Offer of $'. CastBack_Filter_formatPriceField( $offer['offer_amount'] ).'</div>';
 						$output .= '</div>'; // end order history item
 					}
 				}
@@ -351,16 +359,22 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 			$output .= '</div>'; // end order history					
 
 			/* Display Messaging Window */
-			// $output .= '<div class="acf_messages">';
+			$output .= '<div class="acf_messages">';
 
 				/* Send Message */
-				// $output .= '<input style="width: 100px;"id="castback_new_message" type="text-area">';
-				// $output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_sendMessage_button(\''.$order_id.'\')">Send Message</a>';
+				$output .= '<input style="width: 100px;"id="castback_new_message" type="text-area">';
+				$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_sendMessage_button(\''.$order_id.'\')">Send Message</a>';
 			
-			// $output .= '</div>';
+			$output .= '</div>';
 		}
 		else { /* do something */ }
 	} else { $output .= 'This is not your order. Please log in and try again. ("'.$order_id.'", O471, 11052025)'; }
 
 		if($AJAX) { echo $output; wp_die(); } else { return $output; }
 } add_action( 'wp_ajax_CastBack_Offers_ViewOfferSidebar', 'CastBack_Offers_ViewOfferSidebar' );
+
+function CastBack_Offers_refreshRevisionDate( $order_id ) {
+	if( CastBack_customerSeller( $order_id ) ) {
+		update_field( 'revision_date', wp_date('F j, Y g:i:s a'), $order_id );
+	}
+}

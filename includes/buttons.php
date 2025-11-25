@@ -27,10 +27,10 @@ function CastBack_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = 
 				echo CastBack_Buttons_DrawButtonPanel_togglePublish( $post_id );
 				echo CastBack_Buttons_DrawButtonPanel_toggleSold( $post_id );
 			}
-			if( $button == 'buyNow' ) { echo CastBack_Buttons_DrawButtonPanel_buyNow( $post_id ); }
+			if( $button == 'buyNow' ) { echo CastBack_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id ); }
 			if( $button == 'makeOffer' ) { echo CastBack_Buttons_DrawButtonPanel_makeOffer( $post_id ); }
 			if( $button == 'makeOffer_amount' ) { echo CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ); }
-			if( $button == 'makeOfferNow' ) { echo CastBack_Buttons_DrawButtonPanel_makeOfferNow( $post_id ); }
+			if( $button == 'makeOfferNow' ) { echo CastBack_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id ); }
 			if( $button == 'editListing' ) { echo CastBack_Buttons_DrawButtonPanel_editListing( $post_id ); }
 			if( $button == 'wishlistAdd' ) { echo CastBack_Buttons_DrawButtonPanel_wishlistAdd( $post_id ); }
 			if( $button == 'deleteListing' ) { echo CastBack_Buttons_DrawButtonPanel_deleteListing( $post_id ); }
@@ -43,8 +43,8 @@ function CastBack_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = 
 				if( $user_id == get_field( 'customer_id', $post_id ) ) { $isCustomer = true; }
 				if( $user_id == get_field( 'seller_id', $post_id ) ) { $isSeller = true; }
 					
-				if( $isCustomer ) { echo CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id ); }
-				else if( $isSeller ) { echo CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id ); }
+				if( $isCustomer ) { echo CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id ); }
+				else if( $isSeller ) { echo CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id ); }
 				// else { echo 'This is not your order. (a27-09272025)'; }
 			} else { echo 'Please log in. (bo25-09272025)'; }
 		}
@@ -77,13 +77,21 @@ function CastBack_Buttons_DrawButtonPanel_toggleSold( $post_id ) {
 }
 function CastBack_Buttons_DrawButtonPanel_togglePublish( $post_id ) {
 	$product = wc_get_product( $post_id );
-	if( $product->get_status() == 'publish' ) {
+	$status = $product->get_status();
+	if( $status == 'publish' ) {
 		$method = 'hideListing';
 		$buttonText =  'Hide Listing';
-	} else if( $product->get_status() == 'draft' ) {
+	} else if( $status == 'draft' ) {
 		$method = 'publishListing';
 		$buttonText =  'Publish Listing';
 		$classes .= 'castback-button-important';
+	} else if( $status == 'trash' || $status == 'private' ) {
+		$method = 'publishListing';
+		$buttonText =  'Publish Listing';
+	} else {
+		$method = 'hideListing';
+		$buttonText =  'Hide Listing (bad order status)';
+		// Test($status);
 	}
 	if( $product->get_status() == 'trash' ) { $classes .= ' d-none'; }
 	
@@ -104,11 +112,12 @@ function CastBack_Buttons_DrawButtonPanel_deleteListing( $post_id ) {
 }
 
 // /* Offer Buttons */
-function CastBack_Buttons_DrawButtonPanel_buyNow( $post_id ) {
-	// if( !CastBack_userIsStripeConnected() ) { return CastBack_vendorRegistrationPrompt(); }
-	// else {
+function CastBack_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id = null ) {
+	$userCanPurchase = CastBack_userCanPurchase( $user_id );
+	if( $userCanPurchase === true ) {
 		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_buyNow_button('.$post_id.')">Buy Now</button>';
-	// }
+	}
+	else { return CastBack_userRegistrationPrompt( $userCanPurchase ); }
 }
 function CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
 	if( !$order_id && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
@@ -164,15 +173,16 @@ function CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
 function CastBack_Buttons_DrawButtonPanel_makeOffer( $post_id ) {
 	return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_makeOffer_button('.$post_id.')">Make Offer</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_makeOfferNow( $post_id ) {
-	// if( !CastBack_userIsStripeConnected() ) { return CastBack_vendorRegistrationPrompt(); }
-	// else {
+function CastBack_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id = null ) {
+	$userCanPurchase = CastBack_userCanPurchase( $user_id );
+	if( $userCanPurchase === true ) {
 		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 60%;" type="reset" onclick="javascript:CastBack_Action_makeOfferNow_button('.$post_id.')">Make Offer Now!</button>';
-	// }
+	}
+	else { return CastBack_userRegistrationPrompt( $userCanPurchase ); }
 }
-function CastBack_Buttons_DrawButtonPanel_viewOrder( $post_id ) {
+function CastBack_Buttons_DrawButtonPanel_viewOrder( $post_id, $user_id = null ) {
 	return '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'/selling/my-orders/?order_id=' .$post_id.'\'">View Order</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id ) {
+function CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id = null ) {
 		return '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'/offers/view-offer/?order_id=' .$post_id.'\'">View Offer</button>';
 }
