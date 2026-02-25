@@ -127,6 +127,9 @@ function CastBack_Offers_orderStatus_cosmetic( $order_id = null, $display = fals
 				case 'on-hold':
 					$orderStatusCosmetic = 'Disputed';
 					break;
+				case 'cancelled':
+					$orderStatusCosmetic = 'Cancelled';
+					break;
 				case 'processing':
 					if( get_field( 'shipped_date', $order_id ) ) {  
 						$orderStatusCosmetic = 'Processing (Shipped)';
@@ -259,102 +262,112 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 			$output .= '<div class="offer_history">';
 
 				
-				/* Display Offers */
-				$offers = get_field( 'offers', $order_id  );
-				if( $offers ) {
-					foreach( $offers as $offer ) {
-						if( $offer['offer_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
-						else { $customerOrSeller = ' seller'; }
-						
-						$output .= '<div class="offer_history_item'.$customerOrSeller.'" style="order: '.( (int)strtotime( $offer['offer_date'] ) +1 ).';">';
-							$output .= '<div class="offer_history_subitem date">'. $offer['offer_date'] . '</div>';
+			/* Display Offers */
+			$offers = get_field( 'offers', $order_id  );
+			if( $offers ) {
+				foreach( $offers as $offer ) {
+					if( $offer['offer_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
+					else { $customerOrSeller = ' seller'; }
+					
+					$output .= '<div class="offer_history_item'.$customerOrSeller.'" style="order: '.( (int)strtotime( $offer['offer_date'] ) +1 ).';">';
+						$output .= '<div class="offer_history_subitem date">'. $offer['offer_date'] . '</div>';
 
-							$name = get_userdata( $offer['offer_user_id'] );
-							if( $name->first_name || $name->last_name ) {
-								$displayName = $name->first_name .' ';
-								$displayName .= $name->last_name;
-							}
-							if( !$displayName ) { $displayName = '(User #' . $offer['offer_user_id'].')'; }
-							
-							if( $offer['offer_expired_date'] ) { $offerExpired = ' offer_expired'; } else { $offerExpired = ''; }
-							$output .= '<div class="offer_history__subitem'.$offerExpired.'">'. $displayName . ' made an Offer of $'. CastBack_Filter_formatPriceField( $offer['offer_amount'] ).'</div>';
-						$output .= '</div>'; // end order history item
-					}
+						$name = get_userdata( $offer['offer_user_id'] );
+						if( $name->first_name || $name->last_name ) {
+							$displayName = $name->first_name .' ';
+							$displayName .= $name->last_name;
+						}
+						if( !$displayName ) { $displayName = '(User #' . $offer['offer_user_id'].')'; }
+						
+						if( $offer['offer_expired_date'] ) { $offerExpired = ' offer_expired'; } else { $offerExpired = ''; }
+						$output .= '<div class="offer_history_subitem'.$offerExpired.'">'. $displayName . ' made an Offer of $'. CastBack_Filter_formatPriceField( $offer['offer_amount'] ).'</div>';
+					$output .= '</div>'; // end order history item
 				}
-						
-				/* Display Message History */
-				$messages = get_field( 'messages', $order_id  );
-				if( $messages ) {
-					foreach( $messages as $message ) {
-						if( $message['message_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
-						else { $customerOrSeller = ' seller'; }
-						
-						$output .= '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $message['message_date'] ).';">';
-							$output .= '<div class="order_history_subitem date">'. $message['message_date'] . '</div>';
+			}
+					
+			/* Display Message History */
+			$messages = get_field( 'messages', $order_id  );
+			if( $messages ) {
+				foreach( $messages as $message ) {
+					if( $message['message_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
+					else { $customerOrSeller = ' seller'; }
+					
+					$output .= '<div class="order_history_item '.$customerOrSeller.'" style="order: '.strtotime( $message['message_date'] ).';">';
+						$output .= '<div class="order_history_subitem date">'. $message['message_date'] . '</div>';
 
-							$name = get_userdata( $message['message_user_id'] );
-							$output .= '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ': "'.$message['message_text'].'"</div>';
-						$output .= '</div>'; // end order history item
-					}
+						$name = get_userdata( $message['message_user_id'] );
+						$output .= '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ': "'.$message['message_text'].'"</div>';
+					$output .= '</div>'; // end order history item
 				}
+			}
 
-				/* Display Tracking History */
-				$trackingLabels = get_field( 'tracking', $order_id  );
-				if( $trackingLabels ) {
-					foreach( $trackingLabels as $tracking ) {
-						if( $tracking['tracking_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
-						else { $customerOrSeller = ' seller'; }
-						
-						$output .= '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $tracking['tracking_date'] ).';">';
-							$output .= '<div class="order_history_subitem date">'. $tracking['tracking_date'] . '</div>';
+			/* Display Tracking History */
+			$trackingLabels = get_field( 'tracking', $order_id  );
+			if( $trackingLabels ) {
+				foreach( $trackingLabels as $tracking ) {
+					if( $tracking['tracking_user_id'] == get_field( 'customer_id', $order_id ) ) { $customerOrSeller = ' customer'; }
+					else { $customerOrSeller = ' seller'; }
+					
+					$output .= '<div class="order_history_item'.$customerOrSeller.'" style="order: '.strtotime( $tracking['tracking_date'] ).';">';
+						$output .= '<div class="order_history_subitem date">'. $tracking['tracking_date'] . '</div>';
 
-							$name = get_userdata( $tracking['tracking_user_id'] );
-							$output .= '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ' added Tracking #<a href="'.get_site_url().'/?tracking='.$tracking['tracking_number'].'">'.$tracking['tracking_number'].'</a></div>';
-						$output .= '</div>'; // end order history item
-					}
+						$name = get_userdata( $tracking['tracking_user_id'] );
+						$output .= '<div class="order_history_subitem">'. $name->first_name .' '.$name->last_name . ' added Tracking #<a href="'.get_site_url().'/?tracking='.$tracking['tracking_number'].'">'.$tracking['tracking_number'].'</a></div>';
+					$output .= '</div>'; // end order history item
 				}
+			}
 
-				/* Display Status Changes */
-				$offers = get_field( 'offers', $order_id );
-				$dateCreated = $offers[0]['offer_date'];
-				$output .= '<div class="order_history_item customer" style="order: '.strtotime( $dateCreated ).';">';
-					$output .= '<div class="order_history_subitem date">'. $dateCreated . '</div>';
-					$output .= '<div class="order_history_subitem">Order Created</div>';
+			/* Display Status Changes */
+			$offers = get_field( 'offers', $order_id );
+			$dateCreated = $offers[0]['offer_date'];
+			$output .= '<div class="order_history_item status" style="order: '.strtotime( $dateCreated ).';">';
+				$output .= '<div class="order_history_subitem date">'. $dateCreated . '</div>';
+				$output .= '<div class="order_history_subitem">Order Created</div>';
+			$output .= '</div>';
+			$acceptedDate = get_field( 'accepted_date', $order_id );
+			if( $acceptedDate ) {
+				$output .= '<div class="order_history_item status" style="order: '.strtotime( $acceptedDate ).';">';
+					$output .= '<div class="order_history_subitem date">'. $acceptedDate . '</div>';
+					$output .= '<div class="order_history_subitem">Offer Accepted</div>';
 				$output .= '</div>';
-				$acceptedDate = get_field( 'accepted_date', $order_id );
-				if( $acceptedDate ) {
-					$output .= '<div class="order_history_item seller" style="order: '.strtotime( $acceptedDate ).';">';
-						$output .= '<div class="order_history_subitem date">'. $acceptedDate . '</div>';
-						$output .= '<div class="order_history_subitem">Offer Accepted</div>';
-					$output .= '</div>';
-				}
-				$paymentDate = get_field( 'payment_date', $order_id );
-				if( $paymentDate ) {
-					$output .= '<div class="order_history_item customer" style="order: '.( (int)strtotime( $paymentDate )  - 0 ).';">';
-						$output .= '<div class="order_history_subitem date">'. $paymentDate . '</div>';
-						$output .= '<div class="order_history_subitem">Order Paid</div>';
-					$output .= '</div>';
-				}
-				$shippedDate = get_field( 'shipped_date', $order_id );
-				if( $shippedDate ) {
-					$output .= '<div class="order_history_item seller" style="order: '.( (int)strtotime( $shippedDate )  - 0 ).';">';
-						$output .= '<div class="order_history_subitem date">'. $shippedDate . '</div>';
-						$output .= '<div class="order_history_subitem">Order Shipped</div>';
-					$output .= '</div>';
-				}
-				$completedDate = get_field( 'completed_date', $order_id );
-				if( $completedDate ) {
-					$output .= '<div class="order_history_item customer" style="order: '.( (int)strtotime( $completedDate )  - 0 ).';">';
-						$output .= '<div class="order_history_subitem date">'. $completedDate . '</div>';
-						$output .= '<div class="order_history_subitem">Order Completed</div>';
-					$output .= '</div>';
-				}
-				$disputedDate = get_field( 'disputed_date', $order_id );
-				if( $disputedDate ) {
-					$output .= '<div class="order_history_item customer" style="order: '.( (int)strtotime( $disputedDate )  - 0 ).';">';
-						$output .= '<div class="order_history_subitem date">'. $disputedDate . '</div>';
-						$output .= '<div class="order_history_subitem">Order was Disputed. CastBack support will be in touch soon...</div>';
-					$output .= '</div>';
+			}
+			$paymentDate = get_field( 'payment_date', $order_id );
+			if( $paymentDate ) {
+				$output .= '<div class="order_history_item status" style="order: '.( (int)strtotime( $paymentDate )  - 0 ).';">';
+					$output .= '<div class="order_history_subitem date">'. $paymentDate . '</div>';
+					$output .= '<div class="order_history_subitem">Order Paid</div>';
+				$output .= '</div>';
+			}
+			$shippedDate = get_field( 'shipped_date', $order_id );
+			if( $shippedDate ) {
+				$output .= '<div class="order_history_item status" style="order: '.( (int)strtotime( $shippedDate )  - 0 ).';">';
+					$output .= '<div class="order_history_subitem date">'. $shippedDate . '</div>';
+					$output .= '<div class="order_history_subitem">Order Shipped</div>';
+				$output .= '</div>';
+			}
+			$completedDate = get_field( 'completed_date', $order_id );
+			if( $completedDate ) {
+				$output .= '<div class="order_history_item status" style="order: '.( (int)strtotime( $completedDate )  - 0 ).';">';
+					$output .= '<div class="order_history_subitem date">'. $completedDate . '</div>';
+					$output .= '<div class="order_history_subitem">Order Completed</div>';
+				$output .= '</div>';
+			}
+			$disputedDate = get_field( 'disputed_date', $order_id );
+			if( $disputedDate ) {
+				$output .= '<div class="order_history_item customer" style="order: '.( (int)strtotime( $disputedDate )  - 0 ).';">';
+					$output .= '<div class="order_history_subitem date">'. $disputedDate . '</div>';
+					$output .= '<div class="order_history_subitem">Order was Disputed. CastBack support will be in touch soon...</div>';
+				$output .= '</div>';
+			}
+			$automationDate = get_field( 'automation_date', $order_id );
+			if( $automationDate ) {
+				$output .= '<div class="order_history_item status" style="order: '.( (int)strtotime( $automationDate )  - 0 ).';">';
+				
+				if( !$completedDate ) { $automationMessage = 'Order was auto-cancelled'; }
+				else if ( $completedDate ) { $automationMessage = 'Order was auto-completed'; }
+					$output .= '<div class="order_history_subitem date">'. $automationDate . '</div>';
+					$output .= '<div class="order_history_subitem">'. $automationMessage .'</div>';
+				$output .= '</div>';
 			}
 			$output .= '</div>'; // end order history					
 

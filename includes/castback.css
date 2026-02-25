@@ -1,5 +1,7 @@
 #order_status { text-align: right; float: right; padding-left: 0.5rem; text-transform: none; font-size: small; }
 
+.dokan-vendor-setup-wizard #wc-logo img { max-width: 350px !important; }
+
 /* .listing-status-Published { display: none; } */
  /* #CastBack-MyListings .listing-status-Published { display: flex; } */
 /* .listing-status-Draft { background-color: #ff0000; color: white; padding: 0.25rem 0.5rem; margin-right: 0.5rem; display: flex; width: fit-content; border-radius: 10rem; font-size: small; } */
@@ -88,14 +90,18 @@
 /* #acf-form .acf-label label { color: white; } */
 #acf-form a.acf-button { color: var(--e-global-color-01b2f71); }
 .offer_history, .order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
-.offer_history_item, .order_history_item  { width: 100%; float: left; padding: 0.5rem; }
-.offer_history_item.seller, .order_history_item.seller { background-color: rgba(127,127,127,0.5); }
-.offer_history_subitem, .order_history_subitem { width: 100%; float: left; }
-.offer_history_subitem.date, .order_history_subitem.date { font-size: small; }
+.offer_history_item, .order_history_item  { text-align: center; width: 100%; float: left; margin-bottom: 0.25rem; }
+/* .offer_history_item.customer, .order_history_item.customer { background-color: var(--e-global-color-accent); } */
+.offer_history_item.seller, .order_history_item.seller { background-color: var(--e-global-color-accent); }
+.offer_history_item.status, .order_history_item.status { background-color: var(--e-global-color-primary); }
+.offer_history_subitem, .order_history_subitem { width: 100%; float: left; padding: 0.25rem; }
+.offer_history_subitem.date, .order_history_subitem.date { font-size: small; padding: 0.25rem; }
 .offer_history_subitem.offer_expired, .order_history_subitem.offer_expired { text-decoration: line-through; }
 .offer_history_subitem.offer_expired:after, .order_history_subitem.offer_expired:after { content: " (expired)"; color: red; font-size: smaller; }
+
 .customer .order_history_subitem, .customer .offer_history_subitem { text-align: left; }
 .seller .order_history_subitem, .seller .offer_history_subitem { text-align: right; }
+.status .order_history_subitem, .status .offer_history_subitem { text-align: center; }
 
 .acf_offers, .acf_messages, .acf_shipping, .acf_dispute { width: fit-content; clear: both; float: left; margin: 1rem 0; }
 .acf-field-68a0f1c63178a, .acf-field-68af2cd79c27b, .acf-field-68b1c614b344d { display: none; }

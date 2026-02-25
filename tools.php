@@ -81,23 +81,33 @@ function castback_login_redirect($redirect = null, $user = null) {
     else { wp_safe_redirect( '/my-account/' ); }
 } add_action('woocommerce_login_redirect', 'castback_login_redirect', 10, 2);
 
-function CastBack_sendEmailNotification( $order_id = null, $emailTemplate = null, $recipient_id = null ) { /* This is used by SendMessage to trigger a new notifications. UNCLEAR if this is needed for other CastBack Order Actions... */
-	if( $order_id ) {
-		if( $recipient_id && $emailTemplate ) {
+function CastBack_sendEmailNotification( $order_id, $emailTemplate, $recipient_id = null ) {
+	if( $recipient_id ) {
+		// if( is_int( (int)$recipient_id ) ) {
 			$user = get_user_by( 'ID', $recipient_id );
-			
-			
-			// echo json_encode( $user ) .'<br>';
-			// echo $emailTemplate .'<br>';
-			// echo $user->user_email .'<br>';
-			if( $user && $user->user_email ) {
-				$email_new_message = WC()->mailer()->get_emails()[ $emailTemplate ];
-				$response = $email_new_message->trigger( $user->user_email, $order_id );
-			}
-		}
+			if( $user ) { $user_email = $user->user_email; }
+		// }
+		// else $recipient_id ) ) { 
+			/* $recpient_id IS a string... */
+		// }
+		// else {
+			// $user_email = $recipient_id;
+			// echo $T95;
+			// error_log( print_r( 'CastBack T95 - recipient_id is not a string or an int.', true ) );
+		// }
 	}
-	
-	return $response;
+		
+	if( $user_email ) {
+		$email_new_message = WC()->mailer()->get_emails()[ $emailTemplate ];
+		$response = $email_new_message->trigger( $user_email, $order_id );
+
+		return $response;
+	}
+	else {
+		// echo "T104";
+		// echo $T104; /* <-- ..wtf?! */
+		// error_log( print_r( 'CastBack T104 - No user_email found.', true ) );
+	}
 }
 
 /* User functions */
@@ -194,21 +204,23 @@ function CastBack_customerSeller( $post_id, $user_id = null, $method = 'any' ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	if( !$user_id ) { $user_id = get_current_user_id(); }
 	
-	$ids = array();
-	$ids['user_id'] = $user_id;
-	$ids['customer_id'] = get_field( 'customer_id', $post_id );
-	$ids['seller_id'] = get_field( 'seller_id', $post_id );
-	
-	$customerSeller = array();
-	$customerSeller['ids'] = $ids;
-	$customerSeller['any'] = false;
-	if( $ids['user_id'] == $ids['customer_id'] ) { $customerSeller['any'] = true; }
-	if( $ids['user_id'] == $ids['seller_id'] ) { $customerSeller['any'] = true; }
-	
-	// if( !$customerSeller['any'] ) { Test( $customerSeller ); }
-	// echo json_encode( $customerSeller );
-	// return $customerSeller;
-	// Test( $customerSeller['any'] );
+	if( $user_id) {
+		$ids = array();
+		$ids['user_id'] = $user_id;
+		$ids['customer_id'] = get_field( 'customer_id', $post_id );
+		$ids['seller_id'] = get_field( 'seller_id', $post_id );
+		
+		$customerSeller = array();
+		$customerSeller['ids'] = $ids;
+		$customerSeller['any'] = false;
+		if( $ids['user_id'] == $ids['customer_id'] ) { $customerSeller['any'] = true; }
+		if( $ids['user_id'] == $ids['seller_id'] ) { $customerSeller['any'] = true; }
+		
+		// if( !$customerSeller['any'] ) { Test( $customerSeller ); }
+		// echo json_encode( $customerSeller );
+		// return $customerSeller;
+		// Test( $customerSeller['any'] );
+	}
 
 	if( $method == 'customer' || $method == 'customer_id' ) { return ( $customerSeller[ 'ids' ]['customer_id'] == $user_id ); }
 	else if( $method == 'seller' || $method == 'seller_id' ) { return ( $customerSeller[ 'ids' ]['seller_id'] == $user_id ); }
@@ -259,7 +271,7 @@ function CastBack_userIsStripeConnected( $user_id = null ) {
 		// Test( $dokan_settings['profile_completion']['progress'] );
 		
 		// return true;
-		if( $dokan_settings['profile_completion']['progress'] > 30 ) {
+		if( isset( $dokan_settings['profile_completion']['progress'] ) && $dokan_settings['profile_completion']['progress'] > 30 ) {
 			return true;
 		} else {
 			return false;
@@ -319,22 +331,24 @@ function CastBack_userRegistrationPrompt( $reason = null ) {
 
 	return $output;
 }
-function CastBack_vendorRegistrationPrompt() {
+function CastBack_vendorRegistrationPrompt( $url = null ) {
+	$label = 'Vendor Registration';
+	if( $url ) { $label = 'Complete Registration Wizard'; }
+	else { $url = '/my-account/account-migration/'; }
+	
 	$output = "";
 	$output .= '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem; border: solid 2px; border-radius: 0.5rem;">';
 	$output .= '<h5>Please complete Vendor Registration.</h5>';
 	$output .= '<a href="/about/why-register/" class="castback-button" target="_blank">Why Register?</a>';
-	$output .= '<a href="/my-account/account-migration/" class="castback-button castback-button-important" target="_blank">Vendor Registration</a>';
+	$output .= '<a href="'.$url.'" class="castback-button castback-button-important" target="_blank">'.$label.'</a>';
 	$output .= '</div>';
 
 	return $output;
 }
-function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) {
+function CastBack_matchWCShopFields( $store_id, $dokan_settings ) { /* Unused, original version - 2/11/2026, JE */
 	/* Set Dokan Phone */
 	if( isset( $_POST['billing_phone'] ) ) {
-		// if( $_POST['billing_phone'] ) {
 			$dokan_settings['phone'] = sanitize_text_field( $_POST['billing_phone'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_phone', true );
 		if( $field ) { $dokan_settings['phone'] = $field; }
@@ -343,49 +357,37 @@ function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) {
 	/* Build Dokan Address Object */
 	$dokan_address = $dokan_settings["address"];
 	if( isset( $_POST['billing_address_1'] ) ) {
-		// if( $_POST['billing_address_1'] ) {
 			$dokan_address['street_1'] = sanitize_text_field( $_POST['billing_address_1'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_address_1', true );
 		if( $field ) { $dokan_address['street_1'] = $field; }
 	}
 	if( isset( $_POST['billing_address_2'] ) ) {
-		// if( $_POST['billing_address_2'] ) {
 			$dokan_address['street_2'] = sanitize_text_field( $_POST['billing_address_2'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_address_2', true );
 		if( $field ) { $dokan_address['street_2'] = $field; }
 	}
 	if( isset( $_POST['billing_city'] ) ) {
-		// if( $_POST['billing_city'] ) {
 			$dokan_address['city'] = sanitize_text_field( $_POST['billing_city'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_city', true );
 		if( $field ) { $dokan_address['city'] = $field; }
 	}
 	if( isset( $_POST['billing_postcode'] ) ) {
-		// if( $_POST['billing_postcode'] ) {
 			$dokan_address['postcode'] = sanitize_text_field( $_POST['billing_postcode'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_postcode', true );
 		if( $field ) { $dokan_address['postcode'] = $field; }
 	}
 	if( isset( $_POST['billing_country'] ) ) {
-		// if( $_POST['billing_country'] ) {
 			$dokan_address['country'] = sanitize_text_field( $_POST['billing_country'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_country', true );
 		if( $field ) { $dokan_address['country'] = $field; }
 	}
 	if( isset( $_POST['billing_state'] ) ) {
-		// if( $_POST['billing_state'] ) {
 			$dokan_address['state'] = sanitize_text_field( $_POST['billing_state'] );
-		// }
 	} else {
 		$field = get_user_meta( $store_id, 'billing_state', true );
 		if( $field ) { $dokan_address['state'] = $field; }
@@ -396,7 +398,7 @@ function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) {
 	update_user_meta( $store_id, 'dokan_profile_settings', $dokan_settings );
 	
 	/* Set WC Billing Address, Phone */
-	if( !isset( $_POST['billing_address_1'] ) && isset( $_POST['address[street_1]'] ) ) {
+	if( isset( $_POST['address[street_1]'] ) ) {
 		update_user_meta( $store_id, 'billing_address_1', $_POST['address[street_1]'] );
 	}
 	if( !isset( $_POST['billing_address_2'] ) && isset( $_POST['address[street_2]'] ) ) {
@@ -417,203 +419,147 @@ function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) {
 	if( !isset( $_POST['billing_phone'] ) && isset( $_POST['phone'] ) ) {
 		update_user_meta( $store_id, 'billing_phone', $_POST['phone'] );
 	}
+}
+function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) {
+	/* Set Dokan Phone */
+	// if( isset( $_POST['billing_phone'] ) ) {
+			// $dokan_settings['phone'] = sanitize_text_field( $_POST['billing_phone'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_phone', true );
+		// if( $field ) { $dokan_settings['phone'] = $field; }
+	// }
 	
-} add_action( 'dokan_store_profile_saved', 'CastBack_matchDokanShopFields', 10, 2 );
+	/* Build Dokan Address Object */
+	// $dokan_address = $dokan_settings["address"];
+	// if( isset( $_POST['billing_address_1'] ) ) {
+			// $dokan_address['street_1'] = sanitize_text_field( $_POST['billing_address_1'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_address_1', true );
+		// if( $field ) { $dokan_address['street_1'] = $field; }
+	// }
+	// if( isset( $_POST['billing_address_2'] ) ) {
+			// $dokan_address['street_2'] = sanitize_text_field( $_POST['billing_address_2'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_address_2', true );
+		// if( $field ) { $dokan_address['street_2'] = $field; }
+	// }
+	// if( isset( $_POST['billing_city'] ) ) {
+			// $dokan_address['city'] = sanitize_text_field( $_POST['billing_city'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_city', true );
+		// if( $field ) { $dokan_address['city'] = $field; }
+	// }
+	// if( isset( $_POST['billing_postcode'] ) ) {
+			// $dokan_address['postcode'] = sanitize_text_field( $_POST['billing_postcode'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_postcode', true );
+		// if( $field ) { $dokan_address['postcode'] = $field; }
+	// }
+	// if( isset( $_POST['billing_country'] ) ) {
+			// $dokan_address['country'] = sanitize_text_field( $_POST['billing_country'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_country', true );
+		// if( $field ) { $dokan_address['country'] = $field; }
+	// }
+	// if( isset( $_POST['billing_state'] ) ) {
+			// $dokan_address['state'] = sanitize_text_field( $_POST['billing_state'] );
+	// } else {
+		// $field = get_user_meta( $store_id, 'billing_state', true );
+		// if( $field ) { $dokan_address['state'] = $field; }
+	// }
+
+	/* Set Dokan Address */
+	// $dokan_settings['address'] = $dokan_address;
+	// update_user_meta( $store_id, 'dokan_profile_settings', $dokan_settings );
+	
+	/* Set WC Billing Address, Phone */
+	if( isset( $dokan_settings['address']['street_1'] ) ) {
+		if( !get_user_meta( $store_id, 'billing_address_1', true ) ) {
+			update_user_meta( $store_id, 'billing_address_1', $dokan_settings['address']['street_1'] );
+		}
+		if( !get_user_meta( $store_id, 'shipping_address_1', true ) ) {
+			update_user_meta( $store_id, 'shipping_address_1', $dokan_settings['address']['street_1'] );
+		}
+	}
+	if( isset( $dokan_settings['address']['street_2'] ) ) {
+		if( !get_user_meta( $store_id, 'billing_address_2', true ) ) {
+			update_user_meta( $store_id, 'billing_address_2', $dokan_settings['address']['street_2'] );
+		}
+		if( !get_user_meta( $store_id, 'shipping_address_2', true ) ) {
+			update_user_meta( $store_id, 'shipping_address_2', $dokan_settings['address']['street_2'] );
+		}
+	}
+	if( isset( $dokan_settings['address']['city'] ) ) {
+		if( !get_user_meta( $store_id, 'billing_city', true ) ) {
+			update_user_meta( $store_id, 'billing_city', $dokan_settings['address']['city'] );
+		}
+		if( !get_user_meta( $store_id, 'shipping_city', true ) ) {
+			update_user_meta( $store_id, 'shipping_city', $dokan_settings['address']['city'] );
+		}
+	}
+	if( isset( $dokan_settings['address']['zip'] ) ) {
+		if( !get_user_meta( $store_id, 'billing_postcode', true ) ) {
+			update_user_meta( $store_id, 'billing_postcode', $dokan_settings['address']['zip'] );
+		}
+		if( !get_user_meta( $store_id, 'shipping_postcode', true ) ) {
+			update_user_meta( $store_id, 'shipping_postcode', $dokan_settings['address']['zip'] );
+		}
+	}
+	if( isset( $dokan_settings['address']['country'] ) ) {
+		if( !get_user_meta( $store_id, 'billing_country', true ) ) {
+			update_user_meta( $store_id, 'billing_country', $dokan_settings['address']['country'] );
+		}
+		if( !get_user_meta( $store_id, 'shipping_country', true ) ) {
+			update_user_meta( $store_id, 'shipping_country', $dokan_settings['address']['country'] );
+		}
+	}
+	if( isset( $dokan_settings['address']['state'] ) ) {
+		if( !get_user_meta( $store_id, 'billing_state', true ) ) {
+			update_user_meta( $store_id, 'billing_state', $dokan_settings['address']['state'] );
+		}
+		if( !get_user_meta( $store_id, 'shipping_state', true ) ) {
+			update_user_meta( $store_id, 'shipping_state', $dokan_settings['address']['state'] );
+		}
+	}
+	
+	$first = get_user_meta( $store_id, 'first_name', true);
+	if( $first ) {
+		if( !get_user_meta( $store_id, 'billing_first_name', true ) ) {
+			update_user_meta( $store_id, 'billing_first_name', $first );
+		}
+		if( !get_user_meta( $store_id, 'shipping_first_name', true ) ) {
+			update_user_meta( $store_id, 'shipping_first_name', $first );
+		}
+	}
+
+	$last = get_user_meta( $store_id, 'last_name', true);
+	if( $last ) {
+		if( !get_user_meta( $store_id, 'billing_last_name', true ) ) {
+			update_user_meta( $store_id, 'billing_last_name', $last );
+		}
+		if( !get_user_meta( $store_id, 'shipping_last_name', true ) ) {
+			update_user_meta( $store_id, 'shipping_last_name', $last );
+		}
+	}
+
+	// $dokan_settings = get_user_meta( $vendor_id, 'dokan_profile_settings', true );
+	// $phone = $dokan_settings['phone'];
+	// if( $phone ) {
+		// update_user_meta( $store_id, 'billing_phone', $phone);
+
+		// /* If there's no shipping info, prefil that too. */
+		// if( !get_user_meta( $store_id, 'shipping_phone', true ) ) {
+			// update_user_meta( $store_id, 'shipping_phone', $phone );
+		// }
+	// }
+
+
+}
+/* Called by plugin "WP Webhooks Pro" - 2/11/26, JE */
+// add_action( 'dokan_store_profile_saved', 'CastBack_matchDokanShopFields', 10, 2 );
+
 function CastBack_updateUserFields( $user_id, $old_user_data, $userdata ) {
 	$dokan_settings = dokan_get_store_info( $user_id );
 	CastBack_matchDokanShopFields( $user_id, $dokan_settings );
 } add_action( 'profile_update', 'CastBack_updateUserFields', 10, 3 );
 // add_action( 'woocommerce_created_customer', 'CastBack_updateUserFields', 10, 2 );
-
-/* Cron Jobs (deprecated) */
-function castback_cron_noOffers($AJAX = true) {
-    if (get_field('run_automations', 'option')) {
-        $args = array(
-            'status' => 'wc-checkout-draft', // Get completed orders
-            'limit' => -1, // Retrieve up to 10 orders
-            'orderby' => 'date', // Order by date
-            'order' => 'DESC',
-            // 'customer_id'  => get_current_user_id(),
-            // 'meta_query' => array(
-            // array(
-            // 'key'     => 'offers_0_offer_amount',
-            // 'value'   => 'example_value',
-            // 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
-            // ),
-            // ),
-        );
-
-        $orders = wc_get_orders($args);
-        foreach ($orders as $order) {
-
-            $order_id = $order->get_id();
-
-            $offers = get_field('offers', $order_id);
-            if ($offers) {
-                if (end($offers)['offer_expired_date']) {
-                    $order_date = end($offers)['offer_expired_date'];
-                }
-            } else {
-                $order_date = $order->get_date_created()->format('F j, Y g:i a');
-            }
-
-            if ($order_date) {
-                // $cron_no_offer_expired_date = get_field( 'cron_no_offer_expired_date', 'option' );
-                // $offer_expired_date = wp_date('F j, Y g:i:s a', strtotime( '+'.$cron_no_offer_expired_date.' days', strtotime( $offer['offer_date'] ) ) );
-
-                $cron_no_dispute_completed_date = 5;
-                $offer_expired_date = wp_date('F j, Y g:i:s a',
-                    strtotime('+'.$cron_no_dispute_completed_date.' minutes',
-                        strtotime($order_date)
-                    )
-                );
-
-                $offer_expired = strtotime('+5 minutes',
-                    strtotime($order_date)
-                );
-                $currentTime = strtotime(wp_date('F j, Y g:i:s a'));
-
-                if ($currentTime > $offer_expired) {
-                    CastBack_Action_completeOrder($order_id, $AJAX);
-                }
-            }
-
-        }
-
-        // if($AJAX) { wp_die(); }
-    }
-}
-// add_action( 'castback_cron', 'castback_cron_noOffers' );
-function castback_cron_noExpiredDate($AJAX = false) {
-    if (get_field('run_automations', 'option')) {
-        $args = array(
-            'status' => 'wc-checkout-draft', // Get completed orders
-            'limit' => -1, // Retrieve up to 10 orders
-            'orderby' => 'date', // Order by date
-            'order' => 'DESC',
-            // 'customer_id'  => get_current_user_id(),
-            // 'meta_query' => array(
-            // array(
-            // 'key'     => 'offers_0_offer_amount',
-            // 'value'   => 'example_value',
-            // 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
-            // ),
-            // ),
-        );
-
-        $orders = wc_get_orders($args);
-        foreach ($orders as $order) {
-            $order_id = $order->get_id();
-            $offers = get_field('offers', $order_id);
-            foreach ($offers as $key => $offer) {
-                if (!$offer['offer_expired_date']) {
-                    // $cron_no_offer_expired_date = get_field( 'cron_no_offer_expired_date', 'option' );
-                    // $offer_expired_date = wp_date('F j, Y g:i:s a', strtotime( '+'.$cron_no_offer_expired_date.' days', strtotime( $offer['offer_date'] ) ) );
-                    $cron_no_offer_expired_date = 5;
-                    $offer_expired_date = wp_date('F j, Y g:i:s a', strtotime('+'.$cron_no_offer_expired_date.' minutes', strtotime($offer['offer_date'])));
-
-
-                    $offer_expired = strtotime('+5 minutes', strtotime($offer['offer_date']));
-                    $currentTime = strtotime(wp_date('F j, Y g:i:s a'));
-                    if ($currentTime > $offer_expired) {
-                        CastBack_Action_expireOffer($order_id, $key);
-                    }
-                }
-            }
-        }
-
-        // if($AJAX) { wp_die(); }
-    }
-}
-// add_action( 'castback_cron', 'castback_cron_noExpiredDate' );
-function castback_cron_noShippedDate($AJAX = false) {
-    if (get_field('run_automations', 'option')) {
-        $args = array(
-            'status' => 'processing', // Get completed orders
-            'limit' => -1, // Retrieve up to 10 orders
-            'orderby' => 'date', // Order by date
-            'order' => 'DESC',
-            // 'customer_id'  => get_current_user_id(),
-            // 'meta_query' => array(
-            // array(
-            // 'key'     => 'offers_0_offer_amount',
-            // 'value'   => 'example_value',
-            // 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
-            // ),
-            // ),
-        );
-
-
-        $orders = wc_get_orders($args);
-        foreach ($orders as $order) {
-            $order_id = $order->get_id();
-            if (get_field('shipped_date', $order_id) == '') {
-
-                // $cron_no_offer_expired_date = get_field( 'cron_no_offer_expired_date', 'option' );
-                // $offer_expired_date = wp_date('F j, Y g:i:s a', strtotime( '+'.$cron_no_offer_expired_date.' days', strtotime( $offer['offer_date'] ) ) );
-
-                $cron_no_shipping_refund_date = 5;
-                $offer_expired_date = wp_date('F j, Y g:i:s a',
-                    strtotime('+'.$cron_no_shipping_refund_date.' minutes',
-                        strtotime(get_field('payment_date', $order_id))
-                    )
-                );
-
-                $offer_expired = strtotime('+5 minutes', strtotime(get_field('payment_date', $order_id)));
-                $currentTime = strtotime(wp_date('F j, Y g:i:s a'));
-
-                if ($currentTime > $offer_expired) {
-                    update_field('disputed_date', $currentTime, $order_id);
-                }
-            }
-        }
-
-        // if($AJAX) { wp_die(); }
-    }
-}
-// add_action( 'castback_cron', 'castback_cron_noShippedDate' );
-function castback_cron_noCompletedDate($AJAX = false) {
-    if (get_field('run_automations', 'option')) {
-        $args = array(
-            'status' => 'processing', // Get completed orders
-            'limit' => -1, // Retrieve up to 10 orders
-            'orderby' => 'date', // Order by date
-            'order' => 'DESC',
-            // 'customer_id'  => get_current_user_id(),
-            // 'meta_query' => array(
-            // array(
-            // 'key'     => 'offers_0_offer_amount',
-            // 'value'   => 'example_value',
-            // 'compare' => 'EXISTS', // Optional: can be 'IN', 'LIKE', 'EXISTS', etc.
-            // ),
-            // ),
-        );
-
-        $orders = wc_get_orders($args);
-        foreach ($orders as $order) {
-            $order_id = $order->get_id();
-            if (get_field('completed_date', $order_id) == '' && get_field('disputed_date', $order_id) == '') {
-
-                // $cron_no_offer_expired_date = get_field( 'cron_no_offer_expired_date', 'option' );
-                // $offer_expired_date = wp_date('F j, Y g:i:s a', strtotime( '+'.$cron_no_offer_expired_date.' days', strtotime( $offer['offer_date'] ) ) );
-
-                $cron_no_dispute_completed_date = 5;
-                $offer_expired_date = wp_date('F j, Y g:i:s a',
-                    strtotime('+'.$cron_no_dispute_completed_date.' minutes',
-                        strtotime(get_field('shipped_date', $order_id))
-                    )
-                );
-
-                $offer_expired = strtotime('+5 minutes', strtotime(get_field('shipped_date', $order_id)));
-                $currentTime = strtotime(wp_date('F j, Y g:i:s a'));
-
-                if ($currentTime > $offer_expired) {
-                    CastBack_Action_completeOrder($order_id, $AJAX);
-                }
-            }
-        }
-
-        // if($AJAX) { wp_die(); }
-    }
-}
-// add_action( 'castback_cron', 'castback_cron_noCompletedDate' );

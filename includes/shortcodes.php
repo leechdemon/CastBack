@@ -50,7 +50,11 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		else if( $button ) {
 			if( $button == 'drawButtonPanel' ) {
 				$user_id = get_current_user_id();
-				if( !CastBack_userIsStripeConnected( $user_id ) ) { return CastBack_vendorRegistrationPrompt(); }
+				if( !CastBack_userIsStripeConnected( $user_id ) ) {
+					$user = wp_get_current_user();
+					if( in_array( 'seller', (array) $user->roles ) ) { Test("A"); return CastBack_vendorRegistrationPrompt('/?page=dokan-seller-setup'); }
+					else { Test("B"); return CastBack_vendorRegistrationPrompt(); }
+				}
 				else { echo CastBack_Buttons_DrawButtonPanel( $listing_id, $user_id, $button ); }
 			}
 			if( $button == 'deleteListing' ) {
@@ -219,84 +223,21 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 			else if( $field == 'test' ) {
 				if( in_array( get_current_user_id(), array( 1, 2, 3, 466, 538 ) ) ) {
 					
-					$listing_id = 2496; /* Pickle Balls */
-					// $userHasCurrentOffer = CastBack_userHasCurrentOffer( $listing_id );
-					// Test( $userHasCurrentOffer );
-					
-					// Test( CastBack_userHasCurrentOffer( 2627 ) );
-					// Test( CastBack_userHasCurrentOffer( 2628 ) );
-					// Test( CastBack_userHasCurrentOffer( 2629 ) );
-					
-					// $customer_id = 559;
-					//$customer_id = get_current_user_id();
-					
-					// $order_id = '123';
-					// $order = array( 'order_id' => $order_id, 'listing_id' => $listing_id );
-					// add_row( 'orders', $order, $customer_id );
-					
-					// delete_post_meta($customer_id, 'orders');
-					// Test( get_field( 'orders', $customer_id ) );
-					// Test( CastBack_userHasCurrentOffer( $listing_id, $customer_id ) );
-					// Test( CastBack_userCanPurchase(  ) );
-					
+					// $listing_id = 2496; /* Pickle Balls */
 					$customer_id = get_current_user_id();
-					$orders = get_field( 'current_orders', $customer_id );
-					//foreach( $orders as $order ) {
-						//echo var_dump( $order );
-					//	$order_id = $order['order_id'];
-					//	$lastViewed = $order['last_viewed'];
-						// Test( $lastViewed );
-					//	echo $order_id.' - Last Viewed: '. $lastViewed .'<br>';
-					//}
-
-					//echo "<br>-----------<br>";
-
-					$customer_id = 548;
-					$orders = get_field( 'current_orders', $customer_id );
-					$x = 0;
-					foreach( $orders as $order ) {
-						$x++;
-						// if( $order['order_id'] == 3551 ) { delete_row( 'current_orders', $x, $customer_id ); }
-						//echo var_dump( $order );
-						$order_id = $order['order_id'];
-						$lastViewed = $order['last_viewed'];
-						echo '<a href="/offers/view-offer/?order_id='.$order_id.'">'.$order_id.'</a> - Last Viewed: '. $lastViewed .'<br>';
-					}
-
-
-
-					// $response = acf_update_field( 'orders', $order, $customer_id );
-					// Test( $response );
-					// Test( get_fields( $customer_id ) );
-					// Test( get_field( 'orders', $customer_id )[0]["listing_id"] );
-					
-					
-				// $args = array(
-					// 'limit'  => -1,	// Retrieve up to 10 orders
-					// 'orderby' => 'date',
-					// 'order'  => 'DESC',  
-					// 'post_status'  => 'any',
-				// );
-				
-				// $listings = wc_get_products( $args );
-				// foreach( $listings as $listing ) {
-					// $listing_id = $listing->get_id();
-					// update_field( 'listing_id', $listing_id, $listing_id );
-									
-					// if( get_field( 'seller_id' , $listing_id ) ) {
-						// $arg = array(
-							// 'ID' => $post_id,
-							// 'post_author' => $seller_id,
-						// );
-						// wp_update_post( $arg );
+					// $orders = get_field( 'current_orders', $customer_id );
+					// $x = 0;
+					// foreach( $orders as $order ) {
+						// $x++;
+						//	// if( $order['order_id'] == 3551 ) { delete_row( 'current_orders', $x, $customer_id ); }
+						//	// echo var_dump( $order );
+						// $order_id = $order['order_id'];
+						// $lastViewed = $order['last_viewed'];
+						// echo '<a href="/offers/view-offer/?order_id='.$order_id.'">'.$order_id.'</a> - Last Viewed: '. $lastViewed .'<br>';
 					// }
-				// }
-				
-				// $user_ids = new array( 1, 3 );
-		    		// if( CastBack_userIsStripeConnected( 1 ) ) { echo "isStripeConnected"; }
-			    	// if( CastBack_userIsStripeConnected( 77 ) ) { echo "isStripeConnected"; }
-		       		// Test( CastBack_userIsStripeConnected( 3 ) );
-		    		// Test( CastBack_userIsStripeConnected( 536 ) );
+					
+					// if (CastBack_Action_autorefundUnshippedOrder( 3817, $customer_id )) { echo 'yay'; }
+					// else { echo 'boo'; }
 
 				}
 			}

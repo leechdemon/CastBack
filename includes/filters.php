@@ -179,6 +179,7 @@ function CastBack_Filter_formatPriceField( $val = null ) {
 
 /* Orders */
 function CastBack_filter_offers_populate_offer_id($field) {
+		/* Populates $order_id on new orders */
 		// Only run on the front-end
 		if (is_admin()) { return $field; }
 		$field['value'] = get_the_ID(); // Set the value from a GET parameter

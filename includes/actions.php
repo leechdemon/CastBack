@@ -69,15 +69,17 @@
 		}
 	} add_action( 'wp_ajax_CastBack_Action_buyNow', 'CastBack_Action_buyNow' );
 
+
 	/* - Security: CastBack_customerSeller() */
 	function CastBack_Action_sendMessage( $order_id = null, $AJAX = false ) {
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 		if( isset( $_POST['new_message'] ) ) { $new_message = $_POST['new_message']; }
 		
 		if( CastBack_customerSeller( $order_id ) ) {
 
-			if( !$user_id ) { $user_id = get_current_user_id(); }
+			// if( !$user_id ) { $user_id = get_current_user_id(); }
 			if( isset( $order_id ) && isset( $new_message ) ) {
 				$row = array(
 					'message_date' => wp_date('F j, Y g:i:s a' ),
@@ -92,7 +94,8 @@
 					if( $user_id == $customer_id ) { $recipient_id = $seller_id; }
 					if( $user_id == $seller_id ) { $recipient_id = $customer_id; }
 					
-					CastBack_sendEmailNotification( $order_id, 'CastBack_sendMessage', $recipient_id );
+					CastBack_sendEmailNotification( $order_id, 'CastBack_sendMessage_recipient', $recipient_id );
+					CastBack_sendEmailNotification( $order_id, 'CastBack_sendMessage_sender', $user_id );
 				}
 			}
 		}
@@ -104,6 +107,8 @@
 	function CastBack_Action_submitOffer( $order_id = null, $order_amount = false, $AJAX = false ) {
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
+		if( !$user_id ) { $user_id = get_current_user_id(); }
 		if( !$order_amount && isset( $_POST['order_amount'] ) ) { $order_amount = $_POST['order_amount']; }
 		
 		if( !CastBack_customerSeller( $order_id ) ) { $success = false; }
@@ -120,16 +125,26 @@
 			$row = array(
 				'offer_date' => wp_date('F j, Y g:i:s a' ),
 				'offer_amount' => number_format( $order_amount, 2 ),
-				'offer_user_id' => get_current_user_id(),
+				'offer_user_id' => $user_id,
 			);
-			if( !add_row( 'offers', $row, $order_id ) ) { $success = false; }
+			if( add_row( 'offers', $row, $order_id ) ) {
+				$customer_id = get_field( 'customer_id', $order_id );
+				$seller_id = get_field( 'seller_id', $order_id );
+				if( $user_id == $customer_id ) { $recipient_id = $seller_id; }
+				if( $user_id == $seller_id ) { $recipient_id = $customer_id; }
+				
+				CastBack_sendEmailNotification( $order_id, 'CastBack_submitOffer_recipient', $recipient_id );
+				CastBack_sendEmailNotification( $order_id, 'CastBack_submitOffer_sender', $user_id );
+			}
 			
+			/* I think this is breaking, after this point....  */
+			/* number_format should return a string, which should break update_field, and $success=false... */
 			if( $success && !update_field( 'order_amount', number_format( $order_amount, 2 ), $order_id ) ) { $success = false; }
 
 			$customer_id = get_field( 'customer_id', $order_id );
 			$seller_id = get_field( 'seller_id', $order_id );
 			
-			if( get_current_user_id() == $customer_id ) { $waitingOn = $seller_id; }
+			if( $user_id == $customer_id ) { $waitingOn = $seller_id; }
 			else { $waitingOn = $customer_id; }
 			
 			if( $success && !update_field( 'waiting_on', $waitingOn, $order_id ) ) { $success = false; }
@@ -139,8 +154,6 @@
 		if( $success ) {
 			// if( $user_id == $customer_id ) { $recipient_id = $seller_id; }
 			// if( $user_id == $seller_id ) { $recipient_id = $customer_id; }
-			
-			CastBack_sendEmailNotification( $order_id, 'CastBack_submitOffer', $waitingOn );
 			
 			if( $AJAX ) {
 				echo $order_id;
@@ -161,11 +174,12 @@
 	function CastBack_Action_acceptOffer( $order_id = null, $AJAX = false ) {
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 		
 		$seller_id = get_field( 'seller_id', $order_id );
 		$customer_id = get_field( 'customer_id', $order_id );
 		
-		if( !CastBack_customerSeller( $order_id ) ) { $success = false; }
+		if( !CastBack_customerSeller( $order_id, $user_id ) ) { $success = false; }
 		else {
 			$success = true;
 
@@ -173,7 +187,10 @@
 			if( !( end($offers)['offer_expired_date'] ) ) {
 				$order_amount = number_format( get_field( 'order_amount', $order_id ), 2 );
 				update_field( 'accepted_date', wp_date('F j, Y g:i:s a' ), $order_id );
-
+				
+				CastBack_sendEmailNotification( $order_id, 'CastBack_acceptOffer_seller', $seller_id );
+				CastBack_sendEmailNotification( $order_id, 'CastBack_acceptOffer_buyer', $customer_id );
+				
 				// WaitingOnToggle();
 				/* force WaitingOn to buyer */
 				update_field( 'waiting_on', $customer_id, $order_id );
@@ -218,8 +235,6 @@
 		}
 				
 		if( $success ) {
-			CastBack_sendEmailNotification( $order_id, 'CastBack_acceptOffer', $seller_id );
-
 			if( $AJAX ) {
 				// echo CastBack_Offers_drawOrderDetails( $order_id ); 
 				echo $order_id;
@@ -306,6 +321,7 @@
 	function CastBack_Action_addTracking( $order_id = null, $trackingNumber = null, $AJAX = false ) {
 		if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 		if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
+		if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 		if( !$trackingNumber ) { $trackingNumber = $_POST['new_tracking_number']; }
 		
 		if( !CastBack_customerSeller( $order_id ) ) { $success = false; }
@@ -313,11 +329,14 @@
 			$success = true;
 			if( isset( $order_id ) ) {
 				if( $trackingNumber ) {
+					$customer_id = get_field( 'customer_id', $order_id );
+					$seller_id = get_field( 'seller_id', $order_id );
+
 					$trackingDate = wp_date('F j, Y g:i:s a' );
 					$row = array(
 						'tracking_date' => $trackingDate,
 						'tracking_number' => $trackingNumber,
-						'tracking_user_id' => get_current_user_id(),
+						'tracking_user_id' => $user_id,
 					);
 					if( $success && !add_row( 'tracking', $row, $order_id ) ) { $success = false; }
 					if( $success && !update_field( 'new_tracking_number', '', $order_id ) ) { $success = false; }
@@ -325,17 +344,17 @@
 					$shippedDate = get_field( 'shipped_date', $order_id );
 					if( !$shippedDate ) {
 						if( $success && !update_field( 'shipped_date', $trackingDate, $order_id ) ) { $success = false; }
-						if( $success && !update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id ) ) { $success = false; }
+						if( $success && !update_field( 'waiting_on', $customer_id, $order_id ) ) { $success = false; }
 						$order = wc_get_order($order_id);
 						if( $success && !$order->update_status('wc-processing') ) { $success = false; }
 					}
-					$customer_id = get_field( 'customer_id', $order_id );
-					$seller_id = get_field( 'seller_id', $order_id );
 				
-					if( get_current_user_id() == $customer_id ) { $waitingOn = $seller_id; }
+					if( $user_id == $customer_id ) { $waitingOn = $seller_id; }
 					else { $waitingOn = $customer_id; }
 					
 					if( $success && !update_field( 'waiting_on', $waitingOn, $order_id ) ) { $success = false; }
+					
+					CastBack_sendEmailNotification( $order_id, 'CastBack_addTracking_recipient', $waitingOn );
 				} else {
 					echo 'Missing tracking number. (a327-09302025)';
 				}
@@ -369,11 +388,16 @@
 			}
 			
 			if( $success ) {
-				// echo CastBack_Offers_drawOrderDetails( $order_id ); 
+				/* These don't exist... */
+				// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
+				// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-seller', get_field( 'seller_id', $order_id ) );
+				
+				// echo CastBack_Offers_drawOrderDetails( $order_id );
+				echo 'completeOrder: success';			
 				wp_die();
 			} else {
 				// echo CastBack_Offers_drawOrderDetails( $order_id ); 
-				echo 'failed';
+				echo 'completeOrder: failed';
 				wp_die();
 			}
 		} add_action( 'wp_ajax_CastBack_Action_completeOrder', 'CastBack_Action_completeOrder' );
@@ -444,3 +468,110 @@
 			
 			echo '<style>.wc-action-button-'.$action_slug.'::after { font-family: woocommerce !important; content: "\e029" !important; }</style>';
 	} add_action( 'admin_head', 'CastBack_Action_removeDispute_button_css' );
+	
+/* Order Automations */
+function CastBack_Action_autocompleteShippedOrder( $order_id, $user_id ) {
+	/* $user_id is used in child functions... */
+	
+	$shippedDate = get_field( 'shipped_date', $order_id );
+	$completedDate = get_field( 'completed_date', $order_id );
+	$automationDate = get_field( 'automation_date', $order_id );
+	$success = false;
+	
+	if( $shippedDate && !$completedDate) {
+		if( !$automationDate ) {
+			update_field( 'automation_date', wp_date('F j, Y g:i:s a' ), $order_id );
+
+			CastBack_sendEmailNotification( $order_id, 'CastBack_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+		
+			/* start completeOrder() */
+			// CastBack_Action_completeOrder( $order_id, true );
+			$order = wc_get_order($order_id);
+			$order->update_status('wc-completed');
+			update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+					
+			// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
+			// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-seller', get_field( 'seller_id', $order_id ) );
+			/* end completeOrder() */
+			
+			$success = true;
+		}
+	}
+	
+	return $success;
+}
+function CastBack_Action_autocancelUnpaidOrder( $order_id, $user_id ) {
+	/* $user_id is used in child functions... */
+	
+	$acceptedDate = get_field( 'accepted_date', $order_id );
+	$payment_date = get_field( 'payment_date', $order_id );
+	$automationDate = get_field( 'automation_date', $order_id );
+	$success = false;
+	
+	if( $acceptedDate && !$payment_date) {
+		if( !$automationDate ) {
+			update_field( 'automation_date', wp_date('F j, Y g:i:s a' ), $order_id );
+
+			/* start "cancelOrder"() */
+			$order = wc_get_order($order_id);
+			$order->update_status('wc-cancelled');
+			// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+					
+			CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
+			CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
+			/* end "cancelOrder"() */
+			
+			$success = true;
+		}
+	}
+	
+	return $success;
+}
+function CastBack_Action_autorefundUnshippedOrder( $order_id, $user_id ) {
+	/* $user_id is used in child functions... */
+	
+	$payment_date = get_field( 'payment_date', $order_id );
+	$shippedDate = get_field( 'shipped_date', $order_id );
+	$automationDate = get_field( 'automation_date', $order_id );
+	$success = false;
+	
+	if( $payment_date && !$shippedDate) {
+		if( !$automationDate ) {
+			update_field( 'automation_date', wp_date('F j, Y g:i:s a' ), $order_id );
+
+			/* start "cancelOrder"() */
+			$order = wc_get_order($order_id);
+			// $order->update_status('wc-cancelled');
+			
+			// Check if the order is already fully refunded
+			// if ($order->get_status() === 'refunded') {
+					// return new WP_Error('already_refunded', 'Order is already fully refunded.');
+			// }
+			
+			$refund_args = array(
+					'amount'         => $order->get_total(),
+					'reason'         => 'autorefundUnshippedOrder',
+					'order_id'       => $order_id,
+					// 'line_items'     => array(), // Use this to specify partial item refunds
+					'refund_payment' => true,    // Set to true to process refund via payment gateway
+					// 'restock_items'  => true,    // Set to true to restock items
+			);
+
+			// Create the refund using the built-in WooCommerce function
+			$refund = wc_create_refund( $refund_args );
+			// return $refund;
+			
+
+			
+			// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+					
+			CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+			CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
+			/* end "cancelOrder"() */
+			
+			$success = true;
+		}
+	}
+	
+	return $success;
+}

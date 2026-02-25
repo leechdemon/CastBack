@@ -201,7 +201,7 @@ function CastBack_Listings_editListing_ACF( $listing_id, $listingTemplate = null
 							'post_id'   => $listing_id,
 							'field_groups' => array(503,),
 							'uploader'		=> 'basic',
-							'submit_value' => 'Save Listing',
+							'submit_value' => 'Save Changes',
 							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
 						));
 					}
@@ -217,19 +217,20 @@ function CastBack_Listings_editListing_ACF( $listing_id, $listingTemplate = null
 function CastBack_Listings_publishListing( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
+	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	
 	ob_start();	
 	if( CastBack_customerSeller( $listing_id ) ) {
-		// echo '1';
-		$user = wp_get_current_user();
-		// echo '2';
+		$user = get_user_by( 'ID', $user_id );
 		if ( !in_array( 'customer', (array) $user->roles ) ) {
 			$listing = wc_get_product( $listing_id );
 			
 			$listing->set_status( 'publish' );
 			$response =  $listing->save();
 			
-			if( $response ) { CastBack_sendEmailNotification( $listing_id, 'CastBack_publishListing', $user->ID ); }
+			// if( $response ) {
+				CastBack_sendEmailNotification( $listing_id, 'CastBack_publishListing', $user->ID );
+			// }
 			
 			echo $response;
 			
