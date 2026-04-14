@@ -11,7 +11,7 @@ if (!function_exists('Test')) {
         }
     }
 }
-function CastBack_editListing($wp_admin_bar) {
+function Recast_editListing($wp_admin_bar) {
     if (!is_admin()) {
         $listing_id = '';
         if (isset($_POST['listing_id'])) {
@@ -35,8 +35,8 @@ function CastBack_editListing($wp_admin_bar) {
             $wp_admin_bar->add_node($args);
         }
     }
-} add_action('admin_bar_menu', 'CastBack_editListing', 90);
-function CastBack_editOrder($wp_admin_bar) {
+} add_action('admin_bar_menu', 'Recast_editListing', 90);
+function Recast_editOrder($wp_admin_bar) {
     if (!is_admin()) {
         $order_id = '';
         if (isset($_POST['order_id'])) {
@@ -60,7 +60,7 @@ function CastBack_editOrder($wp_admin_bar) {
             $wp_admin_bar->add_node($args);
         }
     }
-} add_action('admin_bar_menu', 'CastBack_editOrder', 90);
+} add_action('admin_bar_menu', 'Recast_editOrder', 90);
 function castback_login_redirect($redirect = null, $user = null) {
     // Get the first of all the roles assigned to the user
     // $role = $user->roles[0];
@@ -81,7 +81,7 @@ function castback_login_redirect($redirect = null, $user = null) {
     else { wp_safe_redirect( '/my-account/' ); }
 } add_action('woocommerce_login_redirect', 'castback_login_redirect', 10, 2);
 
-function CastBack_sendEmailNotification( $order_id, $emailTemplate, $recipient_id = null ) {
+function Recast_sendEmailNotification( $order_id, $emailTemplate, $recipient_id = null ) {
 	if( $recipient_id ) {
 		// if( is_int( (int)$recipient_id ) ) {
 			$user = get_user_by( 'ID', $recipient_id );
@@ -93,7 +93,7 @@ function CastBack_sendEmailNotification( $order_id, $emailTemplate, $recipient_i
 		// else {
 			// $user_email = $recipient_id;
 			// echo $T95;
-			// error_log( print_r( 'CastBack T95 - recipient_id is not a string or an int.', true ) );
+			// error_log( print_r( 'Recast T95 - recipient_id is not a string or an int.', true ) );
 		// }
 	}
 		
@@ -106,12 +106,12 @@ function CastBack_sendEmailNotification( $order_id, $emailTemplate, $recipient_i
 	else {
 		// echo "T104";
 		// echo $T104; /* <-- ..wtf?! */
-		// error_log( print_r( 'CastBack T104 - No user_email found.', true ) );
+		// error_log( print_r( 'Recast T104 - No user_email found.', true ) );
 	}
 }
 
 /* User functions */
-function CastBack_getAddress( $user_id = null, $method = null, $output = false ) {
+function Recast_getAddress( $user_id = null, $method = null, $output = false ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	if( !$user_id ) { $user_id = get_current_user_id(); }
 
@@ -166,7 +166,7 @@ function CastBack_getAddress( $user_id = null, $method = null, $output = false )
 	else if( $output == 'return' ) { return $theAddress; }
 	else { return $hasAddress; }
 }
-function CastBack_Tools_hideDokanFields() {	
+function Recast_Tools_hideDokanFields() {	
 	/* Populate required fields */
 	if( get_current_user_id() ) {
 		$current_user = wp_get_current_user();
@@ -199,8 +199,8 @@ function CastBack_Tools_hideDokanFields() {
 	/* All set? Then hide the fields! */
 	echo '<style>.form-row.form-group:has( #company-name ) { display: none; }</style>';
 	echo '<style>.form-row.form-group:has( #seller-url ) { display: none; }</style>';
-} add_action('wp_footer', 'CastBack_Tools_hideDokanFields');
-function CastBack_customerSeller( $post_id, $user_id = null, $method = 'any' ) {
+} add_action('wp_footer', 'Recast_Tools_hideDokanFields');
+function Recast_customerSeller( $post_id, $user_id = null, $method = 'any' ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	if( !$user_id ) { $user_id = get_current_user_id(); }
 	
@@ -227,7 +227,7 @@ function CastBack_customerSeller( $post_id, $user_id = null, $method = 'any' ) {
 	else if( $method == 'any' ) { return $customerSeller[ 'any' ]; }
 	else { return $customerSeller[ $method ]; }
 }
-function CastBack_userCanPurchase( $user_id = null ) {
+function Recast_userCanPurchase( $user_id = null ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	if( !$user_id ) { $user_id = get_current_user_id(); }
 
@@ -236,7 +236,7 @@ function CastBack_userCanPurchase( $user_id = null ) {
 		$userCanPurchase = false;
 		$reason = 'user_id';
 	}
-	if( $userCanPurchase && !CastBack_getAddress( $user_id, 'shipping' ) ) {
+	if( $userCanPurchase && !Recast_getAddress( $user_id, 'shipping' ) ) {
 		$userCanPurchase = false;
 		$reason = 'shipping';
 	}
@@ -251,16 +251,16 @@ function CastBack_userCanPurchase( $user_id = null ) {
 	}
 	else {
 		// if($AJAX) {
-			// echo CastBack_userRegistrationPrompt( $reason );
+			// echo Recast_userRegistrationPrompt( $reason );
 			// wp_die();
 		// } else {
-			// return CastBack_userRegistrationPrompt( $reason );
+			// return Recast_userRegistrationPrompt( $reason );
 			// return $userCanPurchase;
 			return $reason;
 		// }
 	}
-} add_action( 'wp_ajax_CastBack_userCanPurchase', 'CastBack_userCanPurchase' );
-function CastBack_userIsStripeConnected( $user_id = null ) {
+} add_action( 'wp_ajax_Recast_userCanPurchase', 'Recast_userCanPurchase' );
+function Recast_userIsStripeConnected( $user_id = null ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	if( !$user_id ) { $user_id = get_current_user_id(); }
 	
@@ -277,9 +277,9 @@ function CastBack_userIsStripeConnected( $user_id = null ) {
 			return false;
 		}
 	} else { return false; }
-} add_action( 'wp_ajax_CastBack_userIsStripeConnected', 'CastBack_userIsStripeConnected' );
+} add_action( 'wp_ajax_Recast_userIsStripeConnected', 'Recast_userIsStripeConnected' );
 
-function CastBack_userHasCurrentOffer( $listing_id, $user_id = null ) {
+function Recast_userHasCurrentOffer( $listing_id, $user_id = null ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }		
 	if( !$user_id && is_user_logged_in() ) { $user_id = get_current_user_id(); }
 	$userHasCurrentOffer = null;
@@ -301,7 +301,7 @@ function CastBack_userHasCurrentOffer( $listing_id, $user_id = null ) {
 	
 	return( $userHasCurrentOffer );
 }
-function CastBack_userHasNotification( $order_id, $user_id = null, $method = null ) {
+function Recast_userHasNotification( $order_id, $user_id = null, $method = null ) {
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }		
 	if( !$user_id && is_user_logged_in() ) { $user_id = get_current_user_id(); }
 		
@@ -317,7 +317,7 @@ function CastBack_userHasNotification( $order_id, $user_id = null, $method = nul
 	
 	return( $userHasNotification );
 }
-function CastBack_userRegistrationPrompt( $reason = null ) {
+function Recast_userRegistrationPrompt( $reason = null ) {
 	$output = '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem; border: solid 2px; border-radius: 0.5rem;">';
 
 	if( $reason == "shipping" ) {
@@ -336,7 +336,7 @@ function CastBack_userRegistrationPrompt( $reason = null ) {
 
 	return $output;
 }
-function CastBack_vendorRegistrationPrompt( $url = null ) {
+function Recast_vendorRegistrationPrompt( $url = null ) {
 	$label = 'Vendor Registration';
 	if( $url ) { $label = 'Complete Registration Wizard'; }
 	else { $url = '/my-account/account-migration/'; }
@@ -350,7 +350,7 @@ function CastBack_vendorRegistrationPrompt( $url = null ) {
 
 	return $output;
 }
-function CastBack_matchWCShopFields( $store_id, $dokan_settings ) { /* Unused, original version - 2/11/2026, JE */
+function Recast_matchWCShopFields( $store_id, $dokan_settings ) { /* Unused, original version - 2/11/2026, JE */
 	/* Set Dokan Phone */
 	if( isset( $_POST['billing_phone'] ) ) {
 			$dokan_settings['phone'] = sanitize_text_field( $_POST['billing_phone'] );
@@ -425,7 +425,7 @@ function CastBack_matchWCShopFields( $store_id, $dokan_settings ) { /* Unused, o
 		update_user_meta( $store_id, 'billing_phone', $_POST['phone'] );
 	}
 }
-function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) { /* When Dokan address is saved, copy to Billing/Shipping */
+function Recast_matchDokanShopFields( $store_id, $dokan_settings ) { /* When Dokan address is saved, copy to Billing/Shipping */
 	/* Build Addresses from current Dokan Data */
 		/* Build Dokan Address Object */
 		$dokan_address = $dokan_settings["address"];
@@ -565,14 +565,14 @@ function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) { /* When D
 			}
 		}
 	/* Set Values from Dokan (end) */
-} add_action( 'dokan_store_profile_saved', 'CastBack_matchDokanShopFields', 10, 2 );
+} add_action( 'dokan_store_profile_saved', 'Recast_matchDokanShopFields', 10, 2 );
 
-function CastBack_updateUserFields( $user_id, $old_user_data, $userdata ) {
+function Recast_updateUserFields( $user_id, $old_user_data, $userdata ) {
 	$dokan_settings = dokan_get_store_info( $user_id );
-	CastBack_matchDokanShopFields( $user_id, $dokan_settings );
+	Recast_matchDokanShopFields( $user_id, $dokan_settings );
 }
 
-function CastBack_prefillUserNamesFromAddress( $user_id, $load_address ) {
+function Recast_prefillUserNamesFromAddress( $user_id, $load_address ) {
 	/* When a WC address is saved, update the account first/last if none exist */
 
 	$first = get_user_meta( $user_id, 'first_name', true );
@@ -593,9 +593,9 @@ function CastBack_prefillUserNamesFromAddress( $user_id, $load_address ) {
 		if( $billingLast ) { wp_update_user( array( 'ID' => $user_id, 'last_name' => $billingLast ) ); }
 		if( $shippingLast ) { wp_update_user( array( 'ID' => $user_id, 'last_name' => $shippingLast ) ); }
 	}
-} add_action( 'woocommerce_customer_save_address', 'CastBack_prefillUserNamesFromAddress', 10, 2 );
+} add_action( 'woocommerce_customer_save_address', 'Recast_prefillUserNamesFromAddress', 10, 2 );
 
-// function CastBack_prefillUserPhoneFromAddress( $user_id ) {
+// function Recast_prefillUserPhoneFromAddress( $user_id ) {
 // 	/* When a Vendor is created, update the Dokan Phone with WC Address Phone if available */
 // 	if( $role == 'vendor' ) {
 // 		$billingPhone = get_user_meta( $user_id, 'billing_phone', true );
@@ -604,7 +604,7 @@ function CastBack_prefillUserNamesFromAddress( $user_id, $load_address ) {
 // 		if( $billingPhone ) { wp_update_user( array( 'ID' => $user_id, 'dokan_store_phone' => $billingPhone ) ); }
 // 		elseif( $shippingPhone ) { wp_update_user( array( 'ID' => $user_id, 'dokan_store_phone' => $shippingPhone ) ); }
 // 	}
-// } add_action( 'dokan_seller_registration_field_process', 'CastBack_prefillUserPhoneFromAddress', 10, 1 );
+// } add_action( 'dokan_seller_registration_field_process', 'Recast_prefillUserPhoneFromAddress', 10, 1 );
 
 
-// add_action( 'woocommerce_created_customer', 'CastBack_updateUserFields', 10, 2 );
+// add_action( 'woocommerce_created_customer', 'Recast_updateUserFields', 10, 2 );

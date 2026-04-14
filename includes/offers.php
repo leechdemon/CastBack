@@ -1,5 +1,5 @@
 <?php
-function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
+function Recast_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 	$user_id = get_current_user_id();
 	$output = '';
 	if( $method == 'MyOffers' ) {
@@ -72,18 +72,18 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 			
 			// $offers = get_field( 'offers', $order_id );
 			//$output .= $buyerOrSeller;
-			$notificationBubble = do_shortcode('[CastBack action="userHasNotification" order_id="'.$order_id.'" method="'.$role.'"]');
-			//$notificationBubble = do_shortcode('[CastBack action="userHasNotification" order_id="'.$order_id.'" user_id="'.$user_id.'" method="'.$buyerOrSeller.'"]');
-			$output .= '<h4 style="width: 100%; ">'.$notificationBubble.'Order #<span id="castback_order_id">'.$order_id.'</span> <span class="castback-orderStatus" style="font-size: smaller;">('.CastBack_Offers_orderStatus_cosmetic( $order_id ).')</span></h4> ';
+			$notificationBubble = do_shortcode('[Recast action="userHasNotification" order_id="'.$order_id.'" method="'.$role.'"]');
+			//$notificationBubble = do_shortcode('[Recast action="userHasNotification" order_id="'.$order_id.'" user_id="'.$user_id.'" method="'.$buyerOrSeller.'"]');
+			$output .= '<h4 style="width: 100%; ">'.$notificationBubble.'Order #<span id="castback_order_id">'.$order_id.'</span> <span class="castback-orderStatus" style="font-size: smaller;">('.Recast_Offers_orderStatus_cosmetic( $order_id ).')</span></h4> ';
 			$output .= '<div class="castback-order">';
 					$listing_id = get_field( 'listing_id', $order_id );
 					$output .= '<div class="castback-listing-panel">';
 						$output .= '<div style="width: fit-content; float: left;">';
-							$output .= CastBack_Listings_drawListing( $listing_id, null, false, false );
+							$output .= Recast_Listings_drawListing( $listing_id, null, false, false );
 						$output .= '</div>';
 						
 						$output .= '<div style="width: 25%; float: left; padding-left: 0.5rem; ">';
-							$output .= CastBack_Buttons_DrawButtonPanel( $order_id );
+							$output .= Recast_Buttons_DrawButtonPanel( $order_id );
 						$output .= '</div>';
 					$output .= '</div>';
 			$output .= '</div>';
@@ -104,7 +104,7 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 }
 		
 /* - Security: Public */
-function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDispute = false ) {
+function Recast_Offers_orderStatus_determine( $order_id, $user_id, $removeDispute = false ) {
 	if( $order_id ) { 
 		$order = wc_get_order( $order_id );	
 		if( $order ) { 
@@ -128,7 +128,7 @@ function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDisp
 
 				/* Set the $orderStatus */
 				$order->update_status( $orderStatus );		
-				$order->add_order_note( 'CastBack_Offers_orderStatus_determine(removeDispute=true): '.$orderStatus.'.'  );
+				$order->add_order_note( 'Recast_Offers_orderStatus_determine(removeDispute=true): '.$orderStatus.'.'  );
 			}
 				
 			/* Process Automations */
@@ -142,12 +142,12 @@ function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDisp
 						$order->update_status('wc-cancelled');
 						update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
 						
-						CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
-						CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
+						Recast_sendEmailNotification( $order_id, 'Recast_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
+						Recast_sendEmailNotification( $order_id, 'Recast_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
 						
 						$note_text = '($'.end($offers)['offer_amount'].' offer cancelled)';
 						// $note_text = 'Offer cancelled. offer submitted by ' .get_userdata( $recipient_id )->display_name. '.';
-						$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autocancelUnpaidOrder().'  );
+						$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocancelUnpaidOrder().'  );
 					}
 				}
 			}
@@ -156,15 +156,15 @@ function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDisp
 					$delayInSeconds = 86400 * $autocompleteshippedorder['days'];
 					
 					if( $shippedDate + $delayInSeconds < $current_date ) {
-						CastBack_sendEmailNotification( $order_id, 'CastBack_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+						Recast_sendEmailNotification( $order_id, 'Recast_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
 						
 						$order->update_status('wc-completed');
 						update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
 						
-						// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
-						// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-seller', get_field( 'seller_id', $order_id ) );
+						// Recast_sendEmailNotification( $order_id, 'Recast-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
+						// Recast_sendEmailNotification( $order_id, 'Recast-completeOrder-seller', get_field( 'seller_id', $order_id ) );
 		
-						$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autocompleteShippedOrder().'  );
+						$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocompleteShippedOrder().'  );
 					}
 				}
 			}
@@ -193,10 +193,10 @@ function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDisp
 						
 						// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
 								
-						CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
-						CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
+						Recast_sendEmailNotification( $order_id, 'Recast_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+						Recast_sendEmailNotification( $order_id, 'Recast_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
 
-						$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autorefundUnshippedOrder().'  );
+						$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autorefundUnshippedOrder().'  );
 					}
 				}
 			}
@@ -207,10 +207,10 @@ function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDisp
 						$delayInSeconds = 86400 * $autocancelexpiredoffer['days'];
 						
 						if( strtotime( $offer['offer_date'] ) + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
-							$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autocancelExpiredOffer().'  );
+							$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocancelExpiredOffer().'  );
 							
 							update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
-							$success = CastBack_Action_expireOffer( $order_id, $user_id );
+							$success = Recast_Action_expireOffer( $order_id, $user_id );
 						}
 					}
 				}
@@ -218,7 +218,7 @@ function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDisp
 		}
 	}
 }		
-function CastBack_Offers_orderStatus_cosmetic( $order_id = null, $display = false ) {
+function Recast_Offers_orderStatus_cosmetic( $order_id = null, $display = false ) {
 	if( $order_id ) {		
 		$order = wc_get_order( $order_id );	
 		if( $order ) {
@@ -258,7 +258,7 @@ function CastBack_Offers_orderStatus_cosmetic( $order_id = null, $display = fals
 	}
 	else { return 0; }
 }
-function CastBack_Offers_minimumOfferPrice( $order_amount = null ) {
+function Recast_Offers_minimumOfferPrice( $order_amount = null ) {
 	$MOT = get_field( 'minimum_offer_total', 'option' );
 	
 	if( !$order_amount ) { return $MOT; }
@@ -280,19 +280,19 @@ function CastBack_Offers_minimumOfferPrice( $order_amount = null ) {
 }
 
 /* - Security: Contained in child functions */
-function CastBack_Offers_ViewOfferPanel( $order_id = null, $AJAX = false ) {
+function Recast_Offers_ViewOfferPanel( $order_id = null, $AJAX = false ) {
 	$output .= do_shortcode('[elementor-template id="2725"]');
 	
 	if($AJAX) { echo $output; wp_die(); } else { return $output; }
-} add_action( 'wp_ajax_CastBack_Offers_ViewOfferPanel', 'CastBack_Offers_ViewOfferPanel' );
-function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false ) {
+} add_action( 'wp_ajax_Recast_Offers_ViewOfferPanel', 'Recast_Offers_ViewOfferPanel' );
+function Recast_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false ) {
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 
 	if( $AJAX && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	else { $user_id = get_current_user_id(); }
 	
-	CastBack_Offers_orderStatus_determine( $order_id, $user_id );
+	Recast_Offers_orderStatus_determine( $order_id, $user_id );
 	
 	$disputedDate = get_field( 'disputed_date', $order_id );
 	$waitingOn = get_field( 'waiting_on', $order_id );
@@ -302,7 +302,7 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 	if( !$disputedDate ) {
 		/* Accept / Submit Offer */
 		if( $orderStatus == 'checkout-draft' ) {		
-			$reason = CastBack_userCanPurchase( get_current_user_id() );
+			$reason = Recast_userCanPurchase( get_current_user_id() );
 			if( $reason !== true ) { return $reason; }
 			else {
 				$offers = get_field( 'offers', $order_id );
@@ -311,15 +311,15 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 					if( end($offers)['offer_expired_date'] ) {
 						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
 					} else {
-						$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
+						$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
 						}
 					
 					$output .= '<p style="width: 100%; text-align: center;">(You may also make a counter-offer below)</p>';
 	
-					$output .= CastBack_Offers_ViewOfferPanel( $order_id );
+					$output .= Recast_Offers_ViewOfferPanel( $order_id );
 					$output .= '<div class="acf_offers" style="float: left; clear: both; width: 100%;">';
 						// $output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
+					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
 					$output .= '</div>';
 				} else {
 					if( end($offers)['offer_expired_date'] ) {
@@ -345,31 +345,31 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 			else if( get_field( 'shipped_date', $order_id ) ) { $displayShipping = true; }
 			
 			if( $displayShipping ) {
-				$output .= do_shortcode('[CastBack field="customerAddress"]');
+				$output .= do_shortcode('[Recast field="customerAddress"]');
 				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
 					$output .= '<h6 style="width: fit-content;">Tracking Number:</h6>';
 					$output .= '<input style="width: 100%; margin: 0.5rem 0;" id="castback_new_tracking_number" type="text">';
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_addTracking_button(\''.$order_id.'\')">Add Tracking Number</a>';
+					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_addTracking_button(\''.$order_id.'\')">Add Tracking Number</a>';
 				$output .= '</div>';
 			}
 			
 			/* Complete Order */
 			if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) ) {
 				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_completeOrder_button(\''.$order_id.'\')">Complete Order</a>';
+					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_completeOrder_button(\''.$order_id.'\')">Complete Order</a>';
 				$output .= '</div>';
 			}
 		}
 	}
 
 	if($AJAX) { echo $output; wp_die(); } else { return $output; }
-} add_action( 'wp_ajax_CastBack_Offers_ViewOrderActionButtons', 'CastBack_Offers_ViewOrderActionButtons' );
+} add_action( 'wp_ajax_Recast_Offers_ViewOrderActionButtons', 'Recast_Offers_ViewOrderActionButtons' );
 
-/* - Security: CastBack_customerSeller() */
-function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {	
+/* - Security: Recast_customerSeller() */
+function Recast_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {	
 	if( !$order_id ) { $order_id = $_POST['order_id']; }
 	
-	if( CastBack_customerSeller( $order_id ) || is_user_admin() ) {
+	if( Recast_customerSeller( $order_id ) || is_user_admin() ) {
 		$order = wc_get_order( $order_id );
 		if( $order ) {
 
@@ -378,7 +378,7 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 			/* Display History */
 			$output = '';
 			$output .= '<h5 style="">Offer History';	
-				$output .= '<a class="castback-order-refresh" href="javascript:CastBack_Offers_refreshOrder('.$order_id.');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
+				$output .= '<a class="castback-order-refresh" href="javascript:Recast_Offers_refreshOrder('.$order_id.');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
 			$output .= '</h5>';
 			$output .= '<div class="offer_history">';
 
@@ -401,7 +401,7 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 						if( !$displayName ) { $displayName = '(User #' . $offer['offer_user_id'].')'; }
 						
 						if( $offer['offer_expired_date'] ) { $offerExpired = ' offer_expired'; } else { $offerExpired = ''; }
-						$output .= '<div class="offer_history_subitem'.$offerExpired.'">'. $displayName . ' made an Offer of $'. CastBack_Filter_formatPriceField( $offer['offer_amount'] ).'</div>';
+						$output .= '<div class="offer_history_subitem'.$offerExpired.'">'. $displayName . ' made an Offer of $'. Recast_Filter_formatPriceField( $offer['offer_amount'] ).'</div>';
 					$output .= '</div>'; // end order history item
 				}
 			}
@@ -477,7 +477,7 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 			if( $disputedDate ) {
 				$output .= '<div class="order_history_item customer" style="order: '.( (int)strtotime( $disputedDate )  - 0 ).';">';
 					$output .= '<div class="order_history_subitem date">'. $disputedDate . '</div>';
-					$output .= '<div class="order_history_subitem">Order was Disputed. CastBack support will be in touch soon...</div>';
+					$output .= '<div class="order_history_subitem">Order was Disputed. Recast support will be in touch soon...</div>';
 				$output .= '</div>';
 			}
 			$automationDate = get_field( 'automation_date', $order_id );
@@ -497,7 +497,7 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 
 				/* Send Message */
 				$output .= '<input style="width: 100px;"id="castback_new_message" type="text-area">';
-				$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_sendMessage_button(\''.$order_id.'\')">Send Message</a>';
+				$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_sendMessage_button(\''.$order_id.'\')">Send Message</a>';
 			
 			$output .= '</div>';
 		}
@@ -505,10 +505,10 @@ function CastBack_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 	} else { $output .= 'This is not your order. Please log in and try again. ("'.$order_id.'", O471, 11052025)'; }
 
 		if($AJAX) { echo $output; wp_die(); } else { return $output; }
-} add_action( 'wp_ajax_CastBack_Offers_ViewOfferSidebar', 'CastBack_Offers_ViewOfferSidebar' );
+} add_action( 'wp_ajax_Recast_Offers_ViewOfferSidebar', 'Recast_Offers_ViewOfferSidebar' );
 
-function CastBack_Offers_refreshRevisionDate( $order_id ) {
-	if( CastBack_customerSeller( $order_id ) ) {
+function Recast_Offers_refreshRevisionDate( $order_id ) {
+	if( Recast_customerSeller( $order_id ) ) {
 		update_field( 'revision_date', wp_date('F j, Y g:i:s a'), $order_id );
 	}
 }

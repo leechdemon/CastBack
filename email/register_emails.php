@@ -1,20 +1,20 @@
 <?php 
 
-// function CastBack_Emails_order_meta_fields( $fields, $sent_to_admin, $order ) {
-	// $fields['CastBack_emailIntro'] = array(
+// function Recast_Emails_order_meta_fields( $fields, $sent_to_admin, $order ) {
+	// $fields['Recast_emailIntro'] = array(
 		// 'label' => __( 'Email Introduction' ),
-		// 'value' => get_post_meta( $order->id, 'CastBack_emailIntro', true ),
+		// 'value' => get_post_meta( $order->id, 'Recast_emailIntro', true ),
 		// 'value' => '',
 	// );
-	// $fields['CastBack_emailNextSteps'] = array(
+	// $fields['Recast_emailNextSteps'] = array(
 		// 'label' => __( 'Next Steps' ),
-		// 'value' => get_post_meta( $order->id, 'CastBack_emailNextSteps', true ),
+		// 'value' => get_post_meta( $order->id, 'Recast_emailNextSteps', true ),
 		// 'value' => '',
 	// );
 	// return $fields;
-// } add_filter( 'woocommerce_email_order_meta_fields', 'CastBack_Emails_order_meta_fields', 10, 3 );
+// } add_filter( 'woocommerce_email_order_meta_fields', 'Recast_Emails_order_meta_fields', 10, 3 );
 
-function CastBack_getEmailTemplateFields( $filename ) {
+function Recast_getEmailTemplateFields( $filename ) {
 	foreach( get_field( 'email_template', 'option' ) as $template ) {
 		if( $template['email_id'] == $filename ) {
 			return $template;
@@ -23,7 +23,7 @@ function CastBack_getEmailTemplateFields( $filename ) {
 }
 
 
-class CastBack_Email {
+class Recast_Email {
 	public function __construct() {
     // Filtering the emails and adding our own email.
 		add_filter( 'woocommerce_email_classes', array( $this, 'register_email' ), 90, 1 );
@@ -34,45 +34,45 @@ class CastBack_Email {
 	}
 	public function register_email( $emails ) {
 		/* Listing Actions */
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-publishListing.php';
-		$emails['CastBack_publishListing'] = new CastBack_Email_publishListing();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-publishListing.php';
+		$emails['Recast_publishListing'] = new Recast_Email_publishListing();
 
 		/* Order Actions */
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-sendMessage-recipient.php';
-		$emails['CastBack_sendMessage_recipient'] = new CastBack_Email_sendMessage_recipient();
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-sendMessage-sender.php';
-		$emails['CastBack_sendMessage_sender'] = new CastBack_Email_sendMessage_sender();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-sendMessage-recipient.php';
+		$emails['Recast_sendMessage_recipient'] = new Recast_Email_sendMessage_recipient();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-sendMessage-sender.php';
+		$emails['Recast_sendMessage_sender'] = new Recast_Email_sendMessage_sender();
 
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-submitOffer-recipient.php';
-		$emails['CastBack_submitOffer_recipient'] = new CastBack_Email_submitOffer_recipient();
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-submitOffer-sender.php';
-		$emails['CastBack_submitOffer_sender'] = new CastBack_Email_submitOffer_sender();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-submitOffer-recipient.php';
+		$emails['Recast_submitOffer_recipient'] = new Recast_Email_submitOffer_recipient();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-submitOffer-sender.php';
+		$emails['Recast_submitOffer_sender'] = new Recast_Email_submitOffer_sender();
 		
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-acceptOffer-seller.php';
-		$emails['CastBack_acceptOffer_seller'] = new CastBack_Email_acceptOffer_seller();
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-acceptOffer-buyer.php';
-		$emails['CastBack_acceptOffer_buyer'] = new CastBack_Email_acceptOffer_buyer();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-acceptOffer-seller.php';
+		$emails['Recast_acceptOffer_seller'] = new Recast_Email_acceptOffer_seller();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-acceptOffer-buyer.php';
+		$emails['Recast_acceptOffer_buyer'] = new Recast_Email_acceptOffer_buyer();
 		
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-addTracking-recipient.php';
-		$emails['CastBack_addTracking_recipient'] = new CastBack_Email_addTracking_recipient();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-addTracking-recipient.php';
+		$emails['Recast_addTracking_recipient'] = new Recast_Email_addTracking_recipient();
 		
 		/* automations */
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-autocompleteShippedOrder-buyer.php';
-		$emails['CastBack_autocompleteShippedOrder_buyer'] = new CastBack_Email_autocompleteShippedOrder_buyer();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-autocompleteShippedOrder-buyer.php';
+		$emails['Recast_autocompleteShippedOrder_buyer'] = new Recast_Email_autocompleteShippedOrder_buyer();
 		
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-autocancelUnpaidOrder-buyer.php';
-		$emails['CastBack_autocancelUnpaidOrder_buyer'] = new CastBack_Email_autocancelUnpaidOrder_buyer();
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-autocancelUnpaidOrder-seller.php';
-		$emails['CastBack_autocancelUnpaidOrder_seller'] = new CastBack_Email_autocancelUnpaidOrder_seller();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-autocancelUnpaidOrder-buyer.php';
+		$emails['Recast_autocancelUnpaidOrder_buyer'] = new Recast_Email_autocancelUnpaidOrder_buyer();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-autocancelUnpaidOrder-seller.php';
+		$emails['Recast_autocancelUnpaidOrder_seller'] = new Recast_Email_autocancelUnpaidOrder_seller();
 		
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-autorefundUnshippedOrder-buyer.php';
-		$emails['CastBack_autorefundUnshippedOrder_buyer'] = new CastBack_Email_autorefundUnshippedOrder_buyer();
-		require_once plugin_dir_path(__FILE__) . 'class-CastBack-autorefundUnshippedOrder-seller.php';
-		$emails['CastBack_autorefundUnshippedOrder_seller'] = new CastBack_Email_autorefundUnshippedOrder_seller();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-autorefundUnshippedOrder-buyer.php';
+		$emails['Recast_autorefundUnshippedOrder_buyer'] = new Recast_Email_autorefundUnshippedOrder_buyer();
+		require_once plugin_dir_path(__FILE__) . 'class-Recast-autorefundUnshippedOrder-seller.php';
+		$emails['Recast_autorefundUnshippedOrder_seller'] = new Recast_Email_autorefundUnshippedOrder_seller();
 		
 		return $emails;
 	}
 }
 
-new CastBack_Email();
+new Recast_Email();
 

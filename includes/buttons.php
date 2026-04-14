@@ -5,7 +5,7 @@
 
 
 /* Draw Button Panel */
-function CastBack_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = null ) {	
+function Recast_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = null ) {	
 	// if( !$post_id && isset( $_GET['order_id'] ) ) { $post_id = $_GET['order_id']; }
 	if( !$post_id && isset( $_POST['order_id'] ) ) { $post_id = $_POST['order_id']; }
 	
@@ -24,16 +24,16 @@ function CastBack_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = 
 			
 			/* Draw Buttons*/
 			if( $button == 'drawButtonPanel' ) {
-				echo CastBack_Buttons_DrawButtonPanel_togglePublish( $post_id );
-				echo CastBack_Buttons_DrawButtonPanel_toggleSold( $post_id );
+				echo Recast_Buttons_DrawButtonPanel_togglePublish( $post_id );
+				echo Recast_Buttons_DrawButtonPanel_toggleSold( $post_id );
 			}
-			if( $button == 'buyNow' ) { echo CastBack_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id ); }
-			if( $button == 'makeOffer' ) { echo CastBack_Buttons_DrawButtonPanel_makeOffer( $post_id ); }
-			if( $button == 'makeOffer_amount' ) { echo CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ); }
-			if( $button == 'makeOfferNow' ) { echo CastBack_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id ); }
-			if( $button == 'editListing' ) { echo CastBack_Buttons_DrawButtonPanel_editListing( $post_id ); }
-			if( $button == 'wishlistAdd' ) { echo CastBack_Buttons_DrawButtonPanel_wishlistAdd( $post_id ); }
-			if( $button == 'deleteListing' ) { echo CastBack_Buttons_DrawButtonPanel_deleteListing( $post_id ); }
+			if( $button == 'buyNow' ) { echo Recast_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id ); }
+			if( $button == 'makeOffer' ) { echo Recast_Buttons_DrawButtonPanel_makeOffer( $post_id ); }
+			if( $button == 'makeOffer_amount' ) { echo Recast_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ); }
+			if( $button == 'makeOfferNow' ) { echo Recast_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id ); }
+			if( $button == 'editListing' ) { echo Recast_Buttons_DrawButtonPanel_editListing( $post_id ); }
+			if( $button == 'wishlistAdd' ) { echo Recast_Buttons_DrawButtonPanel_wishlistAdd( $post_id ); }
+			if( $button == 'deleteListing' ) { echo Recast_Buttons_DrawButtonPanel_deleteListing( $post_id ); }
 			
 			// else {'Button not found. ("'.$button.'", b28-09292025)'; }
 		} else if( get_post_type( $post_id ) == 'shop_order_placehold' ) {
@@ -43,8 +43,8 @@ function CastBack_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = 
 				if( $user_id == get_field( 'customer_id', $post_id ) ) { $isCustomer = true; }
 				if( $user_id == get_field( 'seller_id', $post_id ) ) { $isSeller = true; }
 					
-				if( $isCustomer ) { echo CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id ); }
-				else if( $isSeller ) { echo CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id ); }
+				if( $isCustomer ) { echo Recast_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id ); }
+				else if( $isSeller ) { echo Recast_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id ); }
 				// else { echo 'This is not your order. (a27-09272025)'; }
 			} else { echo 'Please log in. (bo25-09272025)'; }
 		}
@@ -55,13 +55,13 @@ function CastBack_Buttons_DrawButtonPanel( $post_id, $user_id = null, $button = 
 
 
 /* Listing Buttons */
-function CastBack_Buttons_DrawButtonPanel_editListing( $post_id ) {
+function Recast_Buttons_DrawButtonPanel_editListing( $post_id ) {
 	return '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\''.get_site_url().'/selling/edit-listing/?listing_id='.$post_id.'\'">Edit Listing</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_wishlistAdd( $post_id ) {
+function Recast_Buttons_DrawButtonPanel_wishlistAdd( $post_id ) {
 	return do_shortcode('[yith_wcwl_add_to_wishlist]');
 }
-function CastBack_Buttons_DrawButtonPanel_toggleSold( $post_id ) {
+function Recast_Buttons_DrawButtonPanel_toggleSold( $post_id ) {
 	$product = wc_get_product( $post_id );
 	if( $product->is_in_stock() ) {
 		$method = 'markSold';
@@ -73,9 +73,9 @@ function CastBack_Buttons_DrawButtonPanel_toggleSold( $post_id ) {
 	}
 	if( $product->get_status() == 'trash' ) { $classes .= ' d-none'; }
 	
-	return '<button class="'.$classes.'" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_'.$method.'('.$post_id.');">'.$buttonText.'</button>';
+	return '<button class="'.$classes.'" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_'.$method.'('.$post_id.');">'.$buttonText.'</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_togglePublish( $post_id ) {
+function Recast_Buttons_DrawButtonPanel_togglePublish( $post_id ) {
 	$product = wc_get_product( $post_id );
 	$status = $product->get_status();
 	if( $status == 'publish' ) {
@@ -95,9 +95,9 @@ function CastBack_Buttons_DrawButtonPanel_togglePublish( $post_id ) {
 	}
 	if( $product->get_status() == 'trash' ) { $classes .= ' d-none'; }
 	
-	return '<button class="'.$classes.'" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_'.$method.'('.$post_id.');">'.$buttonText.'</button>';
+	return '<button class="'.$classes.'" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_'.$method.'('.$post_id.');">'.$buttonText.'</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_deleteListing( $post_id ) {
+function Recast_Buttons_DrawButtonPanel_deleteListing( $post_id ) {
 	$product = wc_get_product( $post_id );
 	if( $product->get_status() == 'trash' ) {
 		$method = 'restoreListing';
@@ -108,18 +108,18 @@ function CastBack_Buttons_DrawButtonPanel_deleteListing( $post_id ) {
 		$buttonText =  'Archive Listing';
 	}
 	
-	return '<button class="'.$classes.'" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_'.$method.'('.$post_id.');">'.$buttonText.'</button>';
+	return '<button class="'.$classes.'" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_'.$method.'('.$post_id.');">'.$buttonText.'</button>';
 }
 
 // /* Offer Buttons */
-function CastBack_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id = null ) {
-	$userCanPurchase = CastBack_userCanPurchase( $user_id );
+function Recast_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id = null ) {
+	$userCanPurchase = Recast_userCanPurchase( $user_id );
 	if( $userCanPurchase === true ) {
-		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_buyNow_button('.$post_id.')">Buy Now</button>';
+		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_buyNow_button('.$post_id.')">Buy Now</button>';
 	}
-	else { return CastBack_userRegistrationPrompt( $userCanPurchase ); }
+	else { return Recast_userRegistrationPrompt( $userCanPurchase ); }
 }
-function CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
+function Recast_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
 	if( !$order_id && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
 	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 	
@@ -140,20 +140,20 @@ function CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
 		$output .= '<span style="display:none;" id="shipping_price">'.$shipping_price.'</span>';
 		if( $shipping_price && $offer_amount ) { $total_price = (float)$shipping_price + (float)$offer_amount; }
 		
-		if( $total_price < CastBack_Offers_minimumOfferPrice() ) { $castback_MOT_flag_display = 'flex'; }
+		if( $total_price < Recast_Offers_minimumOfferPrice() ) { $castback_MOT_flag_display = 'flex'; }
 		else { $castback_MOT_flag_display = 'none'; }
 		
 		$output .= '<span id="castback_MOT_flag" style="color: red; display: '.$castback_MOT_flag_display.';">*</span>';
 		
-		$output .= "<script>function CastBack_Offers_updateTotalPrice( price ) {			
+		$output .= "<script>function Recast_Offers_updateTotalPrice( price ) {			
 			var shippingPrice = document.getElementById('shipping_price').innerHTML;
 			if( !parseFloat( shippingPrice ) ) { shippingPrice = 0; }
 			else { shippingPrice = parseFloat( shippingPrice ); }
 			
 			var newAmount = parseFloat( document.getElementById('castback_offer_amount').value ) + shippingPrice;
 				
-			if( newAmount < ".CastBack_Offers_minimumOfferPrice()." ) {
-				newAmount = ".CastBack_Offers_minimumOfferPrice().";
+			if( newAmount < ".Recast_Offers_minimumOfferPrice()." ) {
+				newAmount = ".Recast_Offers_minimumOfferPrice().";
 				document.getElementById('castback_MOT_flag').style.display = 'flex';
 				document.getElementById('castback_MOT_container').style.display = 'flex';
 			} else {
@@ -165,24 +165,24 @@ function CastBack_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
 		
 		$output .= "<script>
 			const castback_offer_amount = document.getElementById('castback_offer_amount');
-			castback_offer_amount.addEventListener( 'change', CastBack_Offers_updateTotalPrice );
+			castback_offer_amount.addEventListener( 'change', Recast_Offers_updateTotalPrice );
 		</script>";	
 	$output .= '</div>';
 	return $output;
 }
-function CastBack_Buttons_DrawButtonPanel_makeOffer( $post_id ) {
-	return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:CastBack_Action_makeOffer_button('.$post_id.')">Make Offer</button>';
+function Recast_Buttons_DrawButtonPanel_makeOffer( $post_id ) {
+	return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_makeOffer_button('.$post_id.')">Make Offer</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id = null ) {
-	$userCanPurchase = CastBack_userCanPurchase( $user_id );
+function Recast_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id = null ) {
+	$userCanPurchase = Recast_userCanPurchase( $user_id );
 	if( $userCanPurchase === true ) {
-		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 60%;" type="reset" onclick="javascript:CastBack_Action_makeOfferNow_button('.$post_id.')">Make Offer Now!</button>';
+		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 60%;" type="reset" onclick="javascript:Recast_Action_makeOfferNow_button('.$post_id.')">Make Offer Now!</button>';
 	}
-	else { return CastBack_userRegistrationPrompt( $userCanPurchase ); }
+	else { return Recast_userRegistrationPrompt( $userCanPurchase ); }
 }
-function CastBack_Buttons_DrawButtonPanel_viewOrder( $post_id, $user_id = null ) {
+function Recast_Buttons_DrawButtonPanel_viewOrder( $post_id, $user_id = null ) {
 	return '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'/selling/my-orders/?order_id=' .$post_id.'\'">View Order</button>';
 }
-function CastBack_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id = null ) {
+function Recast_Buttons_DrawButtonPanel_viewOffer( $post_id, $user_id = null ) {
 		return '<button style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="location.href=\'/offers/view-offer/?order_id=' .$post_id.'\'">View Offer</button>';
 }

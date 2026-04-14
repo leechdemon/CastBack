@@ -1,5 +1,5 @@
 <?php  
-function CastBack_ShortcodeHandler( $atts, $content = null ) {
+function Recast_ShortcodeHandler( $atts, $content = null ) {
 		global $castbackVersion;
 		extract(shortcode_atts(array( 'page' => null, 'action' => null, 'field' => null, 'button' => null, 'listing_id' => null, 'order_id' => null, 'featuredImage' => null, 'class' => null, 'setQuery' => null, 'posts_per_page' => null, 'location' => null, 'post_status' => null, 'method' => null, 'user_id' => null ), $atts));
 		
@@ -11,33 +11,33 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		if( !isset( $order_id ) && isset( $_GET['order_id'] ) ) { $order_id = $_GET['order_id']; }
 		
 		ob_start();
-		wp_enqueue_style( 'CastBack' );
+		wp_enqueue_style( 'Recast' );
 	
 		if( $page ) {
 			
 			/* We only show pages to logged-in users... */
 			/* ... or 'DrawListing'... */
 			if( is_user_logged_in() || $page == 'DrawListing' ) {
-				echo '<div id="CastBack-'.$page.'">';
+				echo '<div id="Recast-'.$page.'">';
 				if( $page == 'TestProductActions' ) { /* TestProductActions(); */ }
 				else if( $page == 'MyAccount' ) {
-					echo 'CastBack_MyAccount'; 
-					// echo CastBack_MyAccount( $page, $posts_per_page ); 
+					echo 'Recast_MyAccount'; 
+					// echo Recast_MyAccount( $page, $posts_per_page ); 
 				}
-				else if( $page == 'EditListing_ACF' ) { echo CastBack_Listings_editListing_ACF( $listing_id, null, false, false ); }
-				else if( $page == 'MyListings' ) { echo CastBack_Listings( $listing_id, $posts_per_page ); }
-				else if( $page == 'DrawListing' ) { echo CastBack_Listings_drawListing( $listing_id, null, false, false ); }
+				else if( $page == 'EditListing_ACF' ) { echo Recast_Listings_editListing_ACF( $listing_id, null, false, false ); }
+				else if( $page == 'MyListings' ) { echo Recast_Listings( $listing_id, $posts_per_page ); }
+				else if( $page == 'DrawListing' ) { echo Recast_Listings_drawListing( $listing_id, null, false, false ); }
 				else if( $page == 'DrawListingForOrder' ) {
-					if( CastBack_customerSeller( $order_id ) ) {
-						echo CastBack_Listings_drawListing( get_field( 'listing_id', $order_id ), null, false, false );
+					if( Recast_customerSeller( $order_id ) ) {
+						echo Recast_Listings_drawListing( get_field( 'listing_id', $order_id ), null, false, false );
 					}
 				}
 				else if( $page == 'MarkSold' ) {
-					// echo CastBack_Listings_drawListing( $listing_id, null, true, false );
-					echo CastBack_Buttons_DrawButtonPanel_markSold( $listing_id );
+					// echo Recast_Listings_drawListing( $listing_id, null, true, false );
+					echo Recast_Buttons_DrawButtonPanel_markSold( $listing_id );
 				}
-				else if( $page == 'MyOffers' ) {  echo CastBack_Offers( $page, $posts_per_page ); }
-				else if( $page == 'MyOrders' ) { echo CastBack_Offers( $page, $posts_per_page ); }
+				else if( $page == 'MyOffers' ) {  echo Recast_Offers( $page, $posts_per_page ); }
+				else if( $page == 'MyOrders' ) { echo Recast_Offers( $page, $posts_per_page ); }
 				else {
 					echo 'function "'.$page.'" not found. (s74-09232025)';
 				}
@@ -50,32 +50,32 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		else if( $button ) {
 			if( $button == 'drawButtonPanel' ) {
 				$user_id = get_current_user_id();
-				if( !CastBack_userIsStripeConnected( $user_id ) ) {
+				if( !Recast_userIsStripeConnected( $user_id ) ) {
 					$user = wp_get_current_user();
-					if( in_array( 'seller', (array) $user->roles ) ) { Test("A"); return CastBack_vendorRegistrationPrompt('/?page=dokan-seller-setup'); }
-					else { Test("B"); return CastBack_vendorRegistrationPrompt(); }
+					if( in_array( 'seller', (array) $user->roles ) ) { Test("A"); return Recast_vendorRegistrationPrompt('/?page=dokan-seller-setup'); }
+					else { Test("B"); return Recast_vendorRegistrationPrompt(); }
 				}
-				else { echo CastBack_Buttons_DrawButtonPanel( $listing_id, $user_id, $button ); }
+				else { echo Recast_Buttons_DrawButtonPanel( $listing_id, $user_id, $button ); }
 			}
 			if( $button == 'deleteListing' ) {
-				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			}
 			if( $button == 'editListing' ) {
-				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			}
-			if( $button == 'shopFilters' ) { echo CastBack_Queries_shopFilterButtons( 'shop' ); }
-			if( $button == 'archiveFilters' ) { echo CastBack_Queries_shopFilterButtons( 'archive' ); }
-			if( $button == 'listingQueryFilterButtons' ) { echo CastBack_Queries_listingFilterButtons(); }
+			if( $button == 'shopFilters' ) { echo Recast_Queries_shopFilterButtons( 'shop' ); }
+			if( $button == 'archiveFilters' ) { echo Recast_Queries_shopFilterButtons( 'archive' ); }
+			if( $button == 'listingQueryFilterButtons' ) { echo Recast_Queries_listingFilterButtons(); }
 			if( $button == 'makeOffer' ) {
-				// echo 'javascript:CastBack_Action_makeOffer_button("'.$post_id.'")';
-				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo 'javascript:Recast_Action_makeOffer_button("'.$post_id.'")';
+				echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			}
 			
 			// if( $button == ['sendMessage', 'submitOffer', 'acceptOffer', 'expireOffer', 'paymentComplete', 'disputeOrder', 'removeDispute', 'addTracking', 'completeOrder', ] ) {
-				// echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 			// if( $button == [ 'remove_dispute' ] ) {
-				// echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
+				// echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $button );
 			// }
 		}
 		else if( $action ) {
@@ -118,25 +118,25 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 				if( !$user_id ) { $user_id = get_current_user_id(); }
 
-				if( CastBack_userCanPurchase( $user_id ) === true ) { /*  */ }
+				if( Recast_userCanPurchase( $user_id ) === true ) { /*  */ }
 				else { echo 'd-none'; }
 			}
 			else if( $action == "userHasCurrentOffer_SHOW" ) {
 				$listing_id = get_the_ID();
-				$order_id = CastBack_userHasCurrentOffer( $listing_id );
+				$order_id = Recast_userHasCurrentOffer( $listing_id );
 				if( $order_id ) { echo '/offers/view-offer/?order_id='.$order_id; }
 				else { echo 'd-none'; }
 			}
 			else if( $action == "userHasCurrentOffer" ) {
 				$listing_id = get_the_ID();
-				if( CastBack_userHasCurrentOffer( $listing_id ) ) { echo 'd-none'; }
+				if( Recast_userHasCurrentOffer( $listing_id ) ) { echo 'd-none'; }
 			}
 			else if( $action == "userHasNotification_anywhere" ) {
 				
 			}
 			else if( $action == "userHasNotification" ) {
 				if( $order_id ) {
-					if( CastBack_userHasNotification( $order_id, $user_id, $method ) ) {
+					if( Recast_userHasNotification( $order_id, $user_id, $method ) ) {
 						$bubble = "<span style='color: red; font-weight: 800;'>**</span>";
 						
 						echo $bubble;
@@ -154,7 +154,7 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				}
 			}
 			else if( $action == "userIsStripeConnected" ) {
-				if( is_user_logged_in() && CastBack_userIsStripeConnected( get_current_user_id() ) ) { /* do nothing */ }
+				if( is_user_logged_in() && Recast_userIsStripeConnected( get_current_user_id() ) ) { /* do nothing */ }
 				else { echo 'd-none'; }
 			}
 			else if( $action == "displayDokanVendorDashboard" ) {
@@ -171,7 +171,7 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 			else if( is_user_logged_in() ) {
 				/* Customer / Vendor actions below this point */
 				if( $action == "addListing" ) {
-					if( isset( $listing_id ) && $listing_id == $action ) { CastBack_Listings_addListing(); }
+					if( isset( $listing_id ) && $listing_id == $action ) { Recast_Listings_addListing(); }
 					else { echo 'Wrong listing_id set. (s85-10012025)'; }
 				}
 				else if( $action == "isPublished" ) {
@@ -182,11 +182,11 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 					else { echo 'No Listing ID found. (s90-11052025)'; }
 				}
 				else if( $action == "buyNow" ) {
-					if( isset( $listing_id ) ) { CastBack_Action_buyNow( $listing_id ); }
+					if( isset( $listing_id ) ) { Recast_Action_buyNow( $listing_id ); }
 					else { echo 'No Listing ID found. (s671-10212025)'; }
 				}
 				else if( $action == "makeOffer" ) {
-					if( isset( $listing_id ) ) { CastBack_Action_makeOffer( $listing_id ); }
+					if( isset( $listing_id ) ) { Recast_Action_makeOffer( $listing_id ); }
 					else { echo 'No Listing ID found. (s95-09302025)'; }
 				}
 				else {
@@ -214,9 +214,9 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 					if( !$user_id ) { $user_id = get_current_user_id(); }
 
 					if( $user_id != 0 ) { $userIsLoggedIn = ', userIsLoggedIn'; }
-					if( CastBack_userCanPurchase( $user_id ) === true ) { $userCanPurchase = ', userCanPurchase'; }
-					if( CastBack_userIsStripeConnected( $user_id ) ) { $userIsStripeConnected = ', userIsStripeConnected'; }
-					if( $order_id && CastBack_customerSeller( $order_id, $user_id ) ) { $customerSeller = ', userIsCustomerOrSeller'; }
+					if( Recast_userCanPurchase( $user_id ) === true ) { $userCanPurchase = ', userCanPurchase'; }
+					if( Recast_userIsStripeConnected( $user_id ) ) { $userIsStripeConnected = ', userIsStripeConnected'; }
+					if( $order_id && Recast_customerSeller( $order_id, $user_id ) ) { $customerSeller = ', userIsCustomerOrSeller'; }
 					echo ( 'user_id: '. $user_id.$userIsLoggedIn.$userCanPurchase.$userIsStripeConnected.$customerSeller );
 				}
 			}
@@ -237,22 +237,22 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 						// echo '<a href="/offers/view-offer/?order_id='.$order_id.'">'.$order_id.'</a> - Last Viewed: '. $lastViewed .'<br>';
 					// }
 					
-					// $response = CastBack_Action_expireOffer( $order_id );
+					// $response = Recast_Action_expireOffer( $order_id );
 					// if ( $response ) { echo json_encode($response); }
 					
 						
-					CastBack_Offers_orderStatus_determine( 4150, $customer_id );
+					Recast_Offers_orderStatus_determine( 4150, $customer_id );
 
 				}
 			}
 			else if( $field == 'shippingAddress' ) {
-				echo CastBack_getAddress( $user_id );
+				echo Recast_getAddress( $user_id );
 			}
 			else if( $field == 'customerAddress' ) {
 				echo '<div style="text-align: left;">';
 					echo '<h6>Customer Shipping Address:</h6>';
 					
-					echo CastBack_getAddress( get_field( 'customer_id', $order_id ), 'shipping', true );
+					echo Recast_getAddress( get_field( 'customer_id', $order_id ), 'shipping', true );
 
 
 				echo '</div>';
@@ -261,17 +261,17 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				// Do something
 			}
 			else if( $field == 'order_status' ) {
-				echo CastBack_Offers_orderStatus_cosmetic( $order_id, true );
+				echo Recast_Offers_orderStatus_cosmetic( $order_id, true );
 			}
 			else if( $field == 'makeOffer_amount' ) {
-				if( $order_id ) { echo CastBack_Buttons_DrawButtonPanel( $order_id, get_current_user_id(), $field ); }
-				else if( $listing_id ) { echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $field ); }
+				if( $order_id ) { echo Recast_Buttons_DrawButtonPanel( $order_id, get_current_user_id(), $field ); }
+				else if( $listing_id ) { echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $field ); }
 				else {
 					echo 'No ID found. (s693-10292025)';
 				}
 			}
 			else if( $field == 'makeOfferNow' ) {
-				echo CastBack_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $field );
+				echo Recast_Buttons_DrawButtonPanel( $listing_id, get_current_user_id(), $field );
 				}
 			else if( $field == 'ShippingPrice' ) {
 				$shipping_price = get_field( 'shipping_price', $listing_id );
@@ -281,7 +281,7 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				else { echo 'Free Shipping!!'; }
 			}
 			else if( $field == 'MOT' ) {
-				$MOT = CastBack_Filter_formatPriceField( CastBack_Offers_minimumOfferPrice() );
+				$MOT = Recast_Filter_formatPriceField( Recast_Offers_minimumOfferPrice() );
 				
 				echo '<strong id="castback_MOT" style="color: red;">$'.$MOT.'</strong>';
 			}
@@ -299,25 +299,25 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				// Test( $new_offer_amount );
 				$total_price = (float)$shipping_price + (float)$new_offer_amount;
 
-				$total_price = CastBack_Offers_minimumOfferPrice( $total_price );				
+				$total_price = Recast_Offers_minimumOfferPrice( $total_price );				
 				
 				echo '<div id="castback_total_price"><strong>$'.$total_price.'</strong></div>';
 				// $output .= '<span class="castback_offer_amount_plusShipping">(+$<span id="offer_amount_plusShipping_value">'.$total_price.'</span> Shipping)</span>';
-				echo '<script>CastBack_Offers_updateTotalPrice();</script>';
+				echo '<script>Recast_Offers_updateTotalPrice();</script>';
 			}
 			else if( $field == 'ViewOrderActionButtons' ) {
 				$order = wc_get_order( $order_id );
 				Test( $order );
 
-				if( CastBack_customerSeller( $order_id ) || is_user_admin() ) {
-					echo '<div id="CastBack-ViewOrderActionButtons">'.CastBack_Offers_ViewOrderActionButtons( $order_id ).'</div>';
+				if( Recast_customerSeller( $order_id ) || is_user_admin() ) {
+					echo '<div id="Recast-ViewOrderActionButtons">'.Recast_Offers_ViewOrderActionButtons( $order_id ).'</div>';
 				} else { echo 'This is not your order. Please try again. (" '.$order_id.' ", " '.$listing_id.' ", S627-10282025).'; }
 			}
 			else if( $field == 'ViewOfferPanel' ) {
-				echo '<div id="CastBack-ViewOfferPanel">'.CastBack_Offers_ViewOfferPanel( $order_id ).'</div>';
+				echo '<div id="Recast-ViewOfferPanel">'.Recast_Offers_ViewOfferPanel( $order_id ).'</div>';
 			}
 			else if( $field == 'ViewOfferSidebar' ) {
-				echo '<div id="CastBack-ViewOfferSidebar">'.CastBack_Offers_ViewOfferSidebar( $order_id, false ).'</div>';
+				echo '<div id="Recast-ViewOfferSidebar">'.Recast_Offers_ViewOfferSidebar( $order_id, false ).'</div>';
 			}
 			else {
 				/* Do something? */
@@ -330,4 +330,4 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 		}
 			
 		return ob_get_clean();
-} add_shortcode('CastBack', 'CastBack_ShortcodeHandler');
+} add_shortcode('Recast', 'Recast_ShortcodeHandler');

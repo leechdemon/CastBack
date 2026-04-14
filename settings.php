@@ -276,7 +276,7 @@ function Recast_Settings_AddFieldGroups() {
 							'class' => '',
 							'id' => '',
 						),
-						'default_value' => 'CastBack-(orderAction)-(seller).php',
+						'default_value' => 'Recast-(orderAction)-(seller).php',
 						'maxlength' => '',
 						'allow_in_bindings' => 0,
 						'placeholder' => '',

@@ -74,7 +74,7 @@ function custom_query_edit( $query ) {
 	// $query->set( 'post_category', $_POST['acf'][''] );
 } add_action( 'elementor/query/castback-edit' , 'custom_query_edit'  ); 
 
-function CastBack_Queries_shopFilterButtons( $method = null ) {
+function Recast_Queries_shopFilterButtons( $method = null ) {
 	$args = array( 'object_type' => array( 'product' ) );
 	$taxonomies = get_taxonomies( $args, 'objects' );
 	
@@ -97,14 +97,14 @@ function CastBack_Queries_shopFilterButtons( $method = null ) {
 
 	echo '<div style="display: inline-grid;">';
 		foreach( $taxonomies as $tax ) {			
-			if( isset( $drawTax[ $tax->name ] ) ) { CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ); }
-			else if( is_tax( $tax->name ) ) { CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ); }
-			else if( isset( $_GET[ $tax->name ] ) ) { CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ); }
+			if( isset( $drawTax[ $tax->name ] ) ) { Recast_Queries_shopFilterButtons_drawTax( $tax, $method ); }
+			else if( is_tax( $tax->name ) ) { Recast_Queries_shopFilterButtons_drawTax( $tax, $method ); }
+			else if( isset( $_GET[ $tax->name ] ) ) { Recast_Queries_shopFilterButtons_drawTax( $tax, $method ); }
 		}
 	echo '</div>';
 	
 }
-function CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ) {
+function Recast_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 	
 	Test( $tax->name );
 	Test( is_tax( 'product_cat', 'flies-fly-tying' ) );
@@ -130,7 +130,7 @@ function CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 		else { $order = ' style="order: 9;"'; }
 	}
 	
-	echo '<div class="CastBack-shopFilter-taxLabel'.$isActive.'"'.$order.'>'; /* start div */
+	echo '<div class="Recast-shopFilter-taxLabel'.$isActive.'"'.$order.'>'; /* start div */
 	
 	echo '<h3>'.$tax->labels->singular_name.'</h3>';
 	echo '<div style="padding: 0.25rem;">';
@@ -192,20 +192,20 @@ function CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 		
 		// Test( $method );
 		if( $method == 'shop' ) {
-			echo '<a class="CastBack-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $_GET, get_term_link( $term ) ) ).'">'.$term->name.'</a>';
+			echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $_GET, get_term_link( $term ) ) ).'">'.$term->name.'</a>';
 		}
 		else if( $method == 'archive' ) {
 			if( is_tax( $tax->name ) ) {
 				if( is_tax( $tax->name, $term->slug ) ) {
-					echo '<a class="CastBack-shopFilter-termLabel castback-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, '/shop' ) ) .'">'.$term->name.'</a>'; 
+					echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, '/shop' ) ) .'">'.$term->name.'</a>'; 
 				}	
 				else {
-					echo '<a class="CastBack-shopFilter-termLabel castback-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, get_term_link( $term ) ) ) .'">'.$term->name.'</a>'; 
+					echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, get_term_link( $term ) ) ) .'">'.$term->name.'</a>'; 
 				}
 			}
 			else { /* If this is a secondary term... */
-				if( $active == true ) { echo '<a class="CastBack-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( remove_query_arg( $tax->name ) ).'">'.$term->name.'</a>'; }
-				else { echo '<a class="CastBack-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $tax->name, $term->slug ) ).'">'.$term->name.'</a>'; }
+				if( $active == true ) { echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( remove_query_arg( $tax->name ) ).'">'.$term->name.'</a>'; }
+				else { echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $tax->name, $term->slug ) ).'">'.$term->name.'</a>'; }
 			}
 		}
 	}
@@ -214,7 +214,7 @@ function CastBack_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 	echo "</div>"; /* end div */
 }
 
-function CastBack_Queries_listingFilterButtons() {
+function Recast_Queries_listingFilterButtons() {
 	ob_start();
 	
 	/* Stock Status */
@@ -256,7 +256,7 @@ function CastBack_Queries_listingFilterButtons() {
 	
 	return ob_get_clean();
 }
-function CastBack_Queries_processFilters( $args ) { /* Only used by CastBack_Listings()?? Remove? 10/23/25 */
+function Recast_Queries_processFilters( $args ) { /* Only used by Recast_Listings()?? Remove? 10/23/25 */
 	
 	// remove_query_arg( 'listing_id' );
 	// wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/listings/' ) ) );

@@ -1,5 +1,5 @@
 <?php
-function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = false ) {
+function Recast_Listings( $listing_id = null, $posts_per_page = null, $AJAX = false ) {
 	// if( !isset( $listing_id ) && isset( $_POST['listing_id'] ) ){ $listing_id = $_POST['listing_id']; }
 	// if( !$listing_id && isset( $_GET['listing_id'] ) ) { $listing_id = $_GET['listing_id']; }
 	if( $listing_id ) { $posts_per_page = 1; }
@@ -32,10 +32,10 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 				// 'relation' => 'AND', // Optional: 'AND' or 'OR' to combine multiple conditions
 			// ),
 		);
-		echo CastBack_Queries_addFilterButtons();
-		$listings = wc_get_products( CastBack_Queries_processFilters( $args ) ); 
+		echo Recast_Queries_addFilterButtons();
+		$listings = wc_get_products( Recast_Queries_processFilters( $args ) ); 
 
-		// $output .= '<div style="padding: 1.25rem;"><a class="elementor-button elementor-button-link" href="javascript:CastBack_Action_addListing_button();">Add Listing</a></div>';
+		// $output .= '<div style="padding: 1.25rem;"><a class="elementor-button elementor-button-link" href="javascript:Recast_Action_addListing_button();">Add Listing</a></div>';
 		
 		/* Draw Listings */	
 		if ( count($listings) >= 1 ) {
@@ -43,7 +43,7 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 			foreach( $listings as $key => $listing ) {
 				if( $listing && ($key+1 != $posts_per_page) ) {
 					$listing_id = $listing->get_id();
-					$output .= CastBack_Listings_drawListing( $listing_id, null, false, false );
+					$output .= Recast_Listings_drawListing( $listing_id, null, false, false );
 				} else {
 					$output .= '<span><a class="view_more" style="font-size: smaller;" href="'.$title_url.'">View More...</a></span>';
 				}
@@ -63,7 +63,7 @@ function CastBack_Listings( $listing_id = null, $posts_per_page = null, $AJAX = 
 }
 
 /* - Security: Public */
-function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
+function Recast_Listings_drawListing( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
 	// if( !$listingTemplate ) { $listingTemplate = 822; } /* V0.5.4 */
 	// if( !$listingTemplate ) { $listingTemplate = 2429; } /* V0.5.6 */
 	if( !$listingTemplate ) { $listingTemplate = 2628; } /* V1.0 */
@@ -103,11 +103,11 @@ function CastBack_Listings_drawListing( $listing_id, $listingTemplate = null, $b
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_drawListing', 'CastBack_Listings_drawListing' );
+} add_action( 'wp_ajax_Recast_Listings_drawListing', 'Recast_Listings_drawListing' );
 
 /* Listing Actions, AJAX-controlled */
 /* - Security: Does not require security, since all Users can create Listings. */
-function CastBack_Listings_addListing( $AJAX = false ) { /* Currently, method only available via Endpoint( URL->Shortcode ). AJAX disabled. */
+function Recast_Listings_addListing( $AJAX = false ) { /* Currently, method only available via Endpoint( URL->Shortcode ). AJAX disabled. */
 	// if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	// if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	if( !$user_id ) { $user_id = get_current_user_id(); }
@@ -148,7 +148,7 @@ function CastBack_Listings_addListing( $AJAX = false ) { /* Currently, method on
 		if( $success ) {
 			if( $AJAX ) {
 				// success
-				// echo CastBack_Listings_drawListing( $listing_id, null, false, $AJAX );
+				// echo Recast_Listings_drawListing( $listing_id, null, false, $AJAX );
 				remove_query_arg( 'listing_id' );
 				wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/edit-listing/' ) ) );				
 				
@@ -157,7 +157,7 @@ function CastBack_Listings_addListing( $AJAX = false ) { /* Currently, method on
 			else {
 				remove_query_arg( 'listing_id' );
 				wp_safe_redirect( esc_url_raw( add_query_arg( 'listing_id', $listing_id, get_site_url(). '/selling/edit-listing/' ) ) );		
-				// echo do_shortcode('[CastBack page="MyListings"]');
+				// echo do_shortcode('[Recast page="MyListings"]');
 				// echo ob_get_clean();
 			}
 		} else {
@@ -174,8 +174,8 @@ function CastBack_Listings_addListing( $AJAX = false ) { /* Currently, method on
 		}
 		
 	}		
-} /* add_action( 'wp_ajax_CastBack_Listings_addListing', 'CastBack_Listings_addListing' ); */
-function CastBack_Listings_editListing_ACF( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
+} /* add_action( 'wp_ajax_Recast_Listings_addListing', 'Recast_Listings_addListing' ); */
+function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
 	
 	if( $listing_id ) {
 		$args = array(
@@ -213,14 +213,14 @@ function CastBack_Listings_editListing_ACF( $listing_id, $listingTemplate = null
 	}
 }
 
-/* - Security: CastBack_customerSeller() */
-function CastBack_Listings_publishListing( $listing_id = null ) {
+/* - Security: Recast_customerSeller() */
+function Recast_Listings_publishListing( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
 	
 	ob_start();	
-	if( CastBack_customerSeller( $listing_id ) ) {
+	if( Recast_customerSeller( $listing_id ) ) {
 		$user = get_user_by( 'ID', $user_id );
 		if ( !in_array( 'customer', (array) $user->roles ) ) {
 			$listing = wc_get_product( $listing_id );
@@ -229,7 +229,7 @@ function CastBack_Listings_publishListing( $listing_id = null ) {
 			$response =  $listing->save();
 			
 			// if( $response ) {
-				CastBack_sendEmailNotification( $listing_id, 'CastBack_publishListing', $user->ID );
+				Recast_sendEmailNotification( $listing_id, 'Recast_publishListing', $user->ID );
 			// }
 			
 			echo $response;
@@ -240,13 +240,13 @@ function CastBack_Listings_publishListing( $listing_id = null ) {
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_publishListing', 'CastBack_Listings_publishListing' );
-function CastBack_Listings_hideListing( $listing_id = null ) {
+} add_action( 'wp_ajax_Recast_Listings_publishListing', 'Recast_Listings_publishListing' );
+function Recast_Listings_hideListing( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
 	ob_start();	
-	if( CastBack_customerSeller( $listing_id ) ) {
+	if( Recast_customerSeller( $listing_id ) ) {
 		$listing = wc_get_product( $listing_id );
 		
 		$listing->set_status( 'draft' );
@@ -254,13 +254,13 @@ function CastBack_Listings_hideListing( $listing_id = null ) {
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_hideListing', 'CastBack_Listings_hideListing' );
-function CastBack_Listings_markSold( $listing_id = null ) {
+} add_action( 'wp_ajax_Recast_Listings_hideListing', 'Recast_Listings_hideListing' );
+function Recast_Listings_markSold( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
 	ob_start();	
-	if( CastBack_customerSeller( $listing_id ) ) {
+	if( Recast_customerSeller( $listing_id ) ) {
 		$listing = wc_get_product( $listing_id );
 		
 		$listing->set_stock_status( 'outofstock' );
@@ -268,13 +268,13 @@ function CastBack_Listings_markSold( $listing_id = null ) {
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_markSold', 'CastBack_Listings_markSold' );
-function CastBack_Listings_markUnsold( $listing_id = null ) {
+} add_action( 'wp_ajax_Recast_Listings_markSold', 'Recast_Listings_markSold' );
+function Recast_Listings_markUnsold( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
 	ob_start();	
-	if( CastBack_customerSeller( $listing_id ) ) {
+	if( Recast_customerSeller( $listing_id ) ) {
 		$listing = wc_get_product( $listing_id );
 		
 		$listing->set_stock_status( 'instock' );
@@ -282,13 +282,13 @@ function CastBack_Listings_markUnsold( $listing_id = null ) {
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_markUnsold', 'CastBack_Listings_markUnsold' );
-function CastBack_Listings_deleteListing( $listing_id = null ) {
+} add_action( 'wp_ajax_Recast_Listings_markUnsold', 'Recast_Listings_markUnsold' );
+function Recast_Listings_deleteListing( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
 	ob_start();	
-	if( CastBack_customerSeller( $listing_id ) ) {
+	if( Recast_customerSeller( $listing_id ) ) {
 		$listing = wc_get_product( $listing_id );
 		
 		$listing->set_status( 'trash' );
@@ -296,13 +296,13 @@ function CastBack_Listings_deleteListing( $listing_id = null ) {
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_deleteListing', 'CastBack_Listings_deleteListing' );
-function CastBack_Listings_restoreListing( $listing_id = null ) {
+} add_action( 'wp_ajax_Recast_Listings_deleteListing', 'Recast_Listings_deleteListing' );
+function Recast_Listings_restoreListing( $listing_id = null ) {
 	if( !$listing_id && isset( $_POST['listing_id'] ) ) { $listing_id = $_POST['listing_id']; }
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	
 	ob_start();	
-	if( CastBack_customerSeller( $listing_id ) ) {
+	if( Recast_customerSeller( $listing_id ) ) {
 		$listing = wc_get_product( $listing_id );
 		
 		$listing->set_status( 'draft' );
@@ -310,4 +310,4 @@ function CastBack_Listings_restoreListing( $listing_id = null ) {
 	}
 	
 	if( $AJAX ) { echo ob_get_clean(); wp_die(); } else { return ob_get_clean(); }
-} add_action( 'wp_ajax_CastBack_Listings_restoreListing', 'CastBack_Listings_restoreListing' );
+} add_action( 'wp_ajax_Recast_Listings_restoreListing', 'Recast_Listings_restoreListing' );

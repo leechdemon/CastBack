@@ -1,5 +1,5 @@
 <?php
-function CastBack_filter_listings_status_update( $post_id ) {
+function Recast_filter_listings_status_update( $post_id ) {
 	$product = wc_get_product( $post_id );
 	if( $product && isset ( $_POST['acf']['field_688ce497d2c30'] ) ) {
 		$set_status( $_POST['acf']['field_688ce497d2c30'] );
@@ -7,9 +7,9 @@ function CastBack_filter_listings_status_update( $post_id ) {
 	}
 
 	return $post_id;
-} add_filter('acf/pre_save_post' , 'CastBack_filter_listings_status_update', 10, 1 );
+} add_filter('acf/pre_save_post' , 'Recast_filter_listings_status_update', 10, 1 );
 
-function CastBack_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
+function Recast_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
 	$product = wc_get_product( $post_id );
 	if( $product ) {
 		
@@ -108,23 +108,23 @@ function CastBack_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug 
 		
 		/* Format Prices */
 		if( isset ( $_POST['acf']['field_68964c94355ed'] ) && $_POST['acf']['field_68964c94355ed'] != '' ) { /* Listing > Listing Price */
-			update_field( 'listing_price', CastBack_Filter_formatPriceField( $_POST['acf']['field_68964c94355ed'] ), $post_id );
+			update_field( 'listing_price', Recast_Filter_formatPriceField( $_POST['acf']['field_68964c94355ed'] ), $post_id );
 			$product->set_regular_price( get_field( 'listing_price', $post_id ) );
 		}
 		if( isset ( $_POST['acf']['field_68964cb9355ee'] ) && $_POST['acf']['field_68964cb9355ee'] != '' ) { /* Listing > MSRP */
-			update_field( 'msrp', CastBack_Filter_formatPriceField( $_POST['acf']['field_68964cb9355ee'] ), $post_id );
+			update_field( 'msrp', Recast_Filter_formatPriceField( $_POST['acf']['field_68964cb9355ee'] ), $post_id );
 		}
 		if( isset ( $_POST['acf']['field_68e55d2432a2c'] ) && $_POST['acf']['field_68e55d2432a2c'] != '' ) { /* Listing > Shipping Price */
-			update_field( 'shipping_price', CastBack_Filter_formatPriceField( $_POST['acf']['field_68e55d2432a2c'] ), $post_id );
+			update_field( 'shipping_price', Recast_Filter_formatPriceField( $_POST['acf']['field_68e55d2432a2c'] ), $post_id );
 		}
 		
 		$product->save();
 	}
 
 	return $post_id;
-} add_filter('acf/save_post' , 'CastBack_Filters_changeAttribute' );
+} add_filter('acf/save_post' , 'Recast_Filters_changeAttribute' );
 
-function CastBack_Filter_updateListing_imageHandling( $post_id ) {
+function Recast_Filter_updateListing_imageHandling( $post_id ) {
 	$images = get_field( 'images', $post_id );
 	$attachment_ids = array();
 	
@@ -152,23 +152,23 @@ function CastBack_Filter_updateListing_imageHandling( $post_id ) {
 	update_post_meta( $post_id, '_product_image_gallery', implode( ',', $attachment_ids ) );
 	
 	return $post_id;
-} add_filter('acf/save_post' , 'CastBack_Filter_updateListing_imageHandling', 10, 1 );
+} add_filter('acf/save_post' , 'Recast_Filter_updateListing_imageHandling', 10, 1 );
 
-function CastBack_filter_listings_populate_seller_id($field) {
+function Recast_filter_listings_populate_seller_id($field) {
 		// Only run on the front-end
 		if (is_admin()) { return $field; }
 		$field['value'] = get_current_user_id(); // Set the value from a GET parameter
 		
 		return $field;
-} add_filter('acf/prepare_field/key=field_68c043d8de002', 'CastBack_filter_listings_populate_seller_id');
-function CastBack_filter_listings_populate_listing_id($field) {
+} add_filter('acf/prepare_field/key=field_68c043d8de002', 'Recast_filter_listings_populate_seller_id');
+function Recast_filter_listings_populate_listing_id($field) {
 		// Only run on the front-end
 		if (is_admin()) { return $field; }
 		$field['value'] = get_the_ID(); // Set the value from a GET parameter
 		
 		return $field;
-} add_filter('acf/prepare_field/key=field_68d42a88bab0f', 'CastBack_filter_listings_populate_listing_id');
-function CastBack_Filter_formatPriceField( $val = null ) {
+} add_filter('acf/prepare_field/key=field_68d42a88bab0f', 'Recast_filter_listings_populate_listing_id');
+function Recast_Filter_formatPriceField( $val = null ) {
 	// $field['value'] = number_format( $field['value'], 2 );
 	if( (float)$val ) {
 		$val = number_format( (float)$val, 2 );
@@ -178,15 +178,15 @@ function CastBack_Filter_formatPriceField( $val = null ) {
 
 
 /* Orders */
-function CastBack_filter_offers_populate_offer_id($field) {
+function Recast_filter_offers_populate_offer_id($field) {
 		/* Populates $order_id on new orders */
 		// Only run on the front-end
 		if (is_admin()) { return $field; }
 		$field['value'] = get_the_ID(); // Set the value from a GET parameter
 		
 		return $field;
-} add_filter('acf/prepare_field/key=field_68d429cd0734e', 'CastBack_filter_offers_populate_offer_id');
-function CastBack_Filter_renameHoldStatus( $order_statuses ) {
+} add_filter('acf/prepare_field/key=field_68d429cd0734e', 'Recast_filter_offers_populate_offer_id');
+function Recast_Filter_renameHoldStatus( $order_statuses ) {
     foreach ( $order_statuses as $key => $status ) {
         if ( 'wc-on-hold' === $key ) {
 					$order_statuses['wc-on-hold'] = _x( 'Disputed', 'Order status', 'woocommerce' );
@@ -196,10 +196,10 @@ function CastBack_Filter_renameHoldStatus( $order_statuses ) {
 				}
     }
     return $order_statuses;
-} add_filter( 'wc_order_statuses', 'CastBack_Filter_renameHoldStatus' );
+} add_filter( 'wc_order_statuses', 'Recast_Filter_renameHoldStatus' );
 
 /* Users */
-function CastBack_Filter_shopAddress( $user_id ) {
+function Recast_Filter_shopAddress( $user_id ) {
 	// $shop_address_1 = get_user_meta( $user_id, 'dokan_store_address[street_1]', true );
 	// $shop_address_2 = get_user_meta( $user_id, 'dokan_store_address[street_2]', true );
 	// $shop_city = get_user_meta( $user_id, 'dokan_store_address[city]', true );
@@ -241,6 +241,6 @@ function CastBack_Filter_shopAddress( $user_id ) {
 	update_user_meta( $user_id, 'dokan_address', $address_data );
 	// update_user_meta( $user_id, 'shop_phone', $shop_phone );
 } 
-// add_action( 'profile_update', 'CastBack_Filter_shopAddress' );
+// add_action( 'profile_update', 'Recast_Filter_shopAddress' );
 
 
