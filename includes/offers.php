@@ -100,19 +100,124 @@ function CastBack_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 		ob_start();
 		echo $output;
 		return ob_get_clean();
-	// }
+		// }
 }
-
+		
 /* - Security: Public */
-function CastBack_Offers_orderStatus_determine( $order_id ) {
+function CastBack_Offers_orderStatus_determine( $order_id, $user_id, $removeDispute = false ) {
 	if( $order_id ) { 
 		$order = wc_get_order( $order_id );	
 		if( $order ) { 
-			// Fix this!!
-			$order->update_status('checkout-draft');
+			$completedDate = strtotime( get_field( 'completed_date', $order_id ) );
+			$shippedDate = strtotime( get_field( 'shipped_date', $order_id ) );
+			$payment_date =strtotime(  get_field( 'payment_date', $order_id ) );
+			$acceptedDate = strtotime( get_field( 'accepted_date', $order_id ) );
+			$offers = get_field( 'offers', $order_id );
+			$current_date = strtotime( wp_date('F j, Y g:i:s a' ) );
+			
+			/* Determine Current Status */
+			if( $removeDispute == true ) {
+				if( $completedDate ) { $orderStatus = 'completed'; }
+				elseif( $shippedDate ) { $orderStatus = 'processing'; }
+				elseif( $paymentDate ) { $orderStatus = 'processing'; }
+				elseif( $acceptedDate ) { $orderStatus = 'payment'; }
+				else { $orderStatus = 'checkout-draft'; }
+
+				// $orderStatus = 'refunded';
+				// $orderStatus = 'cancelled';
+
+				/* Set the $orderStatus */
+				$order->update_status( $orderStatus );		
+				$order->add_order_note( 'CastBack_Offers_orderStatus_determine(removeDispute=true): '.$orderStatus.'.'  );
+			}
+				
+			/* Process Automations */
+			extract( get_field( 'automations', 'options' ) );
+
+			if( $acceptedDate && !$payment_date && !$completedDate ) { /* If Order Conditions are met... */
+				if( $autocancelunpaidorder['enabled'] ) { /* If the Automation is enabled... */
+					$delayInSeconds = 86400 * $autocancelunpaidorder['days'];
+
+					if( $acceptedDate + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
+						$order->update_status('wc-cancelled');
+						update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+						
+						CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
+						CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
+						
+						$note_text = '($'.end($offers)['offer_amount'].' offer cancelled)';
+						// $note_text = 'Offer cancelled. offer submitted by ' .get_userdata( $recipient_id )->display_name. '.';
+						$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autocancelUnpaidOrder().'  );
+					}
+				}
+			}
+			if( $shippedDate && !$completedDate) { /* If Order Conditions are met... */
+				if( $autocompleteshippedorder['enabled'] ) { /* If the Automation is enabled... */
+					$delayInSeconds = 86400 * $autocompleteshippedorder['days'];
+					
+					if( $shippedDate + $delayInSeconds < $current_date ) {
+						CastBack_sendEmailNotification( $order_id, 'CastBack_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+						
+						$order->update_status('wc-completed');
+						update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+						
+						// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
+						// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-seller', get_field( 'seller_id', $order_id ) );
+		
+						$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autocompleteShippedOrder().'  );
+					}
+				}
+			}
+			if( $payment_date && !$shippedDate ) { /* If Order Conditions are met... */
+				if( $autorefundunshippedorder['enabled'] ) { /* If the Automation is enabled... */
+					$delayInSeconds = 86400 * $autorefundunshippedorder['days'];
+				
+					if( $payment_date + $delayInSeconds < $current_date ) {
+						// $order->update_status('wc-cancelled');
+						
+						// Check if the order is already fully refunded
+						// if ($order->get_status() === 'refunded') {
+								// return new WP_Error('already_refunded', 'Order is already fully refunded.');
+						// }
+						
+						$refund_args = array(
+								'amount'         => $order->get_total(),
+								'reason'         => 'autorefundUnshippedOrder',
+								'order_id'       => $order_id,
+								// 'line_items'     => array(), // Use this to specify partial item refunds
+								'refund_payment' => true,    // Set to true to process refund via payment gateway
+								// 'restock_items'  => true,    // Set to true to restock items
+						);
+
+						$refund = wc_create_refund( $refund_args );
+						
+						// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+								
+						CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+						CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
+
+						$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autorefundUnshippedOrder().'  );
+					}
+				}
+			}
+			if( $offers && !$acceptedDate ) { /* If Order Conditions are met... */
+				if( $autocancelexpiredoffer['enabled'] ) { /* If the Automation is enabled... */
+					$offer = end($offers);
+					if( $offer['offer_expired_date'] == '' ) {
+						$delayInSeconds = 86400 * $autocancelexpiredoffer['days'];
+						
+						if( strtotime( $offer['offer_date'] ) + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
+							$order->add_order_note( 'CastBack_Offers_orderStatus_determine(): autocancelExpiredOffer().'  );
+							
+							update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
+							$success = CastBack_Action_expireOffer( $order_id, $user_id );
+						}
+					}
+				}
+			}
 		}
 	}
-}
+}		
 function CastBack_Offers_orderStatus_cosmetic( $order_id = null, $display = false ) {
 	if( $order_id ) {		
 		$order = wc_get_order( $order_id );	
@@ -184,30 +289,46 @@ function CastBack_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false
 	if( !$AJAX && isset( $_POST['AJAX'] ) ) { $AJAX = $_POST['AJAX']; }
 	if( !$order_id && isset( $_POST['order_id'] ) ) { $order_id = $_POST['order_id']; }
 
+	if( $AJAX && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
+	else { $user_id = get_current_user_id(); }
+	
+	CastBack_Offers_orderStatus_determine( $order_id, $user_id );
+	
 	$disputedDate = get_field( 'disputed_date', $order_id );
 	$waitingOn = get_field( 'waiting_on', $order_id );
 	$order = wc_get_order( $order_id );
 	$orderStatus = $order->get_status();
-	if( $AJAX && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
-	else { $user_id = get_current_user_id(); }
-	
+
 	if( !$disputedDate ) {
 		/* Accept / Submit Offer */
-		if( $orderStatus == 'checkout-draft' && $user_id == $waitingOn ) {		
+		if( $orderStatus == 'checkout-draft' ) {		
 			$reason = CastBack_userCanPurchase( get_current_user_id() );
 			if( $reason !== true ) { return $reason; }
 			else {
-				if( get_field( 'offers', $order_id ) ) {
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
-				}
-
-				$output .= '<p style="width: 100%; text-align: center;">(You may also make a counter-offer below)</p>';
-				
-				$output .= CastBack_Offers_ViewOfferPanel( $order_id );
-				$output .= '<div class="acf_offers" style="float: left; clear: both; width: 100%;">';
-					// $output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
+				$offers = get_field( 'offers', $order_id );
+				if( $user_id == $waitingOn ) {
+					/* Display Accept button (and expiration) */
+					if( end($offers)['offer_expired_date'] ) {
+						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
+					} else {
+						$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
+						}
+					
+					$output .= '<p style="width: 100%; text-align: center;">(You may also make a counter-offer below)</p>';
+	
+					$output .= CastBack_Offers_ViewOfferPanel( $order_id );
+					$output .= '<div class="acf_offers" style="float: left; clear: both; width: 100%;">';
+						// $output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
 					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:CastBack_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
-				$output .= '</div>';
+					$output .= '</div>';
+				} else {
+					if( end($offers)['offer_expired_date'] ) {
+						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
+					} else {
+						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">(Waiting on Accepted Offer)</a>';
+					}
+				}
+							
 			}
 		}		
 		/* Submit Payment */

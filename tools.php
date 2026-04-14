@@ -290,7 +290,12 @@ function CastBack_userHasCurrentOffer( $listing_id, $user_id = null ) {
 	/* Decide if Offers are a match */
 	if( $orders ) {
 		foreach( $orders as $order ) { 
-			if( $order['listing_id'] == $listing_id ) { $userHasCurrentOffer = $order['order_id']; }
+			if( $order['listing_id'] == $listing_id ) {
+				$orderExists = wc_get_order($order['order_id'] );
+				if( $orderExists ) { 
+					$userHasCurrentOffer = $order['order_id'];
+				}
+			}
 		}
 	}
 	
@@ -420,146 +425,186 @@ function CastBack_matchWCShopFields( $store_id, $dokan_settings ) { /* Unused, o
 		update_user_meta( $store_id, 'billing_phone', $_POST['phone'] );
 	}
 }
-function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) {
-	/* Set Dokan Phone */
-	// if( isset( $_POST['billing_phone'] ) ) {
-			// $dokan_settings['phone'] = sanitize_text_field( $_POST['billing_phone'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_phone', true );
-		// if( $field ) { $dokan_settings['phone'] = $field; }
-	// }
-	
-	/* Build Dokan Address Object */
-	// $dokan_address = $dokan_settings["address"];
-	// if( isset( $_POST['billing_address_1'] ) ) {
-			// $dokan_address['street_1'] = sanitize_text_field( $_POST['billing_address_1'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_address_1', true );
-		// if( $field ) { $dokan_address['street_1'] = $field; }
-	// }
-	// if( isset( $_POST['billing_address_2'] ) ) {
-			// $dokan_address['street_2'] = sanitize_text_field( $_POST['billing_address_2'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_address_2', true );
-		// if( $field ) { $dokan_address['street_2'] = $field; }
-	// }
-	// if( isset( $_POST['billing_city'] ) ) {
-			// $dokan_address['city'] = sanitize_text_field( $_POST['billing_city'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_city', true );
-		// if( $field ) { $dokan_address['city'] = $field; }
-	// }
-	// if( isset( $_POST['billing_postcode'] ) ) {
-			// $dokan_address['postcode'] = sanitize_text_field( $_POST['billing_postcode'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_postcode', true );
-		// if( $field ) { $dokan_address['postcode'] = $field; }
-	// }
-	// if( isset( $_POST['billing_country'] ) ) {
-			// $dokan_address['country'] = sanitize_text_field( $_POST['billing_country'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_country', true );
-		// if( $field ) { $dokan_address['country'] = $field; }
-	// }
-	// if( isset( $_POST['billing_state'] ) ) {
-			// $dokan_address['state'] = sanitize_text_field( $_POST['billing_state'] );
-	// } else {
-		// $field = get_user_meta( $store_id, 'billing_state', true );
-		// if( $field ) { $dokan_address['state'] = $field; }
-	// }
+function CastBack_matchDokanShopFields( $store_id, $dokan_settings ) { /* When Dokan address is saved, copy to Billing/Shipping */
+	/* Build Addresses from current Dokan Data */
+		/* Build Dokan Address Object */
+		$dokan_address = $dokan_settings["address"];
+		if( isset( $_POST['billing_address_1'] ) ) {
+				$dokan_address['street_1'] = sanitize_text_field( $_POST['billing_address_1'] );
+		} else {
+			$field = get_user_meta( $store_id, 'billing_address_1', true );
+			if( $field ) { $dokan_address['street_1'] = $field; }
+		}
+		if( isset( $_POST['billing_address_2'] ) ) {
+				$dokan_address['street_2'] = sanitize_text_field( $_POST['billing_address_2'] );
+		} else {
+			$field = get_user_meta( $store_id, 'billing_address_2', true );
+			if( $field ) { $dokan_address['street_2'] = $field; }
+		}
+		if( isset( $_POST['billing_city'] ) ) {
+				$dokan_address['city'] = sanitize_text_field( $_POST['billing_city'] );
+		} else {
+			$field = get_user_meta( $store_id, 'billing_city', true );
+			if( $field ) { $dokan_address['city'] = $field; }
+		}
+		if( isset( $_POST['billing_postcode'] ) ) {
+				$dokan_address['zip'] = sanitize_text_field( $_POST['billing_postcode'] );
+		} else {
+			$field = get_user_meta( $store_id, 'billing_postcode', true );
+			if( $field ) { $dokan_address['zip'] = $field; }
+		}
+		if( isset( $_POST['billing_country'] ) ) {
+				$dokan_address['country'] = sanitize_text_field( $_POST['billing_country'] );
+		} else {
+			$field = get_user_meta( $store_id, 'billing_country', true );
+			if( $field ) { $dokan_address['country'] = $field; }
+		}
+		if( isset( $_POST['billing_state'] ) ) {
+				$dokan_address['state'] = sanitize_text_field( $_POST['billing_state'] );
+		} else {
+			$field = get_user_meta( $store_id, 'billing_state', true );
+			if( $field ) { $dokan_address['state'] = $field; }
+		}
+	/* Build Addresses (end) */
 
 	/* Set Dokan Address */
-	// $dokan_settings['address'] = $dokan_address;
-	// update_user_meta( $store_id, 'dokan_profile_settings', $dokan_settings );
-	
-	/* Set WC Billing Address, Phone */
-	if( isset( $dokan_settings['address']['street_1'] ) ) {
-		if( !get_user_meta( $store_id, 'billing_address_1', true ) ) {
-			update_user_meta( $store_id, 'billing_address_1', $dokan_settings['address']['street_1'] );
-		}
-		if( !get_user_meta( $store_id, 'shipping_address_1', true ) ) {
-			update_user_meta( $store_id, 'shipping_address_1', $dokan_settings['address']['street_1'] );
-		}
-	}
-	if( isset( $dokan_settings['address']['street_2'] ) ) {
-		if( !get_user_meta( $store_id, 'billing_address_2', true ) ) {
-			update_user_meta( $store_id, 'billing_address_2', $dokan_settings['address']['street_2'] );
-		}
-		if( !get_user_meta( $store_id, 'shipping_address_2', true ) ) {
-			update_user_meta( $store_id, 'shipping_address_2', $dokan_settings['address']['street_2'] );
-		}
-	}
-	if( isset( $dokan_settings['address']['city'] ) ) {
-		if( !get_user_meta( $store_id, 'billing_city', true ) ) {
-			update_user_meta( $store_id, 'billing_city', $dokan_settings['address']['city'] );
-		}
-		if( !get_user_meta( $store_id, 'shipping_city', true ) ) {
-			update_user_meta( $store_id, 'shipping_city', $dokan_settings['address']['city'] );
-		}
-	}
-	if( isset( $dokan_settings['address']['zip'] ) ) {
-		if( !get_user_meta( $store_id, 'billing_postcode', true ) ) {
-			update_user_meta( $store_id, 'billing_postcode', $dokan_settings['address']['zip'] );
-		}
-		if( !get_user_meta( $store_id, 'shipping_postcode', true ) ) {
-			update_user_meta( $store_id, 'shipping_postcode', $dokan_settings['address']['zip'] );
-		}
-	}
-	if( isset( $dokan_settings['address']['country'] ) ) {
-		if( !get_user_meta( $store_id, 'billing_country', true ) ) {
-			update_user_meta( $store_id, 'billing_country', $dokan_settings['address']['country'] );
-		}
-		if( !get_user_meta( $store_id, 'shipping_country', true ) ) {
-			update_user_meta( $store_id, 'shipping_country', $dokan_settings['address']['country'] );
-		}
-	}
-	if( isset( $dokan_settings['address']['state'] ) ) {
-		if( !get_user_meta( $store_id, 'billing_state', true ) ) {
-			update_user_meta( $store_id, 'billing_state', $dokan_settings['address']['state'] );
-		}
-		if( !get_user_meta( $store_id, 'shipping_state', true ) ) {
-			update_user_meta( $store_id, 'shipping_state', $dokan_settings['address']['state'] );
-		}
+	$dokan_settings['address'] = $dokan_address;
+	update_user_meta( $store_id, 'dokan_profile_settings', $dokan_settings );
+
+	/* Set Dokan Phone */
+	if( isset( $_POST['billing_phone'] ) ) {
+		$dokan_settings['phone'] = sanitize_text_field( $_POST['billing_phone'] );
+	} else {
+		$field = get_user_meta( $store_id, 'billing_phone', true );
+		if( $field ) { $dokan_settings['phone'] = $field; }
 	}
 	
-	$first = get_user_meta( $store_id, 'first_name', true);
-	if( $first ) {
-		if( !get_user_meta( $store_id, 'billing_first_name', true ) ) {
-			update_user_meta( $store_id, 'billing_first_name', $first );
+
+	/* Set Values from Dokan */
+		/* Set WC Billing Address, Shipping Address */
+		if( isset( $dokan_settings['address']['street_1'] ) ) {
+			if( !get_user_meta( $store_id, 'billing_address_1', true ) ) {
+				update_user_meta( $store_id, 'billing_address_1', $dokan_settings['address']['street_1'] );
+			}
+			if( !get_user_meta( $store_id, 'shipping_address_1', true ) ) {
+				update_user_meta( $store_id, 'shipping_address_1', $dokan_settings['address']['street_1'] );
+			}
 		}
-		if( !get_user_meta( $store_id, 'shipping_first_name', true ) ) {
-			update_user_meta( $store_id, 'shipping_first_name', $first );
+		if( isset( $dokan_settings['address']['street_2'] ) ) {
+			if( !get_user_meta( $store_id, 'billing_address_2', true ) ) {
+				update_user_meta( $store_id, 'billing_address_2', $dokan_settings['address']['street_2'] );
+			}
+			if( !get_user_meta( $store_id, 'shipping_address_2', true ) ) {
+				update_user_meta( $store_id, 'shipping_address_2', $dokan_settings['address']['street_2'] );
+			}
 		}
-	}
-
-	$last = get_user_meta( $store_id, 'last_name', true);
-	if( $last ) {
-		if( !get_user_meta( $store_id, 'billing_last_name', true ) ) {
-			update_user_meta( $store_id, 'billing_last_name', $last );
+		if( isset( $dokan_settings['address']['city'] ) ) {
+			if( !get_user_meta( $store_id, 'billing_city', true ) ) {
+				update_user_meta( $store_id, 'billing_city', $dokan_settings['address']['city'] );
+			}
+			if( !get_user_meta( $store_id, 'shipping_city', true ) ) {
+				update_user_meta( $store_id, 'shipping_city', $dokan_settings['address']['city'] );
+			}
 		}
-		if( !get_user_meta( $store_id, 'shipping_last_name', true ) ) {
-			update_user_meta( $store_id, 'shipping_last_name', $last );
+		if( isset( $dokan_settings['address']['zip'] ) ) {
+			if( !get_user_meta( $store_id, 'billing_postcode', true ) ) {
+				update_user_meta( $store_id, 'billing_postcode', $dokan_settings['address']['zip'] );
+			}
+			if( !get_user_meta( $store_id, 'shipping_postcode', true ) ) {
+				update_user_meta( $store_id, 'shipping_postcode', $dokan_settings['address']['zip'] );
+			}
 		}
-	}
+		if( isset( $dokan_settings['address']['country'] ) ) {
+			if( !get_user_meta( $store_id, 'billing_country', true ) ) {
+				update_user_meta( $store_id, 'billing_country', $dokan_settings['address']['country'] );
+			}
+			if( !get_user_meta( $store_id, 'shipping_country', true ) ) {
+				update_user_meta( $store_id, 'shipping_country', $dokan_settings['address']['country'] );
+			}
+		}
+		if( isset( $dokan_settings['address']['state'] ) ) {
+			if( !get_user_meta( $store_id, 'billing_state', true ) ) {
+				update_user_meta( $store_id, 'billing_state', $dokan_settings['address']['state'] );
+			}
+			if( !get_user_meta( $store_id, 'shipping_state', true ) ) {
+				update_user_meta( $store_id, 'shipping_state', $dokan_settings['address']['state'] );
+			}
+		}
+		
+		/* If WC has a First Name, set it in billing, shipping */
+		$first = get_user_meta( $store_id, 'first_name', true);
+		if( $first ) {
+			if( !get_user_meta( $store_id, 'billing_first_name', true ) ) {
+				update_user_meta( $store_id, 'billing_first_name', $first );
+			}
+			if( !get_user_meta( $store_id, 'shipping_first_name', true ) ) {
+				update_user_meta( $store_id, 'shipping_first_name', $first );
+			}
+		}
+					
+		/* If WC has a Last Name, set it in billing, shipping */
+		$last = get_user_meta( $store_id, 'last_name', true);
+		if( $last ) {
+			if( !get_user_meta( $store_id, 'billing_last_name', true ) ) {
+				update_user_meta( $store_id, 'billing_last_name', $last );
+			}
+			if( !get_user_meta( $store_id, 'shipping_last_name', true ) ) {
+				update_user_meta( $store_id, 'shipping_last_name', $last );
+			}
+		}
 
-	// $dokan_settings = get_user_meta( $vendor_id, 'dokan_profile_settings', true );
-	// $phone = $dokan_settings['phone'];
-	// if( $phone ) {
-		// update_user_meta( $store_id, 'billing_phone', $phone);
+		/* If Dokan has a Last Name, set it in billing, shipping */
+		$dokan_settings = get_user_meta( $vendor_id, 'dokan_profile_settings', true );
+		$phone = $dokan_settings['phone'];
+		if( $phone ) {
+			update_user_meta( $store_id, 'billing_phone', $phone);
 
-		// /* If there's no shipping info, prefil that too. */
-		// if( !get_user_meta( $store_id, 'shipping_phone', true ) ) {
-			// update_user_meta( $store_id, 'shipping_phone', $phone );
-		// }
-	// }
-
-
-}
-/* Called by plugin "WP Webhooks Pro" - 2/11/26, JE */
-// add_action( 'dokan_store_profile_saved', 'CastBack_matchDokanShopFields', 10, 2 );
+			/* If there's no shipping info, prefil that too. */
+			if( !get_user_meta( $store_id, 'shipping_phone', true ) ) {
+				update_user_meta( $store_id, 'shipping_phone', $phone );
+			}
+		}
+	/* Set Values from Dokan (end) */
+} add_action( 'dokan_store_profile_saved', 'CastBack_matchDokanShopFields', 10, 2 );
 
 function CastBack_updateUserFields( $user_id, $old_user_data, $userdata ) {
 	$dokan_settings = dokan_get_store_info( $user_id );
 	CastBack_matchDokanShopFields( $user_id, $dokan_settings );
-} add_action( 'profile_update', 'CastBack_updateUserFields', 10, 3 );
+}
+
+function CastBack_prefillUserNamesFromAddress( $user_id, $load_address ) {
+	/* When a WC address is saved, update the account first/last if none exist */
+
+	$first = get_user_meta( $user_id, 'first_name', true );
+	if( !$first ) { /* If there is no First Name, save from POST data */
+		if( isset( $_POST['billing_first_name'] ) ) { $billingFirst = $_POST['billing_first_name']; }
+		if( isset( $_POST['shipping_first_name'] ) ) { $shippingFirst = $_POST['shipping_first_name']; }
+		
+		if( $billingFirst ) { wp_update_user( array( 'ID' => $user_id, 'first_name' => $billingFirst ) ); }
+		if( $shippingFirst ) { wp_update_user( array( 'ID' => $user_id, 'first_name' => $shippingFirst ) ); }
+	}
+	
+	$last = get_user_meta( $user_id, 'last_name', true );
+	if( !$last ) { /* If there is no Last Name, save from POST data */
+		if( isset( $_POST['billing_last_name'] ) ) { $billingLast = $_POST['billing_last_name']; }
+		if( isset( $_POST['shipping_last_name'] ) ) { $shippingLast = $_POST['shipping_last_name']; }
+		// if( isset( $_POST['shipping_first'] ) { $shippingFirst = $_POST['shipping_first']; }
+		
+		if( $billingLast ) { wp_update_user( array( 'ID' => $user_id, 'last_name' => $billingLast ) ); }
+		if( $shippingLast ) { wp_update_user( array( 'ID' => $user_id, 'last_name' => $shippingLast ) ); }
+	}
+} add_action( 'woocommerce_customer_save_address', 'CastBack_prefillUserNamesFromAddress', 10, 2 );
+
+// function CastBack_prefillUserPhoneFromAddress( $user_id ) {
+// 	/* When a Vendor is created, update the Dokan Phone with WC Address Phone if available */
+// 	if( $role == 'vendor' ) {
+// 		$billingPhone = get_user_meta( $user_id, 'billing_phone', true );
+// 		$shippingPhone = get_user_meta( $user_id, 'shipping_phone', true );
+		
+// 		if( $billingPhone ) { wp_update_user( array( 'ID' => $user_id, 'dokan_store_phone' => $billingPhone ) ); }
+// 		elseif( $shippingPhone ) { wp_update_user( array( 'ID' => $user_id, 'dokan_store_phone' => $shippingPhone ) ); }
+// 	}
+// } add_action( 'dokan_seller_registration_field_process', 'CastBack_prefillUserPhoneFromAddress', 10, 1 );
+
+
 // add_action( 'woocommerce_created_customer', 'CastBack_updateUserFields', 10, 2 );

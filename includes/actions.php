@@ -152,6 +152,11 @@
 		
 		
 		if( $success ) {
+			$offers = get_field( 'offers', $order_id );			
+			$note_text = 'New offer of $'.number_format( $order_amount, 2 ).' submitted by ' .get_userdata( $recipient_id )->display_name. '.';
+			$order = wc_get_order($order_id);
+			$order->add_order_note( $note_text );
+
 			// if( $user_id == $customer_id ) { $recipient_id = $seller_id; }
 			// if( $user_id == $seller_id ) { $recipient_id = $customer_id; }
 			
@@ -235,6 +240,9 @@
 		}
 				
 		if( $success ) {
+			$note_text = 'CastBack: Offer Accepted.';
+			$order->add_order_note( $note_text );
+
 			if( $AJAX ) {
 				// echo CastBack_Offers_drawOrderDetails( $order_id ); 
 				echo $order_id;
@@ -256,12 +264,19 @@
 		if( CastBack_customerSeller( $order_id ) || is_admin() ) {
 			$success = true;
 			$offers = get_field( 'offers', $order_id );
-
-			if($offers) {
-				$row = array(
-						'offer_expired_date'	=>	wp_date('F j, Y g:i:s a' ),
-				);
-				$success = update_row( 'offers', count($offers), $row, $order_id );
+			if( $offers ) {
+				$offer_expired_date = end($offers)['offer_expired_date'];
+				if ( !$offer_expired_date ) {
+					$row = array(
+							'offer_expired_date'	=>	wp_date('F j, Y g:i:s a' ),
+					);
+					$success = update_row( 'offers', count($offers), $row, $order_id );
+					
+					$note_text = '($'.end($offers)['offer_amount'].' offer cancelled)';
+					// $note_text = 'Offer cancelled. offer submitted by ' .get_userdata( $recipient_id )->display_name. '.';
+					$order = wc_get_order($order_id);
+					$order->add_order_note( $note_text );
+				}
 			}
 		}
 		
@@ -346,9 +361,15 @@
 						if( $success && !update_field( 'shipped_date', $trackingDate, $order_id ) ) { $success = false; }
 						if( $success && !update_field( 'waiting_on', $customer_id, $order_id ) ) { $success = false; }
 						$order = wc_get_order($order_id);
+
+						/* Only displays the note on the first order. IDK why. */
+						$note_text = "CastBack: Tracking number added: ".$trackingNumber.".";
+						$order->add_order_note( $note_text );
+						
 						if( $success && !$order->update_status('wc-processing') ) { $success = false; }
 					}
 				
+
 					if( $user_id == $customer_id ) { $waitingOn = $seller_id; }
 					else { $waitingOn = $customer_id; }
 					
@@ -434,7 +455,7 @@
 			if( $order_id ) {
 				$order = wc_get_order($order_id);
 				if( $order ) {
-					CastBack_offers_orderStatus_determine( $order_id );
+					CastBack_offers_orderStatus_determine( $order_id, null, true );
 					update_field( 'disputed_date', '', $order_id );
 				} else { $output .= 'Order #'.$order_id.' not found.'; }
 			} else { $output .= 'no order_id found.'; }
@@ -469,109 +490,3 @@
 			echo '<style>.wc-action-button-'.$action_slug.'::after { font-family: woocommerce !important; content: "\e029" !important; }</style>';
 	} add_action( 'admin_head', 'CastBack_Action_removeDispute_button_css' );
 	
-/* Order Automations */
-function CastBack_Action_autocompleteShippedOrder( $order_id, $user_id ) {
-	/* $user_id is used in child functions... */
-	
-	$shippedDate = get_field( 'shipped_date', $order_id );
-	$completedDate = get_field( 'completed_date', $order_id );
-	$automationDate = get_field( 'automation_date', $order_id );
-	$success = false;
-	
-	if( $shippedDate && !$completedDate) {
-		if( !$automationDate ) {
-			update_field( 'automation_date', wp_date('F j, Y g:i:s a' ), $order_id );
-
-			CastBack_sendEmailNotification( $order_id, 'CastBack_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
-		
-			/* start completeOrder() */
-			// CastBack_Action_completeOrder( $order_id, true );
-			$order = wc_get_order($order_id);
-			$order->update_status('wc-completed');
-			update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
-					
-			// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
-			// CastBack_sendEmailNotification( $order_id, 'CastBack-completeOrder-seller', get_field( 'seller_id', $order_id ) );
-			/* end completeOrder() */
-			
-			$success = true;
-		}
-	}
-	
-	return $success;
-}
-function CastBack_Action_autocancelUnpaidOrder( $order_id, $user_id ) {
-	/* $user_id is used in child functions... */
-	
-	$acceptedDate = get_field( 'accepted_date', $order_id );
-	$payment_date = get_field( 'payment_date', $order_id );
-	$automationDate = get_field( 'automation_date', $order_id );
-	$success = false;
-	
-	if( $acceptedDate && !$payment_date) {
-		if( !$automationDate ) {
-			update_field( 'automation_date', wp_date('F j, Y g:i:s a' ), $order_id );
-
-			/* start "cancelOrder"() */
-			$order = wc_get_order($order_id);
-			$order->update_status('wc-cancelled');
-			// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
-					
-			CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
-			CastBack_sendEmailNotification( $order_id, 'CastBack_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
-			/* end "cancelOrder"() */
-			
-			$success = true;
-		}
-	}
-	
-	return $success;
-}
-function CastBack_Action_autorefundUnshippedOrder( $order_id, $user_id ) {
-	/* $user_id is used in child functions... */
-	
-	$payment_date = get_field( 'payment_date', $order_id );
-	$shippedDate = get_field( 'shipped_date', $order_id );
-	$automationDate = get_field( 'automation_date', $order_id );
-	$success = false;
-	
-	if( $payment_date && !$shippedDate) {
-		if( !$automationDate ) {
-			update_field( 'automation_date', wp_date('F j, Y g:i:s a' ), $order_id );
-
-			/* start "cancelOrder"() */
-			$order = wc_get_order($order_id);
-			// $order->update_status('wc-cancelled');
-			
-			// Check if the order is already fully refunded
-			// if ($order->get_status() === 'refunded') {
-					// return new WP_Error('already_refunded', 'Order is already fully refunded.');
-			// }
-			
-			$refund_args = array(
-					'amount'         => $order->get_total(),
-					'reason'         => 'autorefundUnshippedOrder',
-					'order_id'       => $order_id,
-					// 'line_items'     => array(), // Use this to specify partial item refunds
-					'refund_payment' => true,    // Set to true to process refund via payment gateway
-					// 'restock_items'  => true,    // Set to true to restock items
-			);
-
-			// Create the refund using the built-in WooCommerce function
-			$refund = wc_create_refund( $refund_args );
-			// return $refund;
-			
-
-			
-			// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
-					
-			CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
-			CastBack_sendEmailNotification( $order_id, 'CastBack_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
-			/* end "cancelOrder"() */
-			
-			$success = true;
-		}
-	}
-	
-	return $success;
-}

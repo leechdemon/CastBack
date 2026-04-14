@@ -221,7 +221,8 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				}
 			}
 			else if( $field == 'test' ) {
-				if( in_array( get_current_user_id(), array( 1, 2, 3, 466, 538 ) ) ) {
+				if( get_current_user_id() == 1 ) {
+				// if( in_array( get_current_user_id(), array( 1, 2, 3, 466, 538 ) ) ) {
 					
 					// $listing_id = 2496; /* Pickle Balls */
 					$customer_id = get_current_user_id();
@@ -236,8 +237,11 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 						// echo '<a href="/offers/view-offer/?order_id='.$order_id.'">'.$order_id.'</a> - Last Viewed: '. $lastViewed .'<br>';
 					// }
 					
-					// if (CastBack_Action_autorefundUnshippedOrder( 3817, $customer_id )) { echo 'yay'; }
-					// else { echo 'boo'; }
+					// $response = CastBack_Action_expireOffer( $order_id );
+					// if ( $response ) { echo json_encode($response); }
+					
+						
+					CastBack_Offers_orderStatus_determine( 4150, $customer_id );
 
 				}
 			}
@@ -302,6 +306,9 @@ function CastBack_ShortcodeHandler( $atts, $content = null ) {
 				echo '<script>CastBack_Offers_updateTotalPrice();</script>';
 			}
 			else if( $field == 'ViewOrderActionButtons' ) {
+				$order = wc_get_order( $order_id );
+				Test( $order );
+
 				if( CastBack_customerSeller( $order_id ) || is_user_admin() ) {
 					echo '<div id="CastBack-ViewOrderActionButtons">'.CastBack_Offers_ViewOrderActionButtons( $order_id ).'</div>';
 				} else { echo 'This is not your order. Please try again. (" '.$order_id.' ", " '.$listing_id.' ", S627-10282025).'; }
