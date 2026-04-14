@@ -21,15 +21,15 @@ class Recast_Email_completeOrder_buyer extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_completeOrder_buyer';
-		$this->title       = __( 'Recast - completeOrder() - buyer', 'castback-email' );
-		$this->description = __( 'An email sent to the buyer when an offer is completed.', 'castback-email' );
+		$this->title       = __( 'Recast - completeOrder() - buyer', 'recast-email' );
+		$this->description = __( 'An email sent to the buyer when an offer is completed.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		$this->customer_email = true;
 		// $this->recipient = 'vendor@ofthe.product';
 		
-		$this->heading     = __( 'Order #{order_number}: Offer Completed!', 'castback-email' );
+		$this->heading     = __( 'Order #{order_number}: Offer Completed!', 'recast-email' );
 		// translators: placeholder is {blogname}, a variable that will be substituted when email is sent out
-		$this->subject     = sprintf( _x( 'Order #{order_number}: Offer Completed!', 'default email subject for offer completed (to the buyer).', 'castback-email' ), '{blogname}' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: Offer Completed!', 'default email subject for offer completed (to the buyer).', 'recast-email' ), '{blogname}' );
     
     // Template paths.
 		$this->template_html  = 'Recast-completeOrder-buyer.php';
@@ -45,8 +45,8 @@ class Recast_Email_completeOrder_buyer extends WC_Email {
 
 	function trigger( $user_email, $order_id ) {
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': Offer Completed!', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': Offer Completed!', 'default email subject for Offer Completed.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': Offer Completed!', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': Offer Completed!', 'default email subject for Offer Completed.', 'recast-email' ), 'Recast' );
 
 		if ( ! $this->is_enabled() ) {
 			return;

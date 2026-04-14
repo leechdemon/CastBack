@@ -21,15 +21,15 @@ class Recast_Email_submitOffer_recipient extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_submitOffer_recipient';
-		$this->title       = __( 'Recast - submitOffer() - recipient', 'castback-email' );
-		$this->description = __( 'An email sent to the recipient when an offer is submitted.', 'castback-email' );
+		$this->title       = __( 'Recast - submitOffer() - recipient', 'recast-email' );
+		$this->description = __( 'An email sent to the recipient when an offer is submitted.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'recipient@ofthe.offer';
 		
-		$this->heading     = __( 'Order #{order_number}: New Offer Recieved', 'castback-email' );
+		$this->heading     = __( 'Order #{order_number}: New Offer Recieved', 'recast-email' );
 		// translators: placeholder is {blogname}, a variable that will be substituted when email is sent out
-		$this->subject     = sprintf( _x( 'Order #{order_number}: New Offer Recieved', 'default email subject for new offers (recieved) once submitted.', 'castback-email' ), '{blogname}' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: New Offer Recieved', 'default email subject for new offers (recieved) once submitted.', 'recast-email' ), '{blogname}' );
     
     // Template paths.
 		$this->template_html  = 'Recast-submitOffer-recipient.php';
@@ -45,8 +45,8 @@ class Recast_Email_submitOffer_recipient extends WC_Email {
 
 	function trigger( $user_email, $order_id ) {
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': New Offer Received', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Offer Received', 'default email subject for New Offer Received.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': New Offer Received', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Offer Received', 'default email subject for New Offer Received.', 'recast-email' ), 'Recast' );
 
 		if ( ! $this->is_enabled() ) {
 			return;

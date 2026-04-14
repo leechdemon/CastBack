@@ -21,14 +21,14 @@ class Recast_Email_sendMessage_recipient extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_sendMessage_recipient';
-		$this->title       = __( 'Recast - sendMessage() - recipient', 'castback-email' );
-		$this->description = __( 'An email sent to the recipient when a message has been sent.', 'castback-email' );
+		$this->title       = __( 'Recast - sendMessage() - recipient', 'recast-email' );
+		$this->description = __( 'An email sent to the recipient when a message has been sent.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'recipient@ofthe.message';
 		
-		$this->heading     = __( 'Order #{order_number}: New Message Received', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #{order_number}: New Message Received', 'default email subject for New Message Received.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #{order_number}: New Message Received', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: New Message Received', 'default email subject for New Message Received.', 'recast-email' ), 'Recast' );
     
     // Template paths.
 		$this->template_html  = 'Recast-sendMessage-recipient.php';
@@ -47,8 +47,8 @@ class Recast_Email_sendMessage_recipient extends WC_Email {
 	function trigger( $user_email, $order_id ) {
 		// $this->object = wc_get_order( $order_id );
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': New Message Received', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Message Received', 'default email subject for New Message Received.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': New Message Received', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Message Received', 'default email subject for New Message Received.', 'recast-email' ), 'Recast' );
 		
 		if ( ! $this->is_enabled() || ! $user_email ) {
 			return;

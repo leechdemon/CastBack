@@ -21,15 +21,15 @@ class Recast_Email_acceptOffer_seller extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_acceptOffer_seller';
-		$this->title       = __( 'Recast - acceptOffer() - seller', 'castback-email' );
-		$this->description = __( 'An email sent to the seller when an offer is accepted.', 'castback-email' );
+		$this->title       = __( 'Recast - acceptOffer() - seller', 'recast-email' );
+		$this->description = __( 'An email sent to the seller when an offer is accepted.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'vendor@ofthe.product';
 		
-		$this->heading     = __( 'Order #{order_number}: Offer Accepted!', 'castback-email' );
+		$this->heading     = __( 'Order #{order_number}: Offer Accepted!', 'recast-email' );
 		// translators: placeholder is {blogname}, a variable that will be substituted when email is sent out
-		$this->subject     = sprintf( _x( 'Order #{order_number}: Offer Accepted!', 'default email subject for offer acceoted (to the seller).', 'castback-email' ), '{blogname}' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: Offer Accepted!', 'default email subject for offer acceoted (to the seller).', 'recast-email' ), '{blogname}' );
     
     // Template paths.
 		$this->template_html  = 'Recast-acceptOffer-seller.php';
@@ -45,8 +45,8 @@ class Recast_Email_acceptOffer_seller extends WC_Email {
 
 	function trigger( $user_email, $order_id ) {
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': Offer Accepted!', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': Offer Accepted!', 'default email subject for Offer Accepted.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': Offer Accepted!', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': Offer Accepted!', 'default email subject for Offer Accepted.', 'recast-email' ), 'Recast' );
 
 		if ( ! $this->is_enabled() ) {
 			return;

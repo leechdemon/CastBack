@@ -121,7 +121,7 @@ function Recast_Action_makeOfferNow_button( listing_id ) {
 	else { Buttons = document.getElementById( 'Recast-ViewOfferPanel' ); }
 	
 	Buttons.style.opacity = "0.5";
-	var order_amount = document.getElementById("castback_offer_amount").value;
+	var order_amount = document.getElementById("recast_offer_amount").value;
 	
 	jQuery.ajax({
 		type: "POST",
@@ -141,7 +141,7 @@ function Recast_Action_makeOfferNow_button( listing_id ) {
 }
 function Recast_Action_buyNow_button( listing_id ) {
 	document.getElementById( 'Recast-ViewOrderActionButtons' ).style.opacity = "0.5";
-	var order_amount = document.getElementById("castback_offer_amount").value;
+	var order_amount = document.getElementById("recast_offer_amount").value;
 	
 	jQuery.ajax({
 		type: "POST",
@@ -162,7 +162,7 @@ function Recast_Action_buyNow_button( listing_id ) {
 }
 function Recast_Action_sendMessage_button( order_id ) {
 	document.getElementById( 'Recast-ViewOrderActionButtons' ).style.opacity = "0.5";
-	var new_message = document.getElementById("castback_new_message").value;
+	var new_message = document.getElementById("recast_new_message").value;
 
 	jQuery.ajax({
 		type: "POST",
@@ -183,7 +183,7 @@ function Recast_Action_sendMessage_button( order_id ) {
 /* - Security: Recast_customerSeller() */
 function Recast_Action_submitOffer_button( order_id ) {
 	document.getElementById( 'Recast-ViewOrderActionButtons' ).style.opacity = "0.5";
-	var order_amount = document.getElementById("castback_offer_amount").value;
+	var order_amount = document.getElementById("recast_offer_amount").value;
 	
 	jQuery.ajax({
 		type: "POST",
@@ -219,7 +219,7 @@ function Recast_Action_acceptOffer_button( order_id ) {
 }
 function Recast_Action_addTracking_button( order_id ) {
 	document.getElementById( 'Recast-ViewOrderActionButtons' ).style.opacity = "0.5";
-	var new_tracking_number = document.getElementById("castback_new_tracking_number").value;
+	var new_tracking_number = document.getElementById("recast_new_tracking_number").value;
 	
 	jQuery.ajax({
 		type: "POST",
@@ -298,13 +298,13 @@ function Recast_Offers_refreshOrder( order_id ) {
 	// Recast_Offers_refreshOrder_Status( order_id );
 }
 function Recast_userHasOffers() {	
-	var offers = document.getElementsByClassName('castback-notification-customer');
+	var offers = document.getElementsByClassName('recast-notification-customer');
 	for( var i = 0; i < offers.length; i++) {
 		offers[i].firstChild.innerHTML = "<span style='color: red; font-weight: 800;'>**</span>" + "My Offers";
 	}
 }
 function Recast_userHasOrders() {	
-	var orders = document.getElementsByClassName('castback-notification-seller'); 
+	var orders = document.getElementsByClassName('recast-notification-seller'); 
 	for( var i = 0; i < orders.length; i++) {
 		orders[i].firstChild.innerHTML = "<span style='color: red; font-weight: 800;'>**</span>" + "Orders";
 	}

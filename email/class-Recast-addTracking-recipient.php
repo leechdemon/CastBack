@@ -21,14 +21,14 @@ class Recast_Email_addTracking_recipient extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_addTracking_recipient';
-		$this->title       = __( 'Recast - addTracking() - recipient', 'castback-email' );
-		$this->description = __( 'An email sent to the recipient when a Tracking Number has been sent.', 'castback-email' );
+		$this->title       = __( 'Recast - addTracking() - recipient', 'recast-email' );
+		$this->description = __( 'An email sent to the recipient when a Tracking Number has been sent.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'recipient@ofthe.trackingNumber';
 		
-		$this->heading     = __( 'Order #{order_number}: New Tracking Number Received', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #{order_number}: New Tracking Number Received', 'default email subject for New Tracking Number Received.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #{order_number}: New Tracking Number Received', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: New Tracking Number Received', 'default email subject for New Tracking Number Received.', 'recast-email' ), 'Recast' );
     
     // Template paths.
 		$this->template_html  = 'Recast-addTracking-recipient.php';
@@ -47,8 +47,8 @@ class Recast_Email_addTracking_recipient extends WC_Email {
 	function trigger( $user_email, $order_id ) {
 		// $this->object = wc_get_order( $order_id );
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': New Tracking Number Received', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Tracking Number Received', 'default email subject for New Tracking Number Received.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': New Tracking Number Received', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Tracking Number Received', 'default email subject for New Tracking Number Received.', 'recast-email' ), 'Recast' );
 		
 		if ( ! $this->is_enabled() || ! $user_email ) {
 			return;

@@ -86,9 +86,9 @@ function Recast_Listings_drawListing( $listing_id, $listingTemplate = null, $but
 				if( !$buttonPanelEnabled ) { $disabled = ' disabled'; }
 				else { echo '<h4 style="width: 100%; ">'.get_the_title( $listing_id ).'</h4>'; }
 				
-				echo '<div class="castback-listing'.$disabled.'">';
+				echo '<div class="recast-listing'.$disabled.'">';
 					/* Listing Panel */
-					echo '<div class="castback-listing-panel">';
+					echo '<div class="recast-listing-panel">';
 						// echo apply_filters('the_content', '[elementor-template id="'.$listingTemplate.'"]');
 						echo do_shortcode('[elementor-template id="'.$listingTemplate.'"]');
 					echo '</div>';

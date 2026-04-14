@@ -1,6 +1,6 @@
 <?php  
 function Recast_ShortcodeHandler( $atts, $content = null ) {
-		global $castbackVersion;
+		global $recastVersion;
 		extract(shortcode_atts(array( 'page' => null, 'action' => null, 'field' => null, 'button' => null, 'listing_id' => null, 'order_id' => null, 'featuredImage' => null, 'class' => null, 'setQuery' => null, 'posts_per_page' => null, 'location' => null, 'post_status' => null, 'method' => null, 'user_id' => null ), $atts));
 		
 
@@ -141,12 +141,12 @@ function Recast_ShortcodeHandler( $atts, $content = null ) {
 						
 						echo $bubble;
 						if( $method == 'customer' ) {
-							echo '<script>var offers = document.getElementsByClassName("castback-notification-customer");
+							echo '<script>var offers = document.getElementsByClassName("recast-notification-customer");
 								for( var i = 0; i < offers.length; i++) {
 									offers[i].firstChild.innerHTML = "'.$bubble.'" + "My Offers";
 								}</script>'; }
 						if( $method == 'seller' ) {
-							echo '<script>var orders = document.getElementsByClassName("castback-notification-seller"); 
+							echo '<script>var orders = document.getElementsByClassName("recast-notification-seller"); 
 								for( var i = 0; i < orders.length; i++) {
 									orders[i].firstChild.innerHTML = "'.$bubble.'" + "Orders";
 								}</script>'; }
@@ -283,7 +283,7 @@ function Recast_ShortcodeHandler( $atts, $content = null ) {
 			else if( $field == 'MOT' ) {
 				$MOT = Recast_Filter_formatPriceField( Recast_Offers_minimumOfferPrice() );
 				
-				echo '<strong id="castback_MOT" style="color: red;">$'.$MOT.'</strong>';
+				echo '<strong id="recast_MOT" style="color: red;">$'.$MOT.'</strong>';
 			}
 			else if( $field == 'TotalPrice' ) {
 				$shipping_price = get_field( 'shipping_price', $listing_id );
@@ -301,8 +301,8 @@ function Recast_ShortcodeHandler( $atts, $content = null ) {
 
 				$total_price = Recast_Offers_minimumOfferPrice( $total_price );				
 				
-				echo '<div id="castback_total_price"><strong>$'.$total_price.'</strong></div>';
-				// $output .= '<span class="castback_offer_amount_plusShipping">(+$<span id="offer_amount_plusShipping_value">'.$total_price.'</span> Shipping)</span>';
+				echo '<div id="recast_total_price"><strong>$'.$total_price.'</strong></div>';
+				// $output .= '<span class="recast_offer_amount_plusShipping">(+$<span id="offer_amount_plusShipping_value">'.$total_price.'</span> Shipping)</span>';
 				echo '<script>Recast_Offers_updateTotalPrice();</script>';
 			}
 			else if( $field == 'ViewOrderActionButtons' ) {

@@ -61,7 +61,7 @@ function Recast_editOrder($wp_admin_bar) {
         }
     }
 } add_action('admin_bar_menu', 'Recast_editOrder', 90);
-function castback_login_redirect($redirect = null, $user = null) {
+function recast_login_redirect($redirect = null, $user = null) {
     // Get the first of all the roles assigned to the user
     // $role = $user->roles[0];
     // $myaccount = '/my-account/';
@@ -79,7 +79,7 @@ function castback_login_redirect($redirect = null, $user = null) {
     
     if( $redirect ) { return '/my-account/'; }
     else { wp_safe_redirect( '/my-account/' ); }
-} add_action('woocommerce_login_redirect', 'castback_login_redirect', 10, 2);
+} add_action('woocommerce_login_redirect', 'recast_login_redirect', 10, 2);
 
 function Recast_sendEmailNotification( $order_id, $emailTemplate, $recipient_id = null ) {
 	if( $recipient_id ) {
@@ -331,7 +331,7 @@ function Recast_userRegistrationPrompt( $reason = null ) {
 	}
 	
 	$output .= '<h5>'.$cosmeticReason.'</h5><br>';
-	$output .= '<a href="'.$url.'" class="castback-button castback-button-important" target="_blank">'.$urlLabel.'</a>';
+	$output .= '<a href="'.$url.'" class="recast-button recast-button-important" target="_blank">'.$urlLabel.'</a>';
 	$output .= '</div>';
 
 	return $output;
@@ -344,8 +344,8 @@ function Recast_vendorRegistrationPrompt( $url = null ) {
 	$output = "";
 	$output .= '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem; border: solid 2px; border-radius: 0.5rem;">';
 	$output .= '<h5>Please complete Vendor Registration.</h5>';
-	$output .= '<a href="/about/why-register/" class="castback-button" target="_blank">Why Register?</a>';
-	$output .= '<a href="'.$url.'" class="castback-button castback-button-important" target="_blank">'.$label.'</a>';
+	$output .= '<a href="/about/why-register/" class="recast-button" target="_blank">Why Register?</a>';
+	$output .= '<a href="'.$url.'" class="recast-button recast-button-important" target="_blank">'.$label.'</a>';
 	$output .= '</div>';
 
 	return $output;

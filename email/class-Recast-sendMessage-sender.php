@@ -21,14 +21,14 @@ class Recast_Email_sendMessage_sender extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_sendMessage_sender';
-		$this->title       = __( 'Recast - sendMessage() - sender', 'castback-email' );
-		$this->description = __( 'An email sent to the sender when a message has been sent.', 'castback-email' );
+		$this->title       = __( 'Recast - sendMessage() - sender', 'recast-email' );
+		$this->description = __( 'An email sent to the sender when a message has been sent.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'sender@ofthe.message';
 		
-		$this->heading     = __( 'Order #{order_number}: New Message Sent', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #{order_number}: New Message Sent', 'default email subject for New Message Sent.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #{order_number}: New Message Sent', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: New Message Sent', 'default email subject for New Message Sent.', 'recast-email' ), 'Recast' );
     
     // Template paths.
 		$this->template_html  = 'Recast-sendMessage-sender.php';
@@ -47,8 +47,8 @@ class Recast_Email_sendMessage_sender extends WC_Email {
 	function trigger( $user_email, $order_id ) {
 		// $this->object = wc_get_order( $order_id );
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': New Message Sent', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Message Sent', 'default email subject for New Message Sent.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': New Message Sent', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Message Sent', 'default email subject for New Message Sent.', 'recast-email' ), 'Recast' );
 		
 		if ( ! $this->is_enabled() || ! $user_email ) {
 			return;

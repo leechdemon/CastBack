@@ -21,14 +21,14 @@ class Recast_Email_publishListing extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_publishListing';
-		$this->title       = __( 'Recast - publishListing()', 'castback-email' );
-		$this->description = __( 'An email sent to the vendor when a listing has been published.', 'castback-email' );
+		$this->title       = __( 'Recast - publishListing()', 'recast-email' );
+		$this->description = __( 'An email sent to the vendor when a listing has been published.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'vendor@ofthe.product';
 		
-		$this->heading     = __( 'Listing #{order_number}: Listing Published', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Listing #{order_number}: Listing Published', 'default email subject for listing published.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Listing #{order_number}: Listing Published', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Listing #{order_number}: Listing Published', 'default email subject for listing published.', 'recast-email' ), 'Recast' );
     
     // Template paths.
 		$this->template_html  = 'Recast-publishListing.php';
@@ -46,8 +46,8 @@ class Recast_Email_publishListing extends WC_Email {
 
 	function trigger( $user_email, $listing_id ) {
 		// $this->object = wc_get_order( $listing_id );
-		$this->heading     = __( 'Listing #'.$listing_id.': Listing Published', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Listing #'.$listing_id.': Listing Published', 'default email subject for new message sent.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Listing #'.$listing_id.': Listing Published', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Listing #'.$listing_id.': Listing Published', 'default email subject for new message sent.', 'recast-email' ), 'Recast' );
 		
 		if ( ! $this->is_enabled() || ! $user_email ) {
 			return;

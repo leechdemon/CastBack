@@ -306,7 +306,7 @@ function Recast_Settings_AddFieldGroups() {
 					array(
 						'key' => 'field_69271963c96c0',
 						'label' => 'Email - Introduction',
-						'name' => 'castback_emailintro',
+						'name' => 'recast_emailintro',
 						'aria-label' => '',
 						'type' => 'wysiwyg',
 						'instructions' => '',
@@ -330,7 +330,7 @@ function Recast_Settings_AddFieldGroups() {
 					array(
 						'key' => 'field_6927197fc96c1',
 						'label' => 'Email - Next Steps',
-						'name' => 'castback_emailnextsteps',
+						'name' => 'recast_emailnextsteps',
 						'aria-label' => '',
 						'type' => 'wysiwyg',
 						'instructions' => '',
@@ -352,7 +352,7 @@ function Recast_Settings_AddFieldGroups() {
 					array(
 						'key' => 'field_692719157e97f',
 						'label' => 'Email - Conclusion',
-						'name' => 'castback_emailoutro',
+						'name' => 'recast_emailoutro',
 						'aria-label' => '',
 						'type' => 'wysiwyg',
 						'instructions' => '',

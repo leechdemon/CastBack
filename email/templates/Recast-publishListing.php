@@ -30,10 +30,10 @@ $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improveme
 <?php do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <?php $template = Recast_getEmailTemplateFields( basename(__FILE__) ); ?>
-<?php echo '<p>'. $template['castback_emailintro'] . '</p>'; ?>
+<?php echo '<p>'. $template['recast_emailintro'] . '</p>'; ?>
 <?php echo '<p style="display: flex; margin: 2rem 0; width: 100%;"><a style="width: fit-content; text-decoration: none; background-color: #1E293B; padding: 8px 16px; margin: auto; border-radius: 0.25rem; color: white; font-weight: 800; text-transform: uppercase; font-size: smaller; letter-spacing: 0.1rem;" href="'.get_site_URL() . '/selling/edit-listing/?listing_id='.$listing_id.'">View Listing</a></p>'; ?>
-<?php echo '<p>'. $template['castback_emailnextsteps'] . '</p>'; ?>
-<?php echo '<p>'. $template['castback_emailoutro'] . '</p>'; ?>
+<?php echo '<p>'. $template['recast_emailnextsteps'] . '</p>'; ?>
+<?php echo '<p>'. $template['recast_emailoutro'] . '</p>'; ?>
 
 <?php echo $email_improvements_enabled ? '</div>' : ''; ?>
 

@@ -74,10 +74,10 @@ function Recast_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 			//$output .= $buyerOrSeller;
 			$notificationBubble = do_shortcode('[Recast action="userHasNotification" order_id="'.$order_id.'" method="'.$role.'"]');
 			//$notificationBubble = do_shortcode('[Recast action="userHasNotification" order_id="'.$order_id.'" user_id="'.$user_id.'" method="'.$buyerOrSeller.'"]');
-			$output .= '<h4 style="width: 100%; ">'.$notificationBubble.'Order #<span id="castback_order_id">'.$order_id.'</span> <span class="castback-orderStatus" style="font-size: smaller;">('.Recast_Offers_orderStatus_cosmetic( $order_id ).')</span></h4> ';
-			$output .= '<div class="castback-order">';
+			$output .= '<h4 style="width: 100%; ">'.$notificationBubble.'Order #<span id="recast_order_id">'.$order_id.'</span> <span class="recast-orderStatus" style="font-size: smaller;">('.Recast_Offers_orderStatus_cosmetic( $order_id ).')</span></h4> ';
+			$output .= '<div class="recast-order">';
 					$listing_id = get_field( 'listing_id', $order_id );
-					$output .= '<div class="castback-listing-panel">';
+					$output .= '<div class="recast-listing-panel">';
 						$output .= '<div style="width: fit-content; float: left;">';
 							$output .= Recast_Listings_drawListing( $listing_id, null, false, false );
 						$output .= '</div>';
@@ -89,7 +89,7 @@ function Recast_Offers( $method, $posts_per_page = null, $AJAX = false ) {
 			$output .= '</div>';
 		}
 	}
-	if( isset( $orderLimit ) ) { $output .= '<a class="castback-button elementor-button elementor-button-link" href="'.$title_url.'">View More</a>'; }
+	if( isset( $orderLimit ) ) { $output .= '<a class="recast-button elementor-button elementor-button-link" href="'.$title_url.'">View More</a>'; }
 	if( count($orders) < 1 ) {
 		$output .= 'You have no '.$offersOrders.'.';
 	}
@@ -309,23 +309,23 @@ function Recast_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false )
 				if( $user_id == $waitingOn ) {
 					/* Display Accept button (and expiration) */
 					if( end($offers)['offer_expired_date'] ) {
-						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
+						$output .= '<a class="recast-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
 					} else {
-						$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
+						$output .= '<a class="recast-button elementor-button elementor-button-link" href="javascript:Recast_Action_acceptOffer_button(\''.$order_id.'\')" style="width: 100%;">Accept Offer</a>';
 						}
 					
 					$output .= '<p style="width: 100%; text-align: center;">(You may also make a counter-offer below)</p>';
 	
 					$output .= Recast_Offers_ViewOfferPanel( $order_id );
 					$output .= '<div class="acf_offers" style="float: left; clear: both; width: 100%;">';
-						// $output .= '<input style="width: 100px;"id="castback_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
+						// $output .= '<input style="width: 100px;"id="recast_offer_amount" type="number" value="'.get_field( 'order_amount', $order_id ).'">';
+					$output .= '<a class="recast-button elementor-button elementor-button-link" href="javascript:Recast_Action_submitOffer_button(\''.$order_id.'\')" style="width: 100%;">Submit Offer</a>';
 					$output .= '</div>';
 				} else {
 					if( end($offers)['offer_expired_date'] ) {
-						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
+						$output .= '<a class="recast-button elementor-button elementor-button-link disabled" style="width: 100%;">Accept Offer (expired)</a>';
 					} else {
-						$output .= '<a class="castback-button elementor-button elementor-button-link disabled" style="width: 100%;">(Waiting on Accepted Offer)</a>';
+						$output .= '<a class="recast-button elementor-button elementor-button-link disabled" style="width: 100%;">(Waiting on Accepted Offer)</a>';
 					}
 				}
 							
@@ -334,7 +334,7 @@ function Recast_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false )
 		/* Submit Payment */
 		if( $orderStatus == 'pending' && get_current_user_id() == $waitingOn ) {
 			$output .= '<div class="acf_offers" style="float: left; clear: both;">';
-				$output .= '<a class="castback-button elementor-button elementor-button-link" href="'. $order->get_checkout_payment_url() .'">Pay Order</a>';
+				$output .= '<a class="recast-button elementor-button elementor-button-link" href="'. $order->get_checkout_payment_url() .'">Pay Order</a>';
 			$output .= '</div>';
 		}
 		
@@ -348,15 +348,15 @@ function Recast_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false )
 				$output .= do_shortcode('[Recast field="customerAddress"]');
 				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
 					$output .= '<h6 style="width: fit-content;">Tracking Number:</h6>';
-					$output .= '<input style="width: 100%; margin: 0.5rem 0;" id="castback_new_tracking_number" type="text">';
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_addTracking_button(\''.$order_id.'\')">Add Tracking Number</a>';
+					$output .= '<input style="width: 100%; margin: 0.5rem 0;" id="recast_new_tracking_number" type="text">';
+					$output .= '<a class="recast-button elementor-button elementor-button-link" href="javascript:Recast_Action_addTracking_button(\''.$order_id.'\')">Add Tracking Number</a>';
 				$output .= '</div>';
 			}
 			
 			/* Complete Order */
 			if( get_current_user_id() == $waitingOn && get_field( 'shipped_date', $order_id ) ) {
 				$output .= '<div class="acf_offers" style="float: left; clear: both;">';
-					$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_completeOrder_button(\''.$order_id.'\')">Complete Order</a>';
+					$output .= '<a class="recast-button elementor-button elementor-button-link" href="javascript:Recast_Action_completeOrder_button(\''.$order_id.'\')">Complete Order</a>';
 				$output .= '</div>';
 			}
 		}
@@ -378,7 +378,7 @@ function Recast_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 			/* Display History */
 			$output = '';
 			$output .= '<h5 style="">Offer History';	
-				$output .= '<a class="castback-order-refresh" href="javascript:Recast_Offers_refreshOrder('.$order_id.');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
+				$output .= '<a class="recast-order-refresh" href="javascript:Recast_Offers_refreshOrder('.$order_id.');" style="display: block; float: right; width: auto; padding-left: 0.5rem; font-size: small;">(Refresh)</a>';
 			$output .= '</h5>';
 			$output .= '<div class="offer_history">';
 
@@ -496,8 +496,8 @@ function Recast_Offers_ViewOfferSidebar( $order_id, $AJAX = true ) {
 			$output .= '<div class="acf_messages">';
 
 				/* Send Message */
-				$output .= '<input style="width: 100px;"id="castback_new_message" type="text-area">';
-				$output .= '<a class="castback-button elementor-button elementor-button-link" href="javascript:Recast_Action_sendMessage_button(\''.$order_id.'\')">Send Message</a>';
+				$output .= '<input style="width: 100px;"id="recast_new_message" type="text-area">';
+				$output .= '<a class="recast-button elementor-button elementor-button-link" href="javascript:Recast_Action_sendMessage_button(\''.$order_id.'\')">Send Message</a>';
 			
 			$output .= '</div>';
 		}

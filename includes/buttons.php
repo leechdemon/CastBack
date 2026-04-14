@@ -68,7 +68,7 @@ function Recast_Buttons_DrawButtonPanel_toggleSold( $post_id ) {
 		$buttonText = 'Mark Unavailable';
 	} else {
 		$method = 'markUnsold';
-		$classes .= 'castback-button-important';
+		$classes .= 'recast-button-important';
 		$buttonText = 'Mark Available';
 	}
 	if( $product->get_status() == 'trash' ) { $classes .= ' d-none'; }
@@ -84,7 +84,7 @@ function Recast_Buttons_DrawButtonPanel_togglePublish( $post_id ) {
 	} else if( $status == 'draft' ) {
 		$method = 'publishListing';
 		$buttonText =  'Publish Listing';
-		$classes .= 'castback-button-important';
+		$classes .= 'recast-button-important';
 	} else if( $status == 'trash' || $status == 'private' ) {
 		$method = 'publishListing';
 		$buttonText =  'Publish Listing';
@@ -102,7 +102,7 @@ function Recast_Buttons_DrawButtonPanel_deleteListing( $post_id ) {
 	if( $product->get_status() == 'trash' ) {
 		$method = 'restoreListing';
 		$buttonText =  'Restore Listing';
-		$classes .= 'castback-button-important';
+		$classes .= 'recast-button-important';
 	} else {
 		$method = 'deleteListing';
 		$buttonText =  'Archive Listing';
@@ -115,7 +115,7 @@ function Recast_Buttons_DrawButtonPanel_deleteListing( $post_id ) {
 function Recast_Buttons_DrawButtonPanel_buyNow( $post_id, $user_id = null ) {
 	$userCanPurchase = Recast_userCanPurchase( $user_id );
 	if( $userCanPurchase === true ) {
-		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_buyNow_button('.$post_id.')">Buy Now</button>';
+		return '<button class="recast-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_buyNow_button('.$post_id.')">Buy Now</button>';
 	}
 	else { return Recast_userRegistrationPrompt( $userCanPurchase ); }
 }
@@ -135,48 +135,48 @@ function Recast_Buttons_DrawButtonPanel_makeOffer_amount( $post_id ) {
 		$shipping_price = get_field( 'shipping_price', $listing_id );
 	}
 
-	$output .= '<div class="castback_offer_amount_wrapper">';
-		$output .= '<input id="castback_offer_amount" type="number" value="'.$offer_amount.'">';
+	$output .= '<div class="recast_offer_amount_wrapper">';
+		$output .= '<input id="recast_offer_amount" type="number" value="'.$offer_amount.'">';
 		$output .= '<span style="display:none;" id="shipping_price">'.$shipping_price.'</span>';
 		if( $shipping_price && $offer_amount ) { $total_price = (float)$shipping_price + (float)$offer_amount; }
 		
-		if( $total_price < Recast_Offers_minimumOfferPrice() ) { $castback_MOT_flag_display = 'flex'; }
-		else { $castback_MOT_flag_display = 'none'; }
+		if( $total_price < Recast_Offers_minimumOfferPrice() ) { $recast_MOT_flag_display = 'flex'; }
+		else { $recast_MOT_flag_display = 'none'; }
 		
-		$output .= '<span id="castback_MOT_flag" style="color: red; display: '.$castback_MOT_flag_display.';">*</span>';
+		$output .= '<span id="recast_MOT_flag" style="color: red; display: '.$recast_MOT_flag_display.';">*</span>';
 		
 		$output .= "<script>function Recast_Offers_updateTotalPrice( price ) {			
 			var shippingPrice = document.getElementById('shipping_price').innerHTML;
 			if( !parseFloat( shippingPrice ) ) { shippingPrice = 0; }
 			else { shippingPrice = parseFloat( shippingPrice ); }
 			
-			var newAmount = parseFloat( document.getElementById('castback_offer_amount').value ) + shippingPrice;
+			var newAmount = parseFloat( document.getElementById('recast_offer_amount').value ) + shippingPrice;
 				
 			if( newAmount < ".Recast_Offers_minimumOfferPrice()." ) {
 				newAmount = ".Recast_Offers_minimumOfferPrice().";
-				document.getElementById('castback_MOT_flag').style.display = 'flex';
-				document.getElementById('castback_MOT_container').style.display = 'flex';
+				document.getElementById('recast_MOT_flag').style.display = 'flex';
+				document.getElementById('recast_MOT_container').style.display = 'flex';
 			} else {
-				document.getElementById('castback_MOT_flag').style.display = 'none';
-				document.getElementById('castback_MOT_container').style.display = 'none';
+				document.getElementById('recast_MOT_flag').style.display = 'none';
+				document.getElementById('recast_MOT_container').style.display = 'none';
 			}
-			document.getElementById('castback_total_price').innerHTML = '<strong>$'+newAmount.toFixed(2)+'</strong>';
+			document.getElementById('recast_total_price').innerHTML = '<strong>$'+newAmount.toFixed(2)+'</strong>';
 		}</script>";
 		
 		$output .= "<script>
-			const castback_offer_amount = document.getElementById('castback_offer_amount');
-			castback_offer_amount.addEventListener( 'change', Recast_Offers_updateTotalPrice );
+			const recast_offer_amount = document.getElementById('recast_offer_amount');
+			recast_offer_amount.addEventListener( 'change', Recast_Offers_updateTotalPrice );
 		</script>";	
 	$output .= '</div>';
 	return $output;
 }
 function Recast_Buttons_DrawButtonPanel_makeOffer( $post_id ) {
-	return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_makeOffer_button('.$post_id.')">Make Offer</button>';
+	return '<button class="recast-button-important" style="margin-bottom: 0.5rem; width: 100%;" type="reset" onclick="javascript:Recast_Action_makeOffer_button('.$post_id.')">Make Offer</button>';
 }
 function Recast_Buttons_DrawButtonPanel_makeOfferNow( $post_id, $user_id = null ) {
 	$userCanPurchase = Recast_userCanPurchase( $user_id );
 	if( $userCanPurchase === true ) {
-		return '<button class="castback-button-important" style="margin-bottom: 0.5rem; width: 60%;" type="reset" onclick="javascript:Recast_Action_makeOfferNow_button('.$post_id.')">Make Offer Now!</button>';
+		return '<button class="recast-button-important" style="margin-bottom: 0.5rem; width: 60%;" type="reset" onclick="javascript:Recast_Action_makeOfferNow_button('.$post_id.')">Make Offer Now!</button>';
 	}
 	else { return Recast_userRegistrationPrompt( $userCanPurchase ); }
 }

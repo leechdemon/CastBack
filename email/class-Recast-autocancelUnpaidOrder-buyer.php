@@ -21,14 +21,14 @@ class Recast_Email_autocancelUnpaidOrder_buyer extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_autocancelUnpaidOrder_buyer';
-		$this->title       = __( 'Recast - autocancelUnpaidOrder() - buyer', 'castback-email' );
-		$this->description = __( 'An email sent to the buyer when an offer has been accepted, but not paid.', 'castback-email' );
+		$this->title       = __( 'Recast - autocancelUnpaidOrder() - buyer', 'recast-email' );
+		$this->description = __( 'An email sent to the buyer when an offer has been accepted, but not paid.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		$this->customer_email = true;
 		// $this->recipient = 'vendor@ofthe.product';
 		
-		$this->heading     = __( 'Order #{order_number}: Autocancel Unpaid Order', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #{order_number}: Autocancel Unpaid Order', 'An email sent to the buyer when an offer has been accepted, but not paid.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #{order_number}: Autocancel Unpaid Order', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: Autocancel Unpaid Order', 'An email sent to the buyer when an offer has been accepted, but not paid.', 'recast-email' ), 'Recast' );
     
     // Template paths.
 		$this->template_html  = 'Recast-autocancelUnpaidOrder-buyer.php';
@@ -46,8 +46,8 @@ class Recast_Email_autocancelUnpaidOrder_buyer extends WC_Email {
 
 	function trigger( $user_email, $order_id ) {
 		$this->object = wc_get_order( $order_id );
-		$this->heading     = __( 'Order #'.$order_id.': Autocancel Unpaid Order', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'.$order_id.': Autocancel Unpaid Order', 'An email sent to the buyer when an offer has been accepted, but not paid.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'.$order_id.': Autocancel Unpaid Order', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'.$order_id.': Autocancel Unpaid Order', 'An email sent to the buyer when an offer has been accepted, but not paid.', 'recast-email' ), 'Recast' );
 		
 		if ( ! $this->is_enabled() || ! $user_email ) {
 			return;

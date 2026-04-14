@@ -21,14 +21,14 @@ class Recast_Email_autorefundUnshippedOrder_seller extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_autorefundUnshippedOrder_seller';
-		$this->title       = __( 'Recast - autorefundUnshippedOrder() - seller', 'castback-email' );
-		$this->description = __( 'An email sent to the seller when an offer has been paid, but not shipped.', 'castback-email' );
+		$this->title       = __( 'Recast - autorefundUnshippedOrder() - seller', 'recast-email' );
+		$this->description = __( 'An email sent to the seller when an offer has been paid, but not shipped.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'vendor@ofthe.product';
 		
-		$this->heading     = __( 'Order #{order_number}: Autorefund Unshipped Order', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #{order_number}: Autorefund Unshipped Order', 'An email sent to the seller when an offer has been paid, but not shipped.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #{order_number}: Autorefund Unshipped Order', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: Autorefund Unshipped Order', 'An email sent to the seller when an offer has been paid, but not shipped.', 'recast-email' ), 'Recast' );
     
     // Template paths.
 		$this->template_html  = 'Recast-autorefundUnshippedOrder-seller.php';
@@ -46,8 +46,8 @@ class Recast_Email_autorefundUnshippedOrder_seller extends WC_Email {
 
 	function trigger( $user_email, $order_id ) {
 		$this->object = wc_get_order( $order_id );
-		$this->heading     = __( 'Order #'.$order_id.': Autorefund Unshipped Order', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'.$order_id.': Autorefund Unshipped Order', 'An email sent to the seller when an offer has been paid, but not shipped.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'.$order_id.': Autorefund Unshipped Order', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'.$order_id.': Autorefund Unshipped Order', 'An email sent to the seller when an offer has been paid, but not shipped.', 'recast-email' ), 'Recast' );
 		
 		if ( ! $this->is_enabled() || ! $user_email ) {
 			return;

@@ -21,15 +21,15 @@ class Recast_Email_submitOffer_sender extends WC_Email {
 	function __construct() {
     // Email slug we can use to filter other data.
 		$this->id          = 'Recast_submitOffer_sender';
-		$this->title       = __( 'Recast - submitOffer() - sender', 'castback-email' );
-		$this->description = __( 'An email sent to the sender when an offer is submitted.', 'castback-email' );
+		$this->title       = __( 'Recast - submitOffer() - sender', 'recast-email' );
+		$this->description = __( 'An email sent to the sender when an offer is submitted.', 'recast-email' );
     // For admin area to let the user know we are sending this email to customers.
 		// $this->customer_email = true;
 		$this->recipient = 'sender@ofthe.offer';
 		
-		$this->heading     = __( 'Order #{order_number}: New Offer Recieved', 'castback-email' );
+		$this->heading     = __( 'Order #{order_number}: New Offer Recieved', 'recast-email' );
 		// translators: placeholder is {blogname}, a variable that will be substituted when email is sent out
-		$this->subject     = sprintf( _x( 'Order #{order_number}: New Offer Recieved', 'default email subject for new offers (recieved) once submitted.', 'castback-email' ), '{blogname}' );
+		$this->subject     = sprintf( _x( 'Order #{order_number}: New Offer Recieved', 'default email subject for new offers (recieved) once submitted.', 'recast-email' ), '{blogname}' );
     
     // Template paths.
 		$this->template_html  = 'Recast-submitOffer-sender.php';
@@ -45,8 +45,8 @@ class Recast_Email_submitOffer_sender extends WC_Email {
 
 	function trigger( $user_email, $order_id ) {
 		$this->order_id = $order_id;
-		$this->heading     = __( 'Order #'. $order_id. ': New Offer Sent', 'castback-email' );
-		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Offer Sent', 'default email subject for New Offer Sent.', 'castback-email' ), 'Recast' );
+		$this->heading     = __( 'Order #'. $order_id. ': New Offer Sent', 'recast-email' );
+		$this->subject     = sprintf( _x( 'Order #'. $order_id. ': New Offer Sent', 'default email subject for New Offer Sent.', 'recast-email' ), 'Recast' );
 
 		if ( ! $this->is_enabled() ) {
 			return;

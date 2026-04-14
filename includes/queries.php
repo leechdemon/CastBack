@@ -16,7 +16,7 @@ function custom_query_shop( $query ) {
 		$query->set( 'posts_per_page', '1' );
 	} else { $query->set( 'posts_per_page', '20' ); }
 	
-} add_action( 'elementor/query/castback-shop' , 'custom_query_shop'  ); 
+} add_action( 'elementor/query/recast-shop' , 'custom_query_shop'  ); 
 function custom_query_offer( $query ) {
 	// $args = array( 'object_type' => array( 'product' ) );
 	
@@ -36,7 +36,7 @@ function custom_query_offer( $query ) {
 		// $query->set( 'posts_per_page', '1' );
 	// }
 	// else { $query->set( 'posts_per_page', '20' ); }
-} add_action( 'elementor/query/castback-offer' , 'custom_query_offer'  ); 
+} add_action( 'elementor/query/recast-offer' , 'custom_query_offer'  ); 
 function custom_query_edit( $query ) {	
 	if( isset( $_GET['listing_status'] ) ) { $listing_status = $_GET['listing_status']; }
 	else { $listing_status = array( 'draft', 'publish' ); } 
@@ -72,7 +72,7 @@ function custom_query_edit( $query ) {
 	// Test( $listing_status );
 	
 	// $query->set( 'post_category', $_POST['acf'][''] );
-} add_action( 'elementor/query/castback-edit' , 'custom_query_edit'  ); 
+} add_action( 'elementor/query/recast-edit' , 'custom_query_edit'  ); 
 
 function Recast_Queries_shopFilterButtons( $method = null ) {
 	$args = array( 'object_type' => array( 'product' ) );
@@ -192,20 +192,20 @@ function Recast_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 		
 		// Test( $method );
 		if( $method == 'shop' ) {
-			echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $_GET, get_term_link( $term ) ) ).'">'.$term->name.'</a>';
+			echo '<a class="Recast-shopFilter-termLabel recast-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $_GET, get_term_link( $term ) ) ).'">'.$term->name.'</a>';
 		}
 		else if( $method == 'archive' ) {
 			if( is_tax( $tax->name ) ) {
 				if( is_tax( $tax->name, $term->slug ) ) {
-					echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, '/shop' ) ) .'">'.$term->name.'</a>'; 
+					echo '<a class="Recast-shopFilter-termLabel recast-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, '/shop' ) ) .'">'.$term->name.'</a>'; 
 				}	
 				else {
-					echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, get_term_link( $term ) ) ) .'">'.$term->name.'</a>'; 
+					echo '<a class="Recast-shopFilter-termLabel recast-button'.$activeLabel.'" href="'. remove_query_arg( $tax->name, add_query_arg( $_GET, get_term_link( $term ) ) ) .'">'.$term->name.'</a>'; 
 				}
 			}
 			else { /* If this is a secondary term... */
-				if( $active == true ) { echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( remove_query_arg( $tax->name ) ).'">'.$term->name.'</a>'; }
-				else { echo '<a class="Recast-shopFilter-termLabel castback-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $tax->name, $term->slug ) ).'">'.$term->name.'</a>'; }
+				if( $active == true ) { echo '<a class="Recast-shopFilter-termLabel recast-button'.$activeLabel.'" href="'.esc_url_raw( remove_query_arg( $tax->name ) ).'">'.$term->name.'</a>'; }
+				else { echo '<a class="Recast-shopFilter-termLabel recast-button'.$activeLabel.'" href="'.esc_url_raw( add_query_arg( $tax->name, $term->slug ) ).'">'.$term->name.'</a>'; }
 			}
 		}
 	}
@@ -231,9 +231,9 @@ function Recast_Queries_listingFilterButtons() {
 			$active['stock_status']['all'] = ' active';
 		}
 		
-		echo '<a class="castback-button'.$active['stock_status']['all'].'" href="'.esc_url_raw( remove_query_arg( 'stock_status', get_the_permalink() ) ).'">Show All</a>';
-		echo '<a class="castback-button'.$active['stock_status']['instock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'instock', get_the_permalink() ) ).'">Available</a>';
-		echo '<a class="castback-button'.$active['stock_status']['outofstock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'outofstock', get_the_permalink() ) ).'">Not Available</a>';
+		echo '<a class="recast-button'.$active['stock_status']['all'].'" href="'.esc_url_raw( remove_query_arg( 'stock_status', get_the_permalink() ) ).'">Show All</a>';
+		echo '<a class="recast-button'.$active['stock_status']['instock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'instock', get_the_permalink() ) ).'">Available</a>';
+		echo '<a class="recast-button'.$active['stock_status']['outofstock'].'" href="'.esc_url_raw( add_query_arg( 'stock_status', 'outofstock', get_the_permalink() ) ).'">Not Available</a>';
 	echo '</div>';
 	
 		/* Post Status */
@@ -247,10 +247,10 @@ function Recast_Queries_listingFilterButtons() {
 			$active['listing_status']['publish'] = ' active';
 		}
 		
-		echo '<a class="castback-button'.$active['listing_status']['draft'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'draft', get_the_permalink() ) ).'">Draft</a>';
-		echo '<a class="castback-button'.$active['listing_status']['publish'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'publish', get_the_permalink() ) ).'">Active</a>';
-		echo '<a class="castback-button'.$active['listing_status']['trash'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'trash', get_the_permalink() ) ).'">Trash</a>';
-		echo '<a class="castback-button'.$active['listing_status']['all'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'all', get_the_permalink() ) ).'">Show All</a>';
+		echo '<a class="recast-button'.$active['listing_status']['draft'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'draft', get_the_permalink() ) ).'">Draft</a>';
+		echo '<a class="recast-button'.$active['listing_status']['publish'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'publish', get_the_permalink() ) ).'">Active</a>';
+		echo '<a class="recast-button'.$active['listing_status']['trash'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'trash', get_the_permalink() ) ).'">Trash</a>';
+		echo '<a class="recast-button'.$active['listing_status']['all'].'" href="'.esc_url_raw( add_query_arg( 'listing_status', 'all', get_the_permalink() ) ).'">Show All</a>';
 	echo '</div>';
 	
 	
