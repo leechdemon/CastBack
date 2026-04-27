@@ -11,6 +11,12 @@ if (!function_exists('Test')) {
         }
     }
 }
+function Recast_FooterTest() {
+	// $taxonomies = get_taxonomies();
+	// foreach( $taxonomies as $taxonomy ) { 
+	// 	Test( $taxonomy );
+	// }
+} add_action('wp_footer', 'Recast_FooterTest');
 function Recast_editListing($wp_admin_bar) {
     if (!is_admin()) {
         $listing_id = '';
@@ -61,14 +67,16 @@ function Recast_editOrder($wp_admin_bar) {
         }
     }
 } add_action('admin_bar_menu', 'Recast_editOrder', 90);
-function recast_login_redirect($redirect = null, $user = null) {
+function Recast_login_redirect($redirect = null, $user = null) {
     // Get the first of all the roles assigned to the user
-    // $role = $user->roles[0];
-    // $myaccount = '/my-account/';
+    $role = $user->roles[0];
+    $myAccount = '/my-account/';
+    $myVendor = '/my-account/vendor/settings/payment-manage-dokan_stripe_express/';
 
     // if( $role == '123123123' ) { $redirect = $myaccount; }
-    // if( $role == 'administrator' ) { $redirect = $myaccount; }
-    // elseif ( $role == 'customer' || $role == 'vendor' || $role == 'dc_vendor' ) { $redirect = $myaccount; }
+    if( $role == 'administrator' ) { $redirect = $myAccount; }
+    elseif ( $role == 'seller'  ) { $redirect = $myVendor; }
+    elseif ( $role == 'customer'  ) { $redirect = $myVendor; }
     // $redirect = '';
     // echo $redirect;
     // $redirect = '123';
@@ -77,9 +85,10 @@ function recast_login_redirect($redirect = null, $user = null) {
     
 
     
-    if( $redirect ) { return '/my-account/'; }
+    if( $redirect ) { return $redirect; }
     else { wp_safe_redirect( '/my-account/' ); }
-} add_action('woocommerce_login_redirect', 'recast_login_redirect', 10, 2);
+} 
+// add_action('woocommerce_login_redirect', 'Recast_login_redirect', 10, 2);
 
 function Recast_sendEmailNotification( $order_id, $emailTemplate, $recipient_id = null ) {
 	if( $recipient_id ) {

@@ -400,6 +400,8 @@ function Recast_Settings_AddFieldGroups() {
 } add_action( 'acf/include_fields', 'Recast_Settings_AddFieldGroups' );
 
 function Recast_Settings_FAQ() {
+	global $recastVersion;
+
 	if( $_GET['page'] == 'ld-tools' ) { 
 		echo '<style>
 			.ldtools_tooltip::before { content: "(explain this...)"; }
@@ -437,8 +439,15 @@ function Recast_Settings_FAQ() {
 		$divID = 'ldtools_tooltip_faq';
 		echo '<script>document.getElementById("'.$divID.'").innerHTML = "<iframe width=\"560\" height=\"315\" src=\"'.$videoURL.'\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";</script>';
 		
-		$divID = 'ldtools_tooltip_advanced';
-		echo '<script>document.getElementById("'.$divID.'").innerHTML = "<iframe width=\"560\" height=\"315\" src=\"'.$videoURL.'\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";</script>';
+		$divID = 'ldtools_faq';
+		$videoURL = 'https://www.leechdemon.com/ld-tools/faq?elementor-template=default'.'?v='.$recastVersion;
+		echo '<script>document.getElementById("'.$divID.'").innerHTML = "<iframe width=\"100%\" height=\"800\" src=\"'.$videoURL.'\" title=\"LD Tools - FAQ\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";</script>';
+		// echo '<script>var BlogMain = document.getElementsByClassName("blog-main")[0];</script>';
+		// echo '<script>document.getElementById("'.$divID.'").appendChild( BlogMain );</script>';
+
+		$divID = 'ldtools_advanced';
+		$videoURL = 'https://www.youtube.com/embed/u3CKgkyc7Qo?si=ZrtPmpRN5fhWD14q';
+		echo '<script>document.getElementById("'.$divID.'").innerHTML = "<iframe width=\"560\" height=\"315\" src=\"'.$videoURL.'\" title=\"LD Tools - Advanced" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";</script>';
 	}
 } add_action('admin_footer', 'Recast_Settings_FAQ');
 
