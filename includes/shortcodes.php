@@ -1,6 +1,7 @@
 <?php  
 function Recast_ShortcodeHandler( $atts, $content = null ) {
 		global $recastVersion;
+
 		extract(shortcode_atts(array( 'page' => null, 'action' => null, 'field' => null, 'button' => null, 'listing_id' => null, 'order_id' => null, 'featuredImage' => null, 'class' => null, 'setQuery' => null, 'posts_per_page' => null, 'location' => null, 'post_status' => null, 'method' => null, 'user_id' => null ), $atts));
 		
 
@@ -18,13 +19,15 @@ function Recast_ShortcodeHandler( $atts, $content = null ) {
 			/* We only show pages to logged-in users... */
 			/* ... or 'DrawListing'... */
 			if( is_user_logged_in() || $page == 'DrawListing' ) {
+			
 				echo '<div id="Recast-'.$page.'">';
 				if( $page == 'TestProductActions' ) { /* TestProductActions(); */ }
 				else if( $page == 'MyAccount' ) {
 					echo 'Recast_MyAccount'; 
-					// echo Recast_MyAccount( $page, $posts_per_page ); 
+					// echo Recast_MyAccount( $page, $posts_per_page );  
 				}
 				else if( $page == 'EditListing_ACF' ) { echo Recast_Listings_editListing_ACF( $listing_id, null, false, false ); }
+				else if( $page == 'EditListing_Page' ) { echo Recast_Listings_editListing_Page( $listing_id, null, false, false ); }
 				else if( $page == 'MyListings' ) { echo Recast_Listings( $listing_id, $posts_per_page ); }
 				else if( $page == 'DrawListing' ) { echo Recast_Listings_drawListing( $listing_id, null, false, false ); }
 				else if( $page == 'DrawListingForOrder' ) {

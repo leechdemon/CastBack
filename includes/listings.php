@@ -190,8 +190,12 @@ function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, 
 			while ( $custom_query->have_posts() ) {
 				$custom_query->the_post();
 				if( is_user_logged_in() ) {
+					/* Security Check - Confirm author */
 					if( get_current_user_id() == get_field( 'seller_id', $listing_id ) || current_user_can( 'administrator' ) ) {
 						acf_form_head();
+						$recastListingAttributes = get_field( 'listing-attributes-field-group-id', 'options' );
+						if( !$recastListingAttributes ) { $recastListingAttributes = ''; }
+
 						acf_form(array(
 							'form_attributes'   => array(
 								'method'	=>	'post',
@@ -199,7 +203,7 @@ function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, 
 							),
 							'post_title'   => true,
 							'post_id'   => $listing_id,
-							'field_groups' => array(503,),
+							'field_groups' => array('recast-listing-details', $recastListingAttributes ),
 							'uploader'		=> 'basic',
 							'submit_value' => 'Save Changes',
 							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,

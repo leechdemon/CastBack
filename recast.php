@@ -6,7 +6,7 @@ Author: <a href="https://www.leechdemon.com" target="_blank">Leechdemon</a>
 Version: v1.3.0
 */
 global $recastVersion;
-$recastVersion = "1.3.0";
+$recastVersion = "1.3.1";
 
 require_once plugin_dir_path(__FILE__) . 'tools.php';
 require_once plugin_dir_path(__FILE__) . 'settings.php';
