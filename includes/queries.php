@@ -106,8 +106,8 @@ function Recast_Queries_shopFilterButtons( $method = null ) {
 }
 function Recast_Queries_shopFilterButtons_drawTax( $tax, $method ) {
 	
-	Test( $tax->name );
-	Test( is_tax( 'product_cat', 'flies-fly-tying' ) );
+	// Test( $tax->name );
+	// Test( is_tax( 'product_cat', 'flies-fly-tying' ) );
 	// Test( is_post_type_archive( 'product' ) );
 	
 	

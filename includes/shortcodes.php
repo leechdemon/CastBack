@@ -113,6 +113,10 @@ function Recast_ShortcodeHandler( $atts, $content = null ) {
 			else if( $action == "userIsAuthor" ) {
 				if( get_current_user_id() == get_post( $listing_id )->post_author || current_user_can( 'administrator' ) ) { /* do nothing*/ }
 				else { echo 'd-none'; }
+
+				// echo 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+				// Test('aaaaaaaaaaaaaaaaaaaaaaaaaa');
+				
 			}
 			else if( $action == "userCanPurchase" ) {
 				if( !$user_id && isset( $_POST['user_id'] ) ) { $user_id = $_POST['user_id']; }
