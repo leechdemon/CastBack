@@ -17,7 +17,7 @@ function Recast_Action_addListing_button() {
 	});
 }
 function Recast_Action_markSold( listing_id ) {
-	document.getElementById( 'Recast-EditListing' ).style.opacity = "0.5";
+	Recast_Action_dimListing();
 	jQuery.ajax({
 		type: "POST",
 		url: Recast.url,
@@ -33,7 +33,7 @@ function Recast_Action_markSold( listing_id ) {
 	});
 }
 function Recast_Action_markUnsold( listing_id ) {
-	document.getElementById( 'Recast-EditListing' ).style.opacity = "0.5";
+	Recast_Action_dimListing();
 	jQuery.ajax({
 		type: "POST",
 		url: Recast.url,
@@ -49,7 +49,7 @@ function Recast_Action_markUnsold( listing_id ) {
 	});
 }
 function Recast_Action_publishListing( listing_id ) {
-	document.getElementById( 'Recast-EditListing' ).style.opacity = "0.5";
+	Recast_Action_dimListing();
 	jQuery.ajax({
 		type: "POST",
 		url: Recast.url,
@@ -65,7 +65,7 @@ function Recast_Action_publishListing( listing_id ) {
 	});
 }
 function Recast_Action_hideListing( listing_id ) {
-	document.getElementById( 'Recast-EditListing' ).style.opacity = "0.5";
+	Recast_Action_dimListing();
 	jQuery.ajax({
 		type: "POST",
 		url: Recast.url,
@@ -81,7 +81,7 @@ function Recast_Action_hideListing( listing_id ) {
 	});
 }
 function Recast_Action_deleteListing( listing_id ) {
-	document.getElementById( 'Recast-EditListing' ).style.opacity = "0.5";
+	Recast_Action_dimListing();
 	jQuery.ajax({
 		type: "POST",
 		url: Recast.url,
@@ -97,7 +97,7 @@ function Recast_Action_deleteListing( listing_id ) {
 	});
 }
 function Recast_Action_restoreListing( listing_id ) {
-	document.getElementById( 'Recast-EditListing' ).style.opacity = "0.5";
+	Recast_Action_dimListing();
 	jQuery.ajax({
 		type: "POST",
 		url: Recast.url,
@@ -372,4 +372,8 @@ function Recast_Action_refreshListing( listing_id, data ) {
 	} else {
 		console.log("AJAX failed. Wrong 'user_id'?");
 	}
+}
+function Recast_Action_dimListing() {
+	document.getElementById('Recast-EditListing_Details' ).style.opacity = "0.5";
+	document.getElementById('Recast-EditListing_Attributes' ).style.opacity = "0.5";
 }

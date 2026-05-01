@@ -206,7 +206,7 @@ function Recast_Listings_editListing_details( $listing_id, $listingTemplate = nu
 							'field_groups' => array('recast-listing-details' ),
 							// 'field_groups' => array('recast-listing-details', $recastListingAttributes ),
 							'uploader'		=> 'basic',
-							'submit_value' => 'Save Changes',
+							'submit_value' => 'Save Details',
 							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
 						));
 					}
@@ -248,7 +248,7 @@ function Recast_Listings_editListing_attributes( $listing_id, $listingTemplate =
 							'field_groups' => array( 'recast-listing-attributes' ),
 							// 'field_groups' => array('recast-listing-details', $recastListingAttributes ),
 							'uploader'		=> 'basic',
-							'submit_value' => 'Save Changes',
+							'submit_value' => 'Save Attributes',
 							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
 						));
 					}

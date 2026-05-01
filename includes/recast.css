@@ -26,6 +26,9 @@
 .acf-hidden, .acf-recast-hidden { display: none; }
 .acf-fields { display: contents; }
 .d-none { display: none !important; }
+.float-right { float: right !important; }
+.float-left { float: left !important; }
+.clear { clear: both !important; }
 /* #Recast-Logout { float: right; width: 10%; } */
 /* #Recast-MyListings a, #Recast-MyOffers a, #Recast-MyOrders a, #recast-order a  { color: var(--e-global-color-text); } */
 

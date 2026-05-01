@@ -350,6 +350,57 @@ function Recast_Settings_AddFieldGroups() {
 				'default_to_current_date' => 0,
 			),
 			array(
+				'key' => 'field_688cf6d036b96',
+				'label' => 'Images',
+				'name' => 'images',
+				'aria-label' => '',
+				'type' => 'repeater',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '70',
+					'class' => 'float-right',
+					'id' => '',
+				),
+				'layout' => 'table',
+				'pagination' => 0,
+				'min' => 0,
+				'max' => 0,
+				'collapsed' => '',
+				'button_label' => 'Add Image',
+				'rows_per_page' => 20,
+				'sub_fields' => array(
+					array(
+						'key' => 'field_688cf6d736b97',
+						'label' => 'Image',
+						'name' => 'image',
+						'aria-label' => '',
+						'type' => 'image',
+						'instructions' => '',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '',
+							'class' => '',
+							'id' => '',
+						),
+						'return_format' => 'id',
+						'library' => 'all',
+						'min_width' => '',
+						'min_height' => '',
+						'min_size' => '',
+						'max_width' => '',
+						'max_height' => '',
+						'max_size' => '',
+						'mime_types' => '',
+						'allow_in_bindings' => 0,
+						'preview_size' => 'medium',
+						'parent_repeater' => 'field_688cf6d036b96',
+					),
+				),
+			),
+			array(
 				'key' => 'field_68964c94355ed',
 				'label' => 'Listing Price',
 				'name' => 'listing_price',
@@ -359,7 +410,7 @@ function Recast_Settings_AddFieldGroups() {
 				'required' => 1,
 				'conditional_logic' => 0,
 				'wrapper' => array(
-					'width' => '33',
+					'width' => '30',
 					'class' => '',
 					'id' => '',
 				),
@@ -382,7 +433,7 @@ function Recast_Settings_AddFieldGroups() {
 				'required' => 0,
 				'conditional_logic' => 0,
 				'wrapper' => array(
-					'width' => '33',
+					'width' => '30',
 					'class' => '',
 					'id' => '',
 				),
@@ -414,7 +465,8 @@ function Recast_Settings_AddFieldGroups() {
 				'maxlength' => '',
 				'placeholder' => '',
 				'rows' => '',
-			),			
+			),	
+
 		),
 		'location' => array(
 			array(
@@ -687,33 +739,36 @@ function Recast_Settings_FAQ() {
 function Recast_Settings_TechSupport_SubmitTicket( $post_id ) {
 	if( isset( $_GET['page'] ) ) { $page = $_GET['page']; }
 
-	extract( get_field('new_ticket', 'option' ) );
-	if( $post_id == 'options' && $page == 'recast-support' && $ticket_type != 'none' ) {
-		
+	$newTicket = get_field('new_ticket', 'option' );
+	if( $newTicket ) {
+		extract( $newTicket );
+		if( $post_id == 'options' && $page == 'recast-support' && $ticket_type != 'none' ) {
+			
 
-		$message = 'A new Support ticket has been created by '.get_bloginfo('name').'.<br><br>';
-		$message .= '<strong>Ticket Type</strong>: '. $ticket_type .'<br>';
-		$message .= '<strong>Ticket Subject</strong>: '. $ticket_subject .'<br>';
-		$message .= '<strong>Ticket Description</strong>: '. $ticket_description .'<br>';
-		$order = wc_get_order( $order_number );
-		if( !$order ) { $message .= '<strong>Order Number</strong>: '. $order_number .'<br>'; }
-		else { $message .= '<strong>Order Number</strong>: <a href="'.get_site_url().'/wp-admin/admin.php?page=wc-orders&action=edit&id='.$order_number.'">'. $order_number .'</a><br>'; }
+			$message = 'A new Support ticket has been created by '.get_bloginfo('name').'.<br><br>';
+			$message .= '<strong>Ticket Type</strong>: '. $ticket_type .'<br>';
+			$message .= '<strong>Ticket Subject</strong>: '. $ticket_subject .'<br>';
+			$message .= '<strong>Ticket Description</strong>: '. $ticket_description .'<br>';
+			$order = wc_get_order( $order_number );
+			if( !$order ) { $message .= '<strong>Order Number</strong>: '. $order_number .'<br>'; }
+			else { $message .= '<strong>Order Number</strong>: <a href="'.get_site_url().'/wp-admin/admin.php?page=wc-orders&action=edit&id='.$order_number.'">'. $order_number .'</a><br>'; }
 
-		/* Images */
-		$message .= '<strong>Images</strong>: <br>';
-		foreach( $images as $image ) { 
-			$message .= '<img style="max-width: 500px;" src="'. $image['image'] .'">';
-		 }
-		
-		$ticket_number = get_field( 'ticket_number', 'option' );
-		$ticket_number++;
-		
-		/* Send Ticket Email */
-		wp_mail( 'jason@leechdemon.com', 'Recast - New Ticket #' .$ticket_number, $message );
+			/* Images */
+			$message .= '<strong>Images</strong>: <br>';
+			foreach( $images as $image ) { 
+				$message .= '<img style="max-width: 500px;" src="'. $image['image'] .'">';
+			}
+			
+			$ticket_number = get_field( 'ticket_number', 'option' );
+			$ticket_number++;
+			
+			/* Send Ticket Email */
+			wp_mail( 'jason@leechdemon.com', 'Recast - New Ticket #' .$ticket_number, $message );
 
-		/* Reset Fields */
-		update_field( 'new_ticket', ['ticket_type' => 'none', 'ticket_subject' => '', 'ticket_description' => '', 'order_number' => '' , 'images' => '' ], 'option' );
-		update_field( 'ticket_number', $ticket_number, 'option' );
+			/* Reset Fields */
+			update_field( 'new_ticket', ['ticket_type' => 'none', 'ticket_subject' => '', 'ticket_description' => '', 'order_number' => '' , 'images' => '' ], 'option' );
+			update_field( 'ticket_number', $ticket_number, 'option' );
+		}
 	}
 } add_action('acf/save_post', 'Recast_Settings_TechSupport_SubmitTicket', 20);
 
@@ -731,22 +786,45 @@ function LD_Tools_HideMenus() {
 function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 	$acf_taxonomies = acf_get_acf_taxonomies();
 	$fields = array();
-	foreach ( $acf_taxonomies as $tax ) {
-		// Test( $tax );
-		
+	$terms = get_terms( array( 'hide_empty' => false ) );
+	// Test( $terms );
+			
+	foreach ( $acf_taxonomies as $tax ) {		
 		$isProduct = false; 
 		foreach( $tax['object_type'] as $prodType ) {
 			if( $prodType == "product" ) { $isProduct = true; }
 		}		
 		
 		if( $tax['active'] && $isProduct ) {
+			// Test( $tax );
+			// Test('---');
+				
+			/* Select */
+			$choices = [];
+			// Test( 'Count: '.count( $terms ) );
+			$choice = '-- Select '.$tax['title'].' --' ;
+			array_push( $choices, $choice );	
+			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+				foreach( $terms as $term ) {
+					Test( $term->taxonomy );
+					Test( $tax['taxonomy'] );
+					if( $term->taxonomy == $tax['taxonomy'] ) {
+						// Test($term);
+						// $choice = array( $term->slug => $term->name );
+						// array_push( $choices, $choice );
+						array_push( $choices, $term->name );
+					}
+				}
+			}
+			// Test( $choices );
+
+			
 			$field = array(
 				'key' => $tax['taxonomy'],
 				'label' => $tax['title'],
 				'name' => $tax['taxonomy'],
 				'aria-label' => '',
-				'type' => 'text',
-				// 'type' => 'text',
+				'type' => 'select',
 				'instructions' => '',
 				'required' => 0,
 				'conditional_logic' => 0,
@@ -755,15 +833,44 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 					'class' => '',
 					'id' => '',
 				),
-				'default_value' => '',
-				'min' => '',
-				'max' => '',
+				'choices' => $choices,
+				'default_value' => false,
+				'return_format' => 'value',
+				'multiple' => 0,
+				'allow_null' => 0,
 				'allow_in_bindings' => 0,
+				'ui' => 0,
+				'ajax' => 0,
 				'placeholder' => '',
-				'step' => '',
-				'prepend' => '',
-				'append' => '',
+				'create_options' => 0,
+				'save_options' => 0,
 			);
+
+
+			/* Text */
+			// $field = array(
+			// 	'key' => $tax['taxonomy'],
+			// 	'label' => $tax['title'],
+			// 	'name' => $tax['taxonomy'],
+			// 	'aria-label' => '',
+			// 	'type' => 'text',
+			// 	'instructions' => '',
+			// 	'required' => 0,
+			// 	'conditional_logic' => 0,
+			// 	'wrapper' => array(
+			// 		'width' => '33',
+			// 		'class' => '',
+			// 		'id' => '',
+			// 	),
+			// 	'default_value' => '',
+			// 	'min' => '',
+			// 	'max' => '',
+			// 	'allow_in_bindings' => 0,
+			// 	'placeholder' => '',
+			// 	'step' => '',
+			// 	'prepend' => '',
+			// 	'append' => '',
+			// );
 
 			array_push( $fields, $field );
 		}

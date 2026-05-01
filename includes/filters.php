@@ -9,7 +9,7 @@ function Recast_filter_listings_status_update( $post_id ) {
 	return $post_id;
 } add_filter('acf/pre_save_post' , 'Recast_filter_listings_status_update', 10, 1 );
 
-function Recast_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
+function Recast_Filters_updateListing_changeAttribute( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
 	$product = wc_get_product( $post_id );
 	if( $product ) {
 		
@@ -120,9 +120,16 @@ function Recast_Filters_changeAttribute( $post_id, $taxSlug = null, $termSlug = 
 		
 		$product->save();
 	}
-
+	
+    // Update post with sanitized title to regenerate slug
+	$post = get_post( $post_id );
+	wp_update_post( array(
+        'ID'         => $post_id,
+        'post_name'  => sanitize_title( $post->post_title )
+    ));
+	
 	return $post_id;
-} add_filter('acf/save_post' , 'Recast_Filters_changeAttribute' );
+} add_filter('acf/save_post' , 'Recast_Filters_updateListing_changeAttribute' );
 
 function Recast_Filter_updateListing_imageHandling( $post_id ) {
 	$images = get_field( 'images', $post_id );
