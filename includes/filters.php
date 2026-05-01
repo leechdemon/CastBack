@@ -9,96 +9,19 @@ function Recast_filter_listings_status_update( $post_id ) {
 	return $post_id;
 } add_filter('acf/pre_save_post' , 'Recast_filter_listings_status_update', 10, 1 );
 
-function Recast_Filters_updateListing_changeAttribute( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
+function Recast_Filters_updateListing( $post_id, $taxSlug = null, $termSlug = null, $append = false ) {
 	$product = wc_get_product( $post_id );
 	if( $product ) {
-		
-	// if( isset( $termSlug ) ) {
-		/* This function was called manually. Do something. */
-		// wp_set_object_terms( $post_id, $termSlug, $taxSlug, $append );
-	// } else {
-		/* This function was called via ACF / Admin save. Do many things. */
-		
-		
-		/* Cat */
-		if( isset ( $_POST['acf']['field_68644913a0ab7'] ) ) {
-			$taxSlug = 'product_cat';
-			$termSlug = $_POST['acf']['field_68644913a0ab7'];
-			wp_set_object_terms( $post_id, $termSlug, $taxSlug, false );
-
-			/* Subcat */
-			$termSlug = null;
-			if( isset ( $_POST['acf']['field_68644c210394b'] ) ) { /* Subcat: Accessory Details */
-				$termSlug = $_POST['acf']['field_68644c210394b']['field_68644c210394c'];
+		/* Auto-Taxonomies */
+		if( isset ( $_POST['acf'] ) ) {
+			foreach( $_POST['acf'] as $tax => $term ) {
+				$taxonomy = get_taxonomy( $tax );
+				if( $taxonomy && $term != 0 ) {
+					/* Ignore blank fields */
+					wp_set_object_terms( $post_id, $term, $tax, $append );
+				}
 			}
-			if( isset ( $_POST['acf']['field_68644bd503949'] ) ) { /* Subcat: Flies Fly Tying Details*/
-				$termSlug = $_POST['acf']['field_68644bd503949']['field_68644bd50394a'];
-			}
-			if( isset ( $_POST['acf']['field_68644b5e8fdaa'] ) ) { /* Subcat: Packs, Bags, & Vests Details*/
-				$termSlug = $_POST['acf']['field_68644b5e8fdaa']['field_68644b5f8fdab'];
-			}
-			if( isset ( $_POST['acf']['field_68644b2f8fda8'] ) ) { /* Subcat: Reels Details */
-				$termSlug = $_POST['acf']['field_68644b2f8fda8']['field_68644b488fda9'];
-			}
-			if( isset ( $_POST['acf']['field_68644ae28fda2'] ) ) { /* Subcat: Rods Details (Rod Type) */
-				/* No Rod subcat */
-			}
-			if( isset ( $_POST['acf']['field_686449fd15740'] ) ) { /* Subcat: Waders Details (Wader Type) */
-				$termSlug = $_POST['acf']['field_686449fd15740']['field_68644a1215741'];
-			}				
-				
-			if( isset( $termSlug ) ) { wp_set_object_terms( $post_id, $termSlug, $taxSlug, true ); }
 		}
-		/* Brand */
-		if( isset ( $_POST['acf']['field_68ee26d69a9a8'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68ee26d69a9a8'], 'product_brand', $append );
-		}
-		/* Condition */
-		if( isset ( $_POST['acf']['field_68ee2ace6839f'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68ee2ace6839f'], 'product_condition', $append );
-		}
-		
-		/* Size (Waders) */
-		$taxSlug = 'size_waders';
-		if( isset ( $_POST['acf']['field_686449fd15740']['field_68644a3215742'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_686449fd15740']['field_68644a3215742'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }	
-		/* Size (Boots) */
-		$taxSlug = 'size_boots';
-		if( isset ( $_POST['acf']['field_686449fd15740']['field_68644a4115743'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_686449fd15740']['field_68644a4115743'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
-
-		/* Material */
-		$taxSlug = 'material';
-		if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68644ae28fda3'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68644ae28fda3'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
-		/* Handedness */
-		$taxSlug = 'handedness';
-		if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68644b058fda6'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68644b058fda6'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
-		/* Rod Sections */
-		$taxSlug = 'rod_sections';
-		if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68e5666addfd1'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68e5666addfd1'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
-		
-		/* Length */
-		$taxSlug = 'product_length';
-		if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68eebc8032860'] ) ) {
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68eebc8032860'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
-		/* Weight */
-		$taxSlug = 'product_weight';
-		if( isset ( $_POST['acf']['field_68644ae28fda2']['field_68eebc08d9579'] ) ) {
-			/* Check if Rods */
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68644ae28fda2']['field_68eebc08d9579'], $taxSlug, false );
-		} else if ( isset ( $_POST['acf']['field_68644b2f8fda8']['field_68eebee22cdbc'] ) ) {
-			/* Check if Reels */
-			wp_set_object_terms( $post_id, $_POST['acf']['field_68644b2f8fda8']['field_68eebee22cdbc'], $taxSlug, false );
-		} else { wp_set_object_terms( $post_id, '', $taxSlug, false ); }
 		
 		/* Description */
 		if( isset ( $_POST['acf']['field_68eec29bf173c'] ) ) { /* Listing > Listing Price */
@@ -118,19 +41,24 @@ function Recast_Filters_updateListing_changeAttribute( $post_id, $taxSlug = null
 			update_field( 'shipping_price', Recast_Filter_formatPriceField( $_POST['acf']['field_68e55d2432a2c'] ), $post_id );
 		}
 		
-		$product->save();
-	}
-	
-    // Update post with sanitized title to regenerate slug
-	$post = get_post( $post_id );
-	wp_update_post( array(
-        'ID'         => $post_id,
-        'post_name'  => sanitize_title( $post->post_title )
-    ));
-	
-	return $post_id;
-} add_filter('acf/save_post' , 'Recast_Filters_updateListing_changeAttribute' );
+		/* Image Handling */
+		Recast_Filter_updateListing_imageHandling( $post_id );
 
+		/* Update Title -> Slug */
+		$post = get_post( $post_id );
+		wp_update_post( array(
+			'ID'         => $post_id,
+			'post_name'  => sanitize_title( $post->post_title )
+		));
+
+		/* Save */
+		$product->save();
+
+		/* Force Crash to Troubleshoot */
+		// asdasdasd();
+	}    
+	return $post_id;
+} add_filter('acf/save_post' , 'Recast_Filters_updateListing' );
 function Recast_Filter_updateListing_imageHandling( $post_id ) {
 	$images = get_field( 'images', $post_id );
 	$attachment_ids = array();
@@ -157,10 +85,7 @@ function Recast_Filter_updateListing_imageHandling( $post_id ) {
 	
 	// serialize( $attachment_ids );
 	update_post_meta( $post_id, '_product_image_gallery', implode( ',', $attachment_ids ) );
-	
-	return $post_id;
-} add_filter('acf/save_post' , 'Recast_Filter_updateListing_imageHandling', 10, 1 );
-
+}
 function Recast_filter_listings_populate_seller_id($field) {
 		// Only run on the front-end
 		if (is_admin()) { return $field; }

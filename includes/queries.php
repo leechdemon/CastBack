@@ -95,7 +95,7 @@ function Recast_Queries_shopFilterButtons( $method = null ) {
 		wp_reset_postdata();
 	}
 
-	echo '<div style="display: inline-grid;">';
+	echo '<div style="display: inline-grid; width: 100%">';
 		foreach( $taxonomies as $tax ) {			
 			if( isset( $drawTax[ $tax->name ] ) ) { Recast_Queries_shopFilterButtons_drawTax( $tax, $method ); }
 			else if( is_tax( $tax->name ) ) { Recast_Queries_shopFilterButtons_drawTax( $tax, $method ); }

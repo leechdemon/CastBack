@@ -26,8 +26,7 @@ function Recast_ShortcodeHandler( $atts, $content = null ) {
 					echo 'Recast_MyAccount'; 
 					// echo Recast_MyAccount( $page, $posts_per_page );  
 				}
-				else if( $page == 'EditListing_Details' ) { echo Recast_Listings_editListing_details( $listing_id, null, false, false ); }
-				else if( $page == 'EditListing_Attributes' ) { echo Recast_Listings_editListing_attributes( $listing_id, null, false, false ); }
+				else if( $page == 'EditListing' ) { echo Recast_Listings_editListing( $listing_id, null, false, false ); }
 				else if( $page == 'MyListings' ) { echo Recast_Listings( $listing_id, $posts_per_page ); }
 				else if( $page == 'DrawListing' ) { echo Recast_Listings_drawListing( $listing_id, null, false, false ); }
 				else if( $page == 'DrawListingForOrder' ) {

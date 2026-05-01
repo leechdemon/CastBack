@@ -800,19 +800,12 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 			// Test('---');
 				
 			/* Select */
-			$choices = [];
-			// Test( 'Count: '.count( $terms ) );
-			$choice = '-- Select '.$tax['title'].' --' ;
-			array_push( $choices, $choice );	
+			$choices = array();
+			$choices[0] = '-- Select '.$tax['title'].' --' ;
 			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
 				foreach( $terms as $term ) {
-					Test( $term->taxonomy );
-					Test( $tax['taxonomy'] );
 					if( $term->taxonomy == $tax['taxonomy'] ) {
-						// Test($term);
-						// $choice = array( $term->slug => $term->name );
-						// array_push( $choices, $choice );
-						array_push( $choices, $term->name );
+						$choices[ $term->slug ] = $term->name;
 					}
 				}
 			}
