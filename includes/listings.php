@@ -175,7 +175,7 @@ function Recast_Listings_addListing( $AJAX = false ) { /* Currently, method only
 		
 	}		
 } /* add_action( 'wp_ajax_Recast_Listings_addListing', 'Recast_Listings_addListing' ); */
-function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
+function Recast_Listings_editListing_details( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
 	
 	if( $listing_id ) {
 		$args = array(
@@ -203,7 +203,50 @@ function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, 
 							),
 							'post_title'   => true,
 							'post_id'   => $listing_id,
-							'field_groups' => array('recast-listing-details', $recastListingAttributes ),
+							'field_groups' => array('recast-listing-details' ),
+							// 'field_groups' => array('recast-listing-details', $recastListingAttributes ),
+							'uploader'		=> 'basic',
+							'submit_value' => 'Save Changes',
+							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
+						));
+					}
+				}
+			}
+		}
+		
+		wp_reset_postdata();
+	}
+}
+function Recast_Listings_editListing_attributes( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
+	
+	if( $listing_id ) {
+		$args = array(
+				'p'	=>	$listing_id,
+				'post_type'      => 'product',
+				'post_status'      => array('publish', 'draft'),
+				'posts_per_page' => 1,
+		);
+		$custom_query = new WP_Query( $args );
+		
+		if ( $custom_query->have_posts() ) {
+			while ( $custom_query->have_posts() ) {
+				$custom_query->the_post();
+				if( is_user_logged_in() ) {
+					/* Security Check - Confirm author */
+					if( get_current_user_id() == get_field( 'seller_id', $listing_id ) || current_user_can( 'administrator' ) ) {
+						acf_form_head();
+						$recastListingAttributes = get_field( 'listing-attributes-field-group-id', 'options' );
+						if( !$recastListingAttributes ) { $recastListingAttributes = ''; }
+
+						acf_form(array(
+							'form_attributes'   => array(
+								'method'	=>	'post',
+								'class'		=>	'acf-form',
+							),
+							// 'post_title'   => true,
+							'post_id'   => $listing_id,
+							'field_groups' => array( 'recast-listing-attributes' ),
+							// 'field_groups' => array('recast-listing-details', $recastListingAttributes ),
 							'uploader'		=> 'basic',
 							'submit_value' => 'Save Changes',
 							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,

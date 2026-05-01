@@ -3,7 +3,7 @@
 Plugin Name: Recast
 Description: A Wordpress plugin to manage Listings, Offers, and other Recast tools. Creates Shortcodes for use with Elementor.
 Author: <a href="https://www.leechdemon.com" target="_blank">Leechdemon</a>
-Version: v1.3.0
+Version: v1.3.1
 */
 global $recastVersion;
 $recastVersion = "1.3.1";

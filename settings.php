@@ -71,29 +71,29 @@ function Recast_Settings_AddFieldGroups() {
 		'key' => 'group_68b37c50860b0',
 		'title' => 'Recast - Settings',
 		'fields' => array(
-			array(
-				'key' => 'listing-attributes-field-group-id',
-				'label' => 'Listing Attributes - Field Group ID:',
-				'name' => 'listing-attributes-field-group-id',
-				'aria-label' => '',
-				'type' => 'text',
-				'instructions' => '',
-				'required' => 0,
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '100',
-					'class' => '',
-					'id' => '',
-				),
-				'default_value' => 'recast-listing-attributes',
-				'min' => '',
-				'max' => '',
-				'allow_in_bindings' => 0,
-				'placeholder' => '',
-				'step' => '',
-				'prepend' => '',
-				'append' => '',
-			),
+			// array(
+			// 	'key' => 'listing-attributes-field-group-id',
+			// 	'label' => 'Listing Attributes - Field Group ID:',
+			// 	'name' => 'listing-attributes-field-group-id',
+			// 	'aria-label' => '',
+			// 	'type' => 'text',
+			// 	'instructions' => '',
+			// 	'required' => 0,
+			// 	'conditional_logic' => 0,
+			// 	'wrapper' => array(
+			// 		'width' => '100',
+			// 		'class' => '',
+			// 		'id' => '',
+			// 	),
+			// 	'default_value' => 'recast-listing-attributes',
+			// 	'min' => '',
+			// 	'max' => '',
+			// 	'allow_in_bindings' => 0,
+			// 	'placeholder' => '',
+			// 	'step' => '',
+			// 	'prepend' => '',
+			// 	'append' => '',
+			// ),
 			array(
 				'key' => 'field_68c56e4197be2',
 				'label' => 'Run Automations (Cron Jobs)',
@@ -439,6 +439,34 @@ function Recast_Settings_AddFieldGroups() {
 		'ai_description' => '',
 	) );
 
+	/* Add Recast - Listing Attributes field group */
+	acf_add_local_field_group( array(
+		'key' => 'recast-listing-attributes',
+		'title' => 'Recast - Listing Attributes',
+		'fields' => Recast_Settings_ListingAttributes_CreateFieldGroups(),
+		'location' => array(
+			array(
+				array(
+					'param' => 'post_type',
+					'operator' => '==',
+					'value' => 'product',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+		'display_title' => '',
+		'allow_ai_access' => false,
+		'ai_description' => '',
+	) );
+
 	/* Add Recast Emails field group */
 	acf_add_local_field_group( array(
 		'key' => 'group_6927164ec3bb8',
@@ -699,3 +727,47 @@ function LD_Tools_HideMenus() {
 		// else { Test( 'LD Tools: '. $success ) }
 	}
 } add_action('admin_menu', 'LD_Tools_HideMenus');
+
+function Recast_Settings_ListingAttributes_CreateFieldGroups() {
+	$acf_taxonomies = acf_get_acf_taxonomies();
+	$fields = array();
+	foreach ( $acf_taxonomies as $tax ) {
+		// Test( $tax );
+		
+		$isProduct = false; 
+		foreach( $tax['object_type'] as $prodType ) {
+			if( $prodType == "product" ) { $isProduct = true; }
+		}		
+		
+		if( $tax['active'] && $isProduct ) {
+			$field = array(
+				'key' => $tax['taxonomy'],
+				'label' => $tax['title'],
+				'name' => $tax['taxonomy'],
+				'aria-label' => '',
+				'type' => 'text',
+				// 'type' => 'text',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '33',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			);
+
+			array_push( $fields, $field );
+		}
+	}
+
+	return $fields;
+}
