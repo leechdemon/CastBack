@@ -175,7 +175,7 @@ function Recast_Listings_addListing( $AJAX = false ) { /* Currently, method only
 		
 	}		
 } /* add_action( 'wp_ajax_Recast_Listings_addListing', 'Recast_Listings_addListing' ); */
-function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
+function Recast_Listings_editListing( $listing_id, $listingTemplate = null, $buttonPanelEnabled = false, $AJAX = false ) {
 	
 	if( $listing_id ) {
 		$args = array(
@@ -190,6 +190,7 @@ function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, 
 			while ( $custom_query->have_posts() ) {
 				$custom_query->the_post();
 				if( is_user_logged_in() ) {
+					/* Security Check - Confirm author */
 					if( get_current_user_id() == get_field( 'seller_id', $listing_id ) || current_user_can( 'administrator' ) ) {
 						acf_form_head();
 						acf_form(array(
@@ -199,9 +200,9 @@ function Recast_Listings_editListing_ACF( $listing_id, $listingTemplate = null, 
 							),
 							'post_title'   => true,
 							'post_id'   => $listing_id,
-							'field_groups' => array(503,),
+							'field_groups' => array('recast-listing-details', 'recast-listing-attributes' ),
 							'uploader'		=> 'basic',
-							'submit_value' => 'Save Changes',
+							'submit_value' => 'Save Details',
 							'return'	=> get_site_url() .'/selling/edit-listing/?listing_id='. $listing_id,
 						));
 					}

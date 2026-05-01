@@ -67,173 +67,457 @@ function Recast_Settings_AddFieldGroups() {
 	}
 
 	/* Add Recast Settings field group */
-	// acf_add_local_field_group( array(
-	// 	'key' => 'group_68b37c50860b0',
-	// 	'title' => 'Recast - Settings',
-	// 	'fields' => array(
-	// 		array(
-	// 			'key' => 'field_68c56e4197be2',
-	// 			'label' => 'Run Automations (Cron Jobs)',
-	// 			'name' => 'run_automations',
-	// 			'aria-label' => '',
-	// 			'type' => 'true_false',
-	// 			'instructions' => '',
-	// 			'required' => 0,
-	// 			'conditional_logic' => 0,
-	// 			'wrapper' => array(
-	// 				'width' => '',
-	// 				'class' => '',
-	// 				'id' => '',
-	// 			),
-	// 			'message' => '',
-	// 			'default_value' => 0,
-	// 			'allow_in_bindings' => 0,
-	// 			'ui' => 0,
-	// 			'ui_on_text' => '',
-	// 			'ui_off_text' => '',
-	// 		),
-	// 		array(
-	// 			'key' => 'field_68b37c53386dc',
-	// 			'label' => 'Cron - No Offer Expired Date (Minutes)',
-	// 			'name' => 'cron_no_offer_expired_date',
-	// 			'aria-label' => '',
-	// 			'type' => 'number',
-	// 			'instructions' => '',
-	// 			'required' => 0,
-	// 			'conditional_logic' => 0,
-	// 			'wrapper' => array(
-	// 				'width' => '25',
-	// 				'class' => '',
-	// 				'id' => '',
-	// 			),
-	// 			'default_value' => 3,
-	// 			'min' => '',
-	// 			'max' => '',
-	// 			'allow_in_bindings' => 0,
-	// 			'placeholder' => '',
-	// 			'step' => '',
-	// 			'prepend' => '',
-	// 			'append' => '',
-	// 		),
-	// 		array(
-	// 			'key' => 'field_68b37cd4386dd',
-	// 			'label' => 'Cron - No Shipped Refund Date (Minutes)',
-	// 			'name' => 'cron_no_shipped_refund_date',
-	// 			'aria-label' => '',
-	// 			'type' => 'number',
-	// 			'instructions' => '',
-	// 			'required' => 0,
-	// 			'conditional_logic' => 0,
-	// 			'wrapper' => array(
-	// 				'width' => '25',
-	// 				'class' => '',
-	// 				'id' => '',
-	// 			),
-	// 			'default_value' => 14,
-	// 			'min' => '',
-	// 			'max' => '',
-	// 			'allow_in_bindings' => 0,
-	// 			'placeholder' => '',
-	// 			'step' => '',
-	// 			'prepend' => '',
-	// 			'append' => '',
-	// 		),
-	// 		array(
-	// 			'key' => 'field_68b37cd5386de',
-	// 			'label' => 'Cron - No Dispute Completed Date (Minutes)',
-	// 			'name' => 'cron_no_dispute_completed_date',
-	// 			'aria-label' => '',
-	// 			'type' => 'number',
-	// 			'instructions' => '',
-	// 			'required' => 0,
-	// 			'conditional_logic' => 0,
-	// 			'wrapper' => array(
-	// 				'width' => '25',
-	// 				'class' => '',
-	// 				'id' => '',
-	// 			),
-	// 			'default_value' => 14,
-	// 			'min' => '',
-	// 			'max' => '',
-	// 			'allow_in_bindings' => 0,
-	// 			'placeholder' => '',
-	// 			'step' => '',
-	// 			'prepend' => '',
-	// 			'append' => '',
-	// 		),
-	// 		array(
-	// 			'key' => 'field_68c570427d944',
-	// 			'label' => 'Cron - ? Missing One...',
-	// 			'name' => 'cron_missing_one',
-	// 			'aria-label' => '',
-	// 			'type' => 'number',
-	// 			'instructions' => '',
-	// 			'required' => 0,
-	// 			'conditional_logic' => 0,
-	// 			'wrapper' => array(
-	// 				'width' => '25',
-	// 				'class' => '',
-	// 				'id' => '',
-	// 			),
-	// 			'default_value' => 14,
-	// 			'min' => '',
-	// 			'max' => '',
-	// 			'allow_in_bindings' => 0,
-	// 			'placeholder' => '',
-	// 			'step' => '',
-	// 			'prepend' => '',
-	// 			'append' => '',
-	// 		),
-	// 		array(
-	// 			'key' => 'field_690a2611641c9',
-	// 			'label' => 'Minimum Offer Total',
-	// 			'name' => 'minimum_offer_total',
-	// 			'aria-label' => '',
-	// 			'type' => 'number',
-	// 			'instructions' => 'If a value is set, Offers will be adjusted if their total (including shipping) does not meet this amount.',
-	// 			'required' => 0,
-	// 			'conditional_logic' => 0,
-	// 			'wrapper' => array(
-	// 				'width' => '25',
-	// 				'class' => '',
-	// 				'id' => '',
-	// 			),
-	// 			'default_value' => '',
-	// 			'min' => 0,
-	// 			'max' => '',
-	// 			'allow_in_bindings' => 0,
-	// 			'placeholder' => '',
-	// 			'step' => '',
-	// 			'prepend' => '',
-	// 			'append' => '',
-	// 		),
-	// 	),
-	// 	'location' => array(
-	// 		array(
-	// 			array(
-	// 				'param' => 'options_page',
-	// 				'operator' => '==',
-	// 				'value' => 'recast-settings',
-	// 			),
-	// 		),
-	// 	),
-	// 	'menu_order' => 0,
-	// 	'position' => 'normal',
-	// 	'style' => 'default',
-	// 	'label_placement' => 'top',
-	// 	'instruction_placement' => 'label',
-	// 	'hide_on_screen' => '',
-	// 	'active' => true,
-	// 	'description' => '',
-	// 	'show_in_rest' => 0,
-	// 	'display_title' => '',
-	// 	'allow_ai_access' => false,
-	// 	'ai_description' => '',
-	// 	'no_values_message' => '',
-	// ) );
+	acf_add_local_field_group( array(
+		'key' => 'group_68b37c50860b0',
+		'title' => 'Recast - Settings',
+		'fields' => array(
+			// array(
+			// 	'key' => 'listing-attributes-field-group-id',
+			// 	'label' => 'Listing Attributes - Field Group ID:',
+			// 	'name' => 'listing-attributes-field-group-id',
+			// 	'aria-label' => '',
+			// 	'type' => 'text',
+			// 	'instructions' => '',
+			// 	'required' => 0,
+			// 	'conditional_logic' => 0,
+			// 	'wrapper' => array(
+			// 		'width' => '100',
+			// 		'class' => '',
+			// 		'id' => '',
+			// 	),
+			// 	'default_value' => 'recast-listing-attributes',
+			// 	'min' => '',
+			// 	'max' => '',
+			// 	'allow_in_bindings' => 0,
+			// 	'placeholder' => '',
+			// 	'step' => '',
+			// 	'prepend' => '',
+			// 	'append' => '',
+			// ),
+			array(
+				'key' => 'field_68c56e4197be2',
+				'label' => 'Run Automations (Cron Jobs)',
+				'name' => 'run_automations',
+				'aria-label' => '',
+				'type' => 'true_false',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'message' => '',
+				'default_value' => 0,
+				'allow_in_bindings' => 0,
+				'ui' => 0,
+				'ui_on_text' => '',
+				'ui_off_text' => '',
+			),
+			array(
+				'key' => 'field_68b37c53386dc',
+				'label' => 'Cron - No Offer Expired Date (Minutes)',
+				'name' => 'cron_no_offer_expired_date',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => 3,
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68b37cd4386dd',
+				'label' => 'Cron - No Shipped Refund Date (Minutes)',
+				'name' => 'cron_no_shipped_refund_date',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => 14,
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68b37cd5386de',
+				'label' => 'Cron - No Dispute Completed Date (Minutes)',
+				'name' => 'cron_no_dispute_completed_date',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => 14,
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68c570427d944',
+				'label' => 'Cron - ? Missing One...',
+				'name' => 'cron_missing_one',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => 14,
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_690a2611641c9',
+				'label' => 'Minimum Offer Total',
+				'name' => 'minimum_offer_total',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => 'If a value is set, Offers will be adjusted if their total (including shipping) does not meet this amount.',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => 0,
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+		),
+		'location' => array(
+			array(
+				array(
+					'param' => 'options_page',
+					'operator' => '==',
+					'value' => 'recast-settings',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+		'display_title' => '',
+		'allow_ai_access' => false,
+		'ai_description' => '',
+		'no_values_message' => '',
+	) );
 
 	/* Add Recast Support Ticket field group */
-	
+
+
+	/* Add Recast - Listing Details field group */
+	acf_add_local_field_group( array(
+		'key' => 'recast-listing-details',
+		'title' => 'Recast - Listing Details',
+		'fields' => array(
+			array(
+				'key' => 'field_68c043d8de002',
+				'label' => 'Seller_ID',
+				'name' => 'seller_id',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '33',
+					'class' => 'acf-recast-hidden',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68d42a88bab0f',
+				'label' => 'Listing ID',
+				'name' => 'listing_id',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '33',
+					'class' => 'acf-recast-hidden',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68c571c677502',
+				'label' => 'Listed Date',
+				'name' => 'listed_date',
+				'aria-label' => '',
+				'type' => 'date_time_picker',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => 'acf-recast-hidden',
+					'id' => '',
+				),
+				'display_format' => 'F j, Y g:i a',
+				'return_format' => 'F j, Y g:i a',
+				'first_day' => 1,
+				'allow_in_bindings' => 0,
+				'default_to_current_date' => 0,
+			),
+			array(
+				'key' => 'field_68c571ee77503',
+				'label' => 'Order Date',
+				'name' => 'order_date',
+				'aria-label' => '',
+				'type' => 'date_time_picker',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '25',
+					'class' => 'acf-recast-hidden',
+					'id' => '',
+				),
+				'display_format' => 'F j, Y g:i a',
+				'return_format' => 'F j, Y g:i a',
+				'first_day' => 1,
+				'allow_in_bindings' => 0,
+				'default_to_current_date' => 0,
+			),
+			array(
+				'key' => 'field_688cf6d036b96',
+				'label' => 'Images',
+				'name' => 'images',
+				'aria-label' => '',
+				'type' => 'repeater',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '70',
+					'class' => 'float-right',
+					'id' => '',
+				),
+				'layout' => 'table',
+				'pagination' => 0,
+				'min' => 0,
+				'max' => 0,
+				'collapsed' => '',
+				'button_label' => 'Add Image',
+				'rows_per_page' => 20,
+				'sub_fields' => array(
+					array(
+						'key' => 'field_688cf6d736b97',
+						'label' => 'Image',
+						'name' => 'image',
+						'aria-label' => '',
+						'type' => 'image',
+						'instructions' => '',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '',
+							'class' => '',
+							'id' => '',
+						),
+						'return_format' => 'id',
+						'library' => 'all',
+						'min_width' => '',
+						'min_height' => '',
+						'min_size' => '',
+						'max_width' => '',
+						'max_height' => '',
+						'max_size' => '',
+						'mime_types' => '',
+						'allow_in_bindings' => 0,
+						'preview_size' => 'medium',
+						'parent_repeater' => 'field_688cf6d036b96',
+					),
+				),
+			),
+			array(
+				'key' => 'field_68964c94355ed',
+				'label' => 'Listing Price',
+				'name' => 'listing_price',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 1,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '30',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68e55d2432a2c',
+				'label' => 'Shipping Price',
+				'name' => 'shipping_price',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '30',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => '',
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => '',
+				'prepend' => '',
+				'append' => '',
+			),
+			array(
+				'key' => 'field_68eec29bf173c',
+				'label' => 'Description',
+				'name' => 'description',
+				'aria-label' => '',
+				'type' => 'textarea',
+				'instructions' => '',
+				'required' => false,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '100',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'new_lines' => '',
+				'maxlength' => '',
+				'placeholder' => '',
+				'rows' => '',
+			),	
+
+		),
+		'location' => array(
+			array(
+				array(
+					'param' => 'post_type',
+					'operator' => '==',
+					'value' => 'product',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+		'display_title' => '',
+		'allow_ai_access' => false,
+		'ai_description' => '',
+	) );
+
+	/* Add Recast - Listing Attributes field group */
+	acf_add_local_field_group( array(
+		'key' => 'recast-listing-attributes',
+		'title' => 'Recast - Listing Attributes',
+		'fields' => Recast_Settings_ListingAttributes_CreateFieldGroups(),
+		'location' => array(
+			array(
+				array(
+					'param' => 'post_type',
+					'operator' => '==',
+					'value' => 'product',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+		'display_title' => '',
+		'allow_ai_access' => false,
+		'ai_description' => '',
+	) );
 
 	/* Add Recast Emails field group */
 	acf_add_local_field_group( array(
@@ -397,7 +681,8 @@ function Recast_Settings_AddFieldGroups() {
 		'ai_description' => '',
 		'no_values_message' => '',
 	) );
-} add_action( 'acf/include_fields', 'Recast_Settings_AddFieldGroups' );
+} 
+add_action( 'acf/include_fields', 'Recast_Settings_AddFieldGroups' );
 
 function Recast_Settings_FAQ() {
 	global $recastVersion;
@@ -454,33 +739,36 @@ function Recast_Settings_FAQ() {
 function Recast_Settings_TechSupport_SubmitTicket( $post_id ) {
 	if( isset( $_GET['page'] ) ) { $page = $_GET['page']; }
 
-	extract( get_field('new_ticket', 'option' ) );
-	if( $post_id == 'options' && $page == 'recast-support' && $ticket_type != 'none' ) {
-		
+	$newTicket = get_field('new_ticket', 'option' );
+	if( $newTicket ) {
+		extract( $newTicket );
+		if( $post_id == 'options' && $page == 'recast-support' && $ticket_type != 'none' ) {
+			
 
-		$message = 'A new Support ticket has been created by '.get_bloginfo('name').'.<br><br>';
-		$message .= '<strong>Ticket Type</strong>: '. $ticket_type .'<br>';
-		$message .= '<strong>Ticket Subject</strong>: '. $ticket_subject .'<br>';
-		$message .= '<strong>Ticket Description</strong>: '. $ticket_description .'<br>';
-		$order = wc_get_order( $order_number );
-		if( !$order ) { $message .= '<strong>Order Number</strong>: '. $order_number .'<br>'; }
-		else { $message .= '<strong>Order Number</strong>: <a href="'.get_site_url().'/wp-admin/admin.php?page=wc-orders&action=edit&id='.$order_number.'">'. $order_number .'</a><br>'; }
+			$message = 'A new Support ticket has been created by '.get_bloginfo('name').'.<br><br>';
+			$message .= '<strong>Ticket Type</strong>: '. $ticket_type .'<br>';
+			$message .= '<strong>Ticket Subject</strong>: '. $ticket_subject .'<br>';
+			$message .= '<strong>Ticket Description</strong>: '. $ticket_description .'<br>';
+			$order = wc_get_order( $order_number );
+			if( !$order ) { $message .= '<strong>Order Number</strong>: '. $order_number .'<br>'; }
+			else { $message .= '<strong>Order Number</strong>: <a href="'.get_site_url().'/wp-admin/admin.php?page=wc-orders&action=edit&id='.$order_number.'">'. $order_number .'</a><br>'; }
 
-		/* Images */
-		$message .= '<strong>Images</strong>: <br>';
-		foreach( $images as $image ) { 
-			$message .= '<img style="max-width: 500px;" src="'. $image['image'] .'">';
-		 }
-		
-		$ticket_number = get_field( 'ticket_number', 'option' );
-		$ticket_number++;
-		
-		/* Send Ticket Email */
-		wp_mail( 'jason@leechdemon.com', 'Recast - New Ticket #' .$ticket_number, $message );
+			/* Images */
+			$message .= '<strong>Images</strong>: <br>';
+			foreach( $images as $image ) { 
+				$message .= '<img style="max-width: 500px;" src="'. $image['image'] .'">';
+			}
+			
+			$ticket_number = get_field( 'ticket_number', 'option' );
+			$ticket_number++;
+			
+			/* Send Ticket Email */
+			wp_mail( 'jason@leechdemon.com', 'Recast - New Ticket #' .$ticket_number, $message );
 
-		/* Reset Fields */
-		update_field( 'new_ticket', ['ticket_type' => 'none', 'ticket_subject' => '', 'ticket_description' => '', 'order_number' => '' , 'images' => '' ], 'option' );
-		update_field( 'ticket_number', $ticket_number, 'option' );
+			/* Reset Fields */
+			update_field( 'new_ticket', ['ticket_type' => 'none', 'ticket_subject' => '', 'ticket_description' => '', 'order_number' => '' , 'images' => '' ], 'option' );
+			update_field( 'ticket_number', $ticket_number, 'option' );
+		}
 	}
 } add_action('acf/save_post', 'Recast_Settings_TechSupport_SubmitTicket', 20);
 
@@ -494,3 +782,92 @@ function LD_Tools_HideMenus() {
 		// else { Test( 'LD Tools: '. $success ) }
 	}
 } add_action('admin_menu', 'LD_Tools_HideMenus');
+
+function Recast_Settings_ListingAttributes_CreateFieldGroups() {
+	$acf_taxonomies = acf_get_acf_taxonomies();
+	$fields = array();
+	$terms = get_terms( array( 'hide_empty' => false ) );
+	// Test( $terms );
+			
+	foreach ( $acf_taxonomies as $tax ) {		
+		$isProduct = false; 
+		foreach( $tax['object_type'] as $prodType ) {
+			if( $prodType == "product" ) { $isProduct = true; }
+		}		
+		
+		if( $tax['active'] && $isProduct ) {
+			// Test( $tax );
+			// Test('---');
+				
+			/* Select */
+			$choices = array();
+			$choices[0] = '-- Select '.$tax['title'].' --' ;
+			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+				foreach( $terms as $term ) {
+					if( $term->taxonomy == $tax['taxonomy'] ) {
+						$choices[ $term->slug ] = $term->name;
+					}
+				}
+			}
+			// Test( $choices );
+
+			
+			$field = array(
+				'key' => $tax['taxonomy'],
+				'label' => $tax['title'],
+				'name' => $tax['taxonomy'],
+				'aria-label' => '',
+				'type' => 'select',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '33',
+					'class' => '',
+					'id' => '',
+				),
+				'choices' => $choices,
+				'default_value' => false,
+				'return_format' => 'value',
+				'multiple' => 0,
+				'allow_null' => 0,
+				'allow_in_bindings' => 0,
+				'ui' => 0,
+				'ajax' => 0,
+				'placeholder' => '',
+				'create_options' => 0,
+				'save_options' => 0,
+			);
+
+
+			/* Text */
+			// $field = array(
+			// 	'key' => $tax['taxonomy'],
+			// 	'label' => $tax['title'],
+			// 	'name' => $tax['taxonomy'],
+			// 	'aria-label' => '',
+			// 	'type' => 'text',
+			// 	'instructions' => '',
+			// 	'required' => 0,
+			// 	'conditional_logic' => 0,
+			// 	'wrapper' => array(
+			// 		'width' => '33',
+			// 		'class' => '',
+			// 		'id' => '',
+			// 	),
+			// 	'default_value' => '',
+			// 	'min' => '',
+			// 	'max' => '',
+			// 	'allow_in_bindings' => 0,
+			// 	'placeholder' => '',
+			// 	'step' => '',
+			// 	'prepend' => '',
+			// 	'append' => '',
+			// );
+
+			array_push( $fields, $field );
+		}
+	}
+
+	return $fields;
+}
