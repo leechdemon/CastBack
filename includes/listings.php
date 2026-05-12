@@ -196,7 +196,7 @@ function Recast_Listings_editListing( $listing_id, $listingTemplate = null, $but
 						acf_form(array(
 							'form_attributes'   => array(
 								'method'	=>	'post',
-								'class'		=>	'acf-form',
+								'class'		=>	'acf-form '.get_post_status(),
 							),
 							'post_title'   => true,
 							'post_id'   => $listing_id,
