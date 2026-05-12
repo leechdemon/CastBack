@@ -257,6 +257,270 @@ function Recast_Settings_AddFieldGroups() {
 
 	/* Add Recast Support Ticket field group */
 
+	/* Add Recast "Taxonomy Settings" Option Page */
+	acf_add_options_page( array(
+		'page_title' => 'Recast Tax Settings',
+		'menu_slug' => 'recast-taxonomy-settings',
+		'parent_slug' => 'edit.php?post_type=product',
+		'position' => 2,
+		'redirect' => false,
+	) );
+
+	/* Add Recast Taxonomy Settings */
+	acf_add_local_field_group( array(
+		'key' => 'group_69ff79005eedb',
+		'title' => 'Recast - Taxonomy Settings',
+		'fields' => array(
+			array(
+				'key' => 'field_69ff7cc2e325f',
+				'label' => 'Taxonomies',
+				'name' => 'taxonomies',
+				'aria-label' => '',
+				'type' => 'repeater',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'layout' => 'block',
+				'pagination' => 0,
+				'min' => 0,
+				'max' => 0,
+				'collapsed' => '',
+				'button_label' => 'Add Row',
+				'rows_per_page' => 20,
+				'sub_fields' => array(
+					array(
+						'key' => 'field_69ff7d9a55e85',
+						'label' => 'Taxonomy Title',
+						'name' => 'taxonomy_title',
+						'aria-label' => '',
+						'type' => 'text',
+						'instructions' => '',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '25',
+							'class' => '',
+							'id' => '',
+						),
+						'default_value' => '',
+						'maxlength' => '',
+						'allow_in_bindings' => 0,
+						'placeholder' => '',
+						'prepend' => '',
+						'append' => '',
+						'parent_repeater' => 'field_69ff7cc2e325f',
+					),
+					array(
+						'key' => 'field_69ff7de98f1ff',
+						'label' => 'Settings',
+						'name' => '',
+						'aria-label' => '',
+						'type' => 'accordion',
+						'instructions' => '',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '',
+							'class' => '',
+							'id' => '',
+						),
+						'open' => 0,
+						'multi_expand' => 0,
+						'endpoint' => 0,
+						'parent_repeater' => 'field_69ff7cc2e325f',
+					),
+					array(
+						'key' => 'field_6a0209e248507',
+						'label' => 'Image',
+						'name' => 'image',
+						'aria-label' => '',
+						'type' => 'image',
+						'instructions' => '',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '25',
+							'class' => '',
+							'id' => '',
+						),
+						'return_format' => 'array',
+						'library' => 'all',
+						'min_width' => '',
+						'min_height' => '',
+						'min_size' => '',
+						'max_width' => '',
+						'max_height' => '',
+						'max_size' => '',
+						'mime_types' => '',
+						'allow_in_bindings' => 0,
+						'preview_size' => 'medium',
+						'parent_repeater' => 'field_69ff7cc2e325f',
+					),
+					array(
+						'key' => 'field_69ff7e3885c0c',
+						'label' => 'Taxonomy Type',
+						'name' => 'taxonomy_type',
+						'aria-label' => '',
+						'type' => 'radio',
+						'instructions' => '',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '23',
+							'class' => '',
+							'id' => '',
+						),
+						'choices' => array(
+							'select' => 'Select',
+							'checkbox' => 'Checkboxes',
+						),
+						'default_value' => '0',
+						'return_format' => 'value',
+						'allow_null' => 0,
+						'other_choice' => 0,
+						'allow_in_bindings' => 0,
+						'layout' => 'vertical',
+						'save_other_choice' => 0,
+						'parent_repeater' => 'field_69ff7cc2e325f',
+					),
+					array(
+						'key' => 'field_69ff7e5f6023f',
+						'label' => 'Hide Field If...',
+						'name' => 'hide_field_if',
+						'aria-label' => '',
+						'type' => 'text',
+						// 'instructions' => 'If this field is set, this field will be hidden if a matching CSS class name is found.<ul><li>Use commas to separate multiples</li><li>Do not incude the "."</li>',
+						'instructions' => 'Coming Soon...',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '25',
+							'class' => '',
+							'id' => '',
+						),
+						'default_value' => '',
+						'maxlength' => '',
+						'allow_in_bindings' => 0,
+						'placeholder' => '',
+						'prepend' => '',
+						'append' => '',
+						'parent_repeater' => 'field_69ff7cc2e325f',
+					),
+					array(
+						'key' => 'field_69ff7e5785c0d',
+						'label' => 'Show Field If',
+						'name' => 'show_field_if',
+						'aria-label' => '',
+						'type' => 'text',
+						// 'instructions' => 'If this field is set, this field will NOT be shown unless a matching CSS classname is found.<ul><li>Use commas to separate multiples</li><li>Do not incude the "."</li>',
+						'instructions' => 'Coming Soon...',
+						'required' => 0,
+						'conditional_logic' => 0,
+						'wrapper' => array(
+							'width' => '25',
+							'class' => '',
+							'id' => '',
+						),
+						'default_value' => '',
+						'maxlength' => '',
+						'allow_in_bindings' => 0,
+						'placeholder' => '',
+						'prepend' => '',
+						'append' => '',
+						'parent_repeater' => 'field_69ff7cc2e325f',
+					),
+				),
+			),
+		),
+		'location' => array(
+			array(
+				array(
+					'param' => 'options_page',
+					'operator' => '==',
+					'value' => 'recast-settings',
+				),
+			),
+			array(
+				array(
+					'param' => 'options_page',
+					'operator' => '==',
+					'value' => 'recast-taxonomy-settings',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+		'display_title' => '',
+		'allow_ai_access' => false,
+		'ai_description' => '',
+	) );
+
+	/* Add Recast Term Fields */
+	acf_add_local_field_group( array(
+		'key' => 'group_6a020bd05b9d2',
+		'title' => 'Recast - Term Fields',
+		'fields' => array(
+			array(
+				'key' => 'field_6a020bd13a0ed',
+				'label' => 'Term Image',
+				'name' => 'term_image',
+				'aria-label' => '',
+				'type' => 'image',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'return_format' => 'array',
+				'library' => 'all',
+				'min_width' => '',
+				'min_height' => '',
+				'min_size' => '',
+				'max_width' => '',
+				'max_height' => '',
+				'max_size' => '',
+				'mime_types' => '',
+				'allow_in_bindings' => 0,
+				'preview_size' => 'medium',
+			),
+		),
+		'location' => array(
+			array(
+				array(
+					'param' => 'taxonomy',
+					'operator' => '==',
+					'value' => 'all',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'high',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+		'display_title' => '',
+		'allow_ai_access' => false,
+		'ai_description' => '',
+	) );
 
 	/* Add Recast - Listing Details field group */
 	acf_add_local_field_group( array(
@@ -684,6 +948,37 @@ function Recast_Settings_AddFieldGroups() {
 } 
 add_action( 'acf/include_fields', 'Recast_Settings_AddFieldGroups' );
 
+function Recast_Settings_AddFieldGroups_PopulateTaxonomySettings() {
+	/* Create New Taxonomy Settings */
+	$acf_taxonomies = acf_get_acf_taxonomies();
+	foreach ( $acf_taxonomies as $tax ) {
+		$setTax = true;
+		$taxonomySettings = get_field( 'taxonomies', 'options' );
+		if( $taxonomySettings ) {
+			foreach( $taxonomySettings as $taxSet ) {
+				if( $taxSet['taxonomy_title'] == $tax['title'] ) {
+					$setTax = false;
+				}
+			}
+			if( $setTax ) {
+				add_row( 'taxonomies', array( 'taxonomy_title' => $tax['title'] ), 'options' );
+			}
+		}
+	}
+	/* Delete orphaned Taxonomy Settings */
+	foreach( get_field( 'taxonomies', 'options' ) as $taxonomySetting ) {
+		$matchFound = false;
+		foreach( acf_get_acf_taxonomies() as $row_index => $tax ) {
+			if( $taxonomySetting['taxonomy_title'] == $tax['title'] ) { $matchFound = true; }
+		}
+		if( !$matchFound ) { 
+			delete_row('taxonomies', $row_index, 'options');
+		 }
+	}
+
+	
+} add_action( 'acf/include_fields', 'Recast_Settings_AddFieldGroups_PopulateTaxonomySettings' );
+
 function Recast_Settings_FAQ() {
 	global $recastVersion;
 
@@ -787,21 +1082,15 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 	$acf_taxonomies = acf_get_acf_taxonomies();
 	$fields = array();
 	$terms = get_terms( array( 'hide_empty' => false ) );
-	// Test( $terms );
 			
 	foreach ( $acf_taxonomies as $tax ) {		
 		$isProduct = false; 
 		foreach( $tax['object_type'] as $prodType ) {
 			if( $prodType == "product" ) { $isProduct = true; }
-		}		
-		
+		}
+
 		if( $tax['active'] && $isProduct ) {
-			// Test( $tax );
-			// Test('---');
-				
-			/* Select */
 			$choices = array();
-			$choices[0] = '-- Select '.$tax['title'].' --' ;
 			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
 				foreach( $terms as $term ) {
 					if( $term->taxonomy == $tax['taxonomy'] ) {
@@ -809,18 +1098,55 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 					}
 				}
 			}
-			// Test( $choices );
 
-			
+			// $fieldType = 'select';
+			$conditionals = array('conditional_logic' => 0);
+			$taxonomySettings = get_field( 'taxonomies', 'options' );
+			foreach( $taxonomySettings as $taxSet ) {
+				if( $taxSet['taxonomy_title'] == $tax['title'] ) {
+					/* For each Tax Setting with a matching "title"... */
+					$fieldType = $taxSet['taxonomy_type'];
+					
+					// if( $taxSet['hide_if'] ) {
+					// } 
+
+
+					if( $taxSet['show_field_if'] ) {
+						// if(  ) {						
+						// foreach( $taxSet['show_field_if'] as $thisTaxSet ) {
+							if( has_term( $thisTaxSet ) ) {
+
+						// }
+								$conditionals = array(
+									'conditional_logic' => array(
+										// array(
+											array(
+												'field' => $thisTaxSet,
+												'operator' => '==',
+												'value' => $taxSet['show_field_if'],
+											),
+										// ),
+									),
+								);
+						// }
+
+						
+							}
+					} 
+						
+				}
+			}
+
 			$field = array(
 				'key' => $tax['taxonomy'],
 				'label' => $tax['title'],
 				'name' => $tax['taxonomy'],
 				'aria-label' => '',
-				'type' => 'select',
+				'type' => $fieldType,
 				'instructions' => '',
 				'required' => 0,
-				'conditional_logic' => 0,
+				// 'conditional_logic' => 0,
+				$conditionals,
 				'wrapper' => array(
 					'width' => '33',
 					'class' => '',
@@ -838,32 +1164,6 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 				'create_options' => 0,
 				'save_options' => 0,
 			);
-
-
-			/* Text */
-			// $field = array(
-			// 	'key' => $tax['taxonomy'],
-			// 	'label' => $tax['title'],
-			// 	'name' => $tax['taxonomy'],
-			// 	'aria-label' => '',
-			// 	'type' => 'text',
-			// 	'instructions' => '',
-			// 	'required' => 0,
-			// 	'conditional_logic' => 0,
-			// 	'wrapper' => array(
-			// 		'width' => '33',
-			// 		'class' => '',
-			// 		'id' => '',
-			// 	),
-			// 	'default_value' => '',
-			// 	'min' => '',
-			// 	'max' => '',
-			// 	'allow_in_bindings' => 0,
-			// 	'placeholder' => '',
-			// 	'step' => '',
-			// 	'prepend' => '',
-			// 	'append' => '',
-			// );
 
 			array_push( $fields, $field );
 		}

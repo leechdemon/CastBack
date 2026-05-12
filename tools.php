@@ -280,7 +280,7 @@ function Recast_userIsStripeConnected( $user_id = null ) {
 		// Test( $dokan_settings['profile_completion']['progress'] );
 		
 		// return true;
-		if( isset( $dokan_settings['profile_completion']['progress'] ) && $dokan_settings['profile_completion']['progress'] > 30 ) {
+		if( isset( $dokan_settings['profile_completion']['progress'] ) && $dokan_settings['profile_completion']['progress'] >= 30 ) {
 			return true;
 		} else {
 			return false;
@@ -354,6 +354,18 @@ function Recast_vendorRegistrationPrompt( $url = null ) {
 	$output .= '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem; border: solid 2px; border-radius: 0.5rem;">';
 	$output .= '<h5>Please complete Vendor Registration.</h5>';
 	$output .= '<a href="/about/why-register/" class="recast-button" target="_blank">Why Register?</a>';
+	$output .= '<a href="'.$url.'" class="recast-button recast-button-important" target="_blank">'.$label.'</a>';
+	$output .= '</div>';
+
+	return $output;
+}
+function Recast_userAddressPrompt() {
+	$label = 'Update Address';
+	$url = '/my-account/edit-address/';	
+	$output = "";
+	$output .= '<div style="width: 100%; text-align: center; padding: 1rem 0.5rem; border: solid 2px; border-radius: 0.5rem;">';
+	$output .= '<h5>Please update your billing and/or shipping address to continue.</h5>';
+	// $output .= '<a href="/about/why-register/" class="recast-button" target="_blank">Why Register?</a>';
 	$output .= '<a href="'.$url.'" class="recast-button recast-button-important" target="_blank">'.$label.'</a>';
 	$output .= '</div>';
 

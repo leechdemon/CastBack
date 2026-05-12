@@ -374,6 +374,7 @@ function Recast_Action_refreshListing( listing_id, data ) {
 	}
 }
 function Recast_Action_dimListing() {
-	document.getElementById('Recast-EditListing_Details' ).style.opacity = "0.5";
-	document.getElementById('Recast-EditListing_Attributes' ).style.opacity = "0.5";
+// 	document.getElementById('Recast-EditListing_Details' ).style.opacity = "0.5";
+// 	document.getElementById('Recast-EditListing_Attributes' ).style.opacity = "0.5";
+	document.getElementById('Recast-EditListing' ).style.opacity = "0.5";
 }

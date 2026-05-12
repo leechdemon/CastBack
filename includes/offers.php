@@ -132,85 +132,87 @@ function Recast_Offers_orderStatus_determine( $order_id, $user_id, $removeDisput
 			}
 				
 			/* Process Automations */
-			extract( get_field( 'automations', 'options' ) );
+			$options = get_field( 'automations', 'options' );
+			if( $options ) {
+				extract( $options );
+				if( $acceptedDate && !$payment_date && !$completedDate ) { /* If Order Conditions are met... */
+					if( $autocancelunpaidorder['enabled'] ) { /* If the Automation is enabled... */
+						$delayInSeconds = 86400 * $autocancelunpaidorder['days'];
 
-			if( $acceptedDate && !$payment_date && !$completedDate ) { /* If Order Conditions are met... */
-				if( $autocancelunpaidorder['enabled'] ) { /* If the Automation is enabled... */
-					$delayInSeconds = 86400 * $autocancelunpaidorder['days'];
-
-					if( $acceptedDate + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
-						$order->update_status('wc-cancelled');
-						update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
-						
-						Recast_sendEmailNotification( $order_id, 'Recast_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
-						Recast_sendEmailNotification( $order_id, 'Recast_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
-						
-						$note_text = '($'.end($offers)['offer_amount'].' offer cancelled)';
-						// $note_text = 'Offer cancelled. offer submitted by ' .get_userdata( $recipient_id )->display_name. '.';
-						$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocancelUnpaidOrder().'  );
-					}
-				}
-			}
-			if( $shippedDate && !$completedDate) { /* If Order Conditions are met... */
-				if( $autocompleteshippedorder['enabled'] ) { /* If the Automation is enabled... */
-					$delayInSeconds = 86400 * $autocompleteshippedorder['days'];
-					
-					if( $shippedDate + $delayInSeconds < $current_date ) {
-						Recast_sendEmailNotification( $order_id, 'Recast_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
-						
-						$order->update_status('wc-completed');
-						update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
-						
-						// Recast_sendEmailNotification( $order_id, 'Recast-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
-						// Recast_sendEmailNotification( $order_id, 'Recast-completeOrder-seller', get_field( 'seller_id', $order_id ) );
-		
-						$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocompleteShippedOrder().'  );
-					}
-				}
-			}
-			if( $payment_date && !$shippedDate ) { /* If Order Conditions are met... */
-				if( $autorefundunshippedorder['enabled'] ) { /* If the Automation is enabled... */
-					$delayInSeconds = 86400 * $autorefundunshippedorder['days'];
-				
-					if( $payment_date + $delayInSeconds < $current_date ) {
-						// $order->update_status('wc-cancelled');
-						
-						// Check if the order is already fully refunded
-						// if ($order->get_status() === 'refunded') {
-								// return new WP_Error('already_refunded', 'Order is already fully refunded.');
-						// }
-						
-						$refund_args = array(
-								'amount'         => $order->get_total(),
-								'reason'         => 'autorefundUnshippedOrder',
-								'order_id'       => $order_id,
-								// 'line_items'     => array(), // Use this to specify partial item refunds
-								'refund_payment' => true,    // Set to true to process refund via payment gateway
-								// 'restock_items'  => true,    // Set to true to restock items
-						);
-
-						$refund = wc_create_refund( $refund_args );
-						
-						// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
-								
-						Recast_sendEmailNotification( $order_id, 'Recast_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
-						Recast_sendEmailNotification( $order_id, 'Recast_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
-
-						$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autorefundUnshippedOrder().'  );
-					}
-				}
-			}
-			if( $offers && !$acceptedDate ) { /* If Order Conditions are met... */
-				if( $autocancelexpiredoffer['enabled'] ) { /* If the Automation is enabled... */
-					$offer = end($offers);
-					if( $offer['offer_expired_date'] == '' ) {
-						$delayInSeconds = 86400 * $autocancelexpiredoffer['days'];
-						
-						if( strtotime( $offer['offer_date'] ) + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
-							$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocancelExpiredOffer().'  );
+						if( $acceptedDate + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
+							$order->update_status('wc-cancelled');
+							update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
 							
-							update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
-							$success = Recast_Action_expireOffer( $order_id, $user_id );
+							Recast_sendEmailNotification( $order_id, 'Recast_autocancelUnpaidOrder_buyer', get_field( 'customer_id', $order_id ) );
+							Recast_sendEmailNotification( $order_id, 'Recast_autocancelUnpaidOrder_seller', get_field( 'seller_id', $order_id ) );
+							
+							$note_text = '($'.end($offers)['offer_amount'].' offer cancelled)';
+							// $note_text = 'Offer cancelled. offer submitted by ' .get_userdata( $recipient_id )->display_name. '.';
+							$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocancelUnpaidOrder().'  );
+						}
+					}
+				}
+				if( $shippedDate && !$completedDate) { /* If Order Conditions are met... */
+					if( $autocompleteshippedorder['enabled'] ) { /* If the Automation is enabled... */
+						$delayInSeconds = 86400 * $autocompleteshippedorder['days'];
+						
+						if( $shippedDate + $delayInSeconds < $current_date ) {
+							Recast_sendEmailNotification( $order_id, 'Recast_autocompleteShippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+							
+							$order->update_status('wc-completed');
+							update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+							
+							// Recast_sendEmailNotification( $order_id, 'Recast-completeOrder-buyer', get_field( 'customer_id', $order_id ) );
+							// Recast_sendEmailNotification( $order_id, 'Recast-completeOrder-seller', get_field( 'seller_id', $order_id ) );
+			
+							$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocompleteShippedOrder().'  );
+						}
+					}
+				}
+				if( $payment_date && !$shippedDate ) { /* If Order Conditions are met... */
+					if( $autorefundunshippedorder['enabled'] ) { /* If the Automation is enabled... */
+						$delayInSeconds = 86400 * $autorefundunshippedorder['days'];
+					
+						if( $payment_date + $delayInSeconds < $current_date ) {
+							// $order->update_status('wc-cancelled');
+							
+							// Check if the order is already fully refunded
+							// if ($order->get_status() === 'refunded') {
+									// return new WP_Error('already_refunded', 'Order is already fully refunded.');
+							// }
+							
+							$refund_args = array(
+									'amount'         => $order->get_total(),
+									'reason'         => 'autorefundUnshippedOrder',
+									'order_id'       => $order_id,
+									// 'line_items'     => array(), // Use this to specify partial item refunds
+									'refund_payment' => true,    // Set to true to process refund via payment gateway
+									// 'restock_items'  => true,    // Set to true to restock items
+							);
+
+							$refund = wc_create_refund( $refund_args );
+							
+							// update_field( 'completed_date', wp_date('F j, Y g:i:s a' ), $order_id );
+									
+							Recast_sendEmailNotification( $order_id, 'Recast_autorefundUnshippedOrder_buyer', get_field( 'customer_id', $order_id ) );
+							Recast_sendEmailNotification( $order_id, 'Recast_autorefundUnshippedOrder_seller', get_field( 'seller_id', $order_id ) );
+
+							$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autorefundUnshippedOrder().'  );
+						}
+					}
+				}
+				if( $offers && !$acceptedDate ) { /* If Order Conditions are met... */
+					if( $autocancelexpiredoffer['enabled'] ) { /* If the Automation is enabled... */
+						$offer = end($offers);
+						if( $offer['offer_expired_date'] == '' ) {
+							$delayInSeconds = 86400 * $autocancelexpiredoffer['days'];
+							
+							if( strtotime( $offer['offer_date'] ) + $delayInSeconds < $current_date ) { /* If the Automation Criteria are met... */
+								$order->add_order_note( 'Recast_Offers_orderStatus_determine(): autocancelExpiredOffer().'  );
+								
+								update_field( 'waiting_on', get_field( 'customer_id', $order_id ), $order_id );
+								$success = Recast_Action_expireOffer( $order_id, $user_id );
+							}
 						}
 					}
 				}
@@ -303,7 +305,10 @@ function Recast_Offers_ViewOrderActionButtons( $order_id = null, $AJAX = false )
 		/* Accept / Submit Offer */
 		if( $orderStatus == 'checkout-draft' ) {		
 			$reason = Recast_userCanPurchase( get_current_user_id() );
-			if( $reason !== true ) { return $reason; }
+			if( $reason !== true ) {
+				if( $reason == 'shipping' ) { echo Recast_userAddressPrompt(); }
+				else { return $reason; }
+			}
 			else {
 				$offers = get_field( 'offers', $order_id );
 				if( $user_id == $waitingOn ) {

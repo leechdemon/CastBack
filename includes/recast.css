@@ -89,7 +89,8 @@
 /* .recast-order, .recast-listing .listing-details .e-con-inner { display: block; } */
 
 #acf-form input.acf-button { margin: 1rem; }
-#acf-form { background-color: var(--e-global-color-primary); }
+#acf-form.publish { background-color: var(--e-global-color-primary); }
+#acf-form { background-color: #888; }
 /* #acf-form .acf-label label { color: white; } */
 #acf-form a.acf-button { color: var(--e-global-color-01b2f71); }
 .offer_history, .order_history { display: flex; flex-direction: column; border: solid 1px black; float: right; margin-top: 1rem; }
