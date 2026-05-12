@@ -88,6 +88,7 @@
 /* .e-con-full .e-flex:has(> .listing-details) { flex-direction: row; } */
 /* .recast-order, .recast-listing .listing-details .e-con-inner { display: block; } */
 
+.recast_conditionalField { float: right; }
 #acf-form input.acf-button { margin: 1rem; }
 #acf-form.publish { background-color: var(--e-global-color-primary); }
 #acf-form { background-color: #888; }

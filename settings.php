@@ -1084,7 +1084,7 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 	$terms = get_terms( array( 'hide_empty' => false ) );
 			
 	foreach ( $acf_taxonomies as $tax ) {		
-		$isProduct = false; 
+		$isProduct = false;
 		foreach( $tax['object_type'] as $prodType ) {
 			if( $prodType == "product" ) { $isProduct = true; }
 		}
@@ -1095,43 +1095,61 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 				foreach( $terms as $term ) {
 					if( $term->taxonomy == $tax['taxonomy'] ) {
 						$choices[ $term->slug ] = $term->name;
+
+
+						
 					}
 				}
 			}
 
-			// $fieldType = 'select';
 			$conditionals = array('conditional_logic' => 0);
 			$taxonomySettings = get_field( 'taxonomies', 'options' );
 			foreach( $taxonomySettings as $taxSet ) {
 				if( $taxSet['taxonomy_title'] == $tax['title'] ) {
+
 					/* For each Tax Setting with a matching "title"... */
 					$fieldType = $taxSet['taxonomy_type'];
+					$conditionals = array();
 					
-					// if( $taxSet['hide_if'] ) {
+					/* If this Taxonomy has a Setting with "Hide Field If"... */
+					// if( $taxSet['hide_field_if'] ) {
+					// 	$hideFields = explode( ',', $taxSet['hide_field_if'] );
+					// 	foreach( $hideFields as $hideField ) {
+ 					// 		$hideField = trim( $hideField );
+							
+					// 		/* Find the correct Taxonomy for our hideField Term */
+					// 		foreach ( $terms as $thisTerm ) {
+					// 			if( $thisTerm->slug == $hideField ) { $term = $thisTerm; }
+					// 			$condition = array(
+					// 				'field' => $term->taxonomy,
+					// 				'operator' => '==',
+					// 				'value' => $hideField,
+					// 			);
+					// 			array_push( $conditionals, $condition );
+					// 		}
+
+					// 	}
 					// } 
 
 
+					/* If this Taxonomy has a Setting with "Show Field If"... */
 					if( $taxSet['show_field_if'] ) {
-						// if(  ) {						
-						// foreach( $taxSet['show_field_if'] as $thisTaxSet ) {
-							if( has_term( $thisTaxSet ) ) {
-
-						// }
-								$conditionals = array(
-									'conditional_logic' => array(
-										// array(
-											array(
-												'field' => $thisTaxSet,
-												'operator' => '==',
-												'value' => $taxSet['show_field_if'],
-											),
-										// ),
-									),
+						$showFields = explode( ',', $taxSet['show_field_if'] );
+						foreach( $showFields as $showField ) {
+ 							$showField = trim( $showField );
+							
+							/* Find the correct Taxonomy for our showField Term */
+							foreach ( $terms as $thisTerm ) {
+								if( $thisTerm->slug == $showField ) { $term = $thisTerm; }
+								$condition = array(
+									'field' => $term->taxonomy,
+									'operator' => '==',
+									'value' => $showField,
 								);
-						// }
-
-						
+								array_push( $conditionals, $condition );
 							}
+
+						}
 					} 
 						
 				}
@@ -1145,11 +1163,10 @@ function Recast_Settings_ListingAttributes_CreateFieldGroups() {
 				'type' => $fieldType,
 				'instructions' => '',
 				'required' => 0,
-				// 'conditional_logic' => 0,
-				$conditionals,
+				'conditional_logic' => $conditionals,
 				'wrapper' => array(
 					'width' => '33',
-					'class' => '',
+					'class' => 'recast_conditionalField',
 					'id' => '',
 				),
 				'choices' => $choices,
